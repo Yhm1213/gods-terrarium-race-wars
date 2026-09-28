@@ -39,10 +39,32 @@
 | **`qa-guardian`** | 自动化测试体系、九大极端守门断言实现 | `tests/core/`<br/>`tests/guardrails/` | 1. 负责 TC-EDGE-01 ~ 09 代码级硬断言编写；<br/>2. 极速无头 Node 环境运行，单用例执行 $<2\text{ms}$。 |
 | **`reviewer-architect`** | 静态代码审查、架构分层合规性与零 GC 巡检 | 全局审查 | 1. 审查 ESLint 与 dependency-cruiser 扫描结果；<br/>2. 发现任何热路径临时对象分配立即亮红灯阻断合入。 |
 
-### 1.2 任务包派发与并发协作规则
-1. **拓扑排序驱动**：主控 Agent 严格按照 WBS v1.1 的依赖拓扑链条派发。例如在 M0 任务（`SpatialHash`, `DomainEventBus`）未完成前，严禁分派依赖其接口的 `CombatSystem`。
-2. **接口先行契约 (Contract-First)**：所有子 Agent 编写代码时，必须且只能引用 `TDS v1.1` 中已裁决的常量、偏移量、方法签名与事件枚举。严禁子 Agent 之间通过口头商定私自引入未经 TDS 批准的数据结构。
-3. **隔离开发与测试先行**：每个开发子 Agent 领取任务包后，**必须同步交付该模块的单元测试文件**。未包含单测的代码视为未完工，主控 Agent 拒绝接收。
+### 1.2 任务包派发与阶段契约先行动态规则 (Phase Contract & Dispatch Protocol)
+1. **阶段契约发布前置门禁 (Pre-Dispatch Contract Gate - Step 0)**：
+   - 在任何里程碑 (M0~M4) 动工派发任务包之前，主控总指挥 (Lead Orchestrator) **必须首先编制并发布本阶段的《系统技术详细设计与数据契约说明书》(docs/mX_detailed_technical_design_and_data_contracts.md)**；
+   - 该说明书必须穷尽：子 Agent 必读文档专册清单、连续内存 TypedArray 布局与步长偏移、模块接口与方法签名、有限状态机与数学偏微分公式、领域事件载荷格式、DoD 与守门断言；
+   - **未发布本阶段独立契约说明书前，严禁向任何子 Agent 分派任务包！**
+2. **任务包派发三要素绑定 (Three-Element Package Dispatch)**：
+   - 派发任务包时，主控 Agent 必须向承接子 Agent 同时送达：
+     ① WBS 任务包编号（如 `WP-2.1.1`）；
+     ② 本阶段《系统技术详细设计与数据契约说明书》对应章节；
+     ③ GDD / SRS / TDS / QA 宪法对应专册索引。
+3. **拓扑排序驱动**：主控 Agent 严格按照 WBS v1.1 的依赖拓扑链条派发。例如在 M0 任务（`SpatialHash`, `DomainEventBus`）未完成前，严禁分派依赖其接口的 `CombatSystem`。
+4. **接口先行契约 (Contract-First)**：所有子 Agent 编写代码时，必须且只能引用《阶段系统技术详细设计与数据契约说明书》及 `TDS v1.1` 中已裁决的常量、偏移量、方法签名与事件枚举。严禁子 Agent 之间通过口头商定私自引入未经批准的数据结构。
+5. **隔离开发与测试先行**：每个开发子 Agent 领取任务包后，**必须同步交付该模块的单元测试文件**。未包含单测的代码视为未完工，主控 Agent 拒绝接收。
+
+### 1.3 母 Agent 定位铁律与缺陷工单定向打回机制 (PM Role & Defect Return Protocol)
+1. **母 Agent (Lead Orchestrator / PM) 角色纯粹性**：
+   - 母 Agent 严格恪守**项目经理 (PM) 与总调度**角色；
+   - 职责边界：甘特图排期编排、WBS 任务包分派、阶段契约说明书发布、跨子 Agent 进度调度、质量门禁裁决、组织过程资产（《经验教训登记册》）维护；
+   - **红线底线：严禁母 Agent 亲自下场编写、修改或重构任何业务生产代码**！所有业务实现、算法推演与代码缺陷修复必须 100% 交由专属子 Agent 完成，彻底杜绝母 Agent 上下文被语法与细节实现污染。
+2. **代码所有权与缺陷工单定向打回机制 (Code Ownership & Rectification Protocol)**：
+   - 遵循“**谁编写谁负责，谁交付谁修复**”的责任溯源机制；
+   - 在单元测试飘红、质量守门报警或 Tier 2 专家联合会审【要求整改】时：
+     - 母 Agent 整理《缺陷整改工单》(Rectification Work Order)；
+     - 准确标明缺陷等级（P0/P1/P2）、出错文件、违背的契约条款与整改要求；
+     - **定向打回给原作者子 Agent（如 `coder-rendering` 或 `coder-systems`）进行闭环修复**；
+     - 原作者修复并自测绿灯后，重新提交交付汇报，再由 `qa-guardian` 与 `reviewer-architect` 重新复验！
 
 ---
 
