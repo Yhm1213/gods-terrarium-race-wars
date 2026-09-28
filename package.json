@@ -1,0 +1,24 @@
+{
+  "name": "gods-terrarium-race-wars",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "God's Terrarium: Race Wars - 2D Pixel God Simulator & Auto-Battler",
+  "scripts": {
+    "start": "python3 -m http.server 3000",
+    "serve": "node server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "game",
+    "pixel-art",
+    "god-simulator",
+    "auto-battler"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "vitest": "^5.0.2"
+  }
+}
