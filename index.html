@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《神之蛐蛐缸：万族争霸》 - Milestone 2 宏观生态与全真领域视窗</title>
+  <title>《神之蛐蛐缸：万族争霸》 - Milestone 4 终极总装端到端全真视窗</title>
   <style>
     /* ==========================================
        像素复古深色控制台主题 (Dark Retro Pixel UI)
@@ -40,24 +40,24 @@
       overflow-x: hidden;
     }
 
-    /* 顶部导航控制台 */
+    /* 顶部导航主控台 */
     header {
       background: var(--panel-bg);
       border-bottom: 2px solid var(--card-border);
-      padding: 10px 20px;
+      padding: 8px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      z-index: 10;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+      z-index: 100;
     }
 
     .brand-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .game-title {
@@ -80,21 +80,21 @@
       text-transform: uppercase;
     }
 
-    /* 仪表盘快报区 */
+    /* 遥测快报区 */
     .telemetry-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
     }
 
     .telemetry-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: var(--card-bg);
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 4px;
       border: 1px solid var(--card-border);
     }
@@ -103,21 +103,21 @@
     .fps-mid  { color: var(--accent-amber); font-weight: bold; }
     .fps-low  { color: var(--accent-rose); font-weight: bold; }
 
-    /* 倍速控制按钮组 */
+    /* 时间法则倍速控制按钮组 */
     .controls-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     .btn {
       background: var(--card-bg);
       color: var(--text-main);
       border: 1px solid var(--card-border);
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       transition: all 0.15s ease;
       display: inline-flex;
@@ -191,12 +191,96 @@
       box-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
     }
 
+    /* 顶部神恩池与狂欢控制 */
+    .fervor-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #101626;
+      border: 1px solid #253354;
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    .fervor-label {
+      font-size: 0.72rem;
+      color: #ffd700;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .fervor-bar-wrap {
+      width: 110px;
+      height: 8px;
+      background: #090d18;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    .fervor-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #ffd700);
+      width: 30%;
+      transition: width 0.2s ease;
+    }
+
+    .btn-overdrive {
+      background: #271d0e;
+      color: #fbbf24;
+      border: 1px solid #78350f;
+      font-weight: bold;
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-overdrive:hover {
+      background: #451a03;
+      border-color: #d97706;
+    }
+    .btn-overdrive.ready {
+      background: linear-gradient(135deg, #b45309, #fbbf24);
+      color: #ffffff;
+      border-color: #ffd700;
+      box-shadow: 0 0 14px rgba(255, 215, 0, 0.7);
+      animation: pulse-gold 1.2s infinite;
+    }
+    .btn-overdrive.active {
+      background: linear-gradient(135deg, #dc2626, #f59e0b);
+      color: #ffffff;
+      border-color: #ffffff;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
+    }
+    @keyframes pulse-gold {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
+      50% { transform: scale(1.04); box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+    }
+
+    /* 音频控制区 */
+    .audio-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .audio-group input[type="range"] {
+      width: 60px;
+      height: 4px;
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+
     /* 主布局容器 */
     main {
       flex: 1;
       display: flex;
-      padding: 16px;
-      gap: 16px;
+      padding: 12px 16px;
+      gap: 14px;
       max-width: 1920px;
       margin: 0 auto;
       width: 100%;
@@ -208,7 +292,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       min-width: 0;
     }
 
@@ -224,8 +308,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background-image: 
-        radial-gradient(circle at center, rgba(16, 24, 40, 0.4) 0%, rgba(0, 0, 0, 0.9) 100%);
+      background-image: radial-gradient(circle at center, rgba(16, 24, 40, 0.4) 0%, rgba(0, 0, 0, 0.9) 100%);
     }
 
     /* 保证像素绝对锐利 pixelated */
@@ -241,26 +324,176 @@
       image-rendering: crisp-edges;
       cursor: crosshair;
     }
+    canvas#gameCanvas.grab-cursor {
+      cursor: grab;
+    }
+    canvas#gameCanvas.grabbing-cursor {
+      cursor: grabbing;
+    }
+    canvas#gameCanvas.aim-cursor {
+      cursor: cell;
+    }
+
+    /* 全屏狂欢金色滤镜外框 (CSS 辉光叠合) */
+    .overdrive-screen-fx {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 4px solid #ffd700;
+      box-shadow: inset 0 0 45px rgba(255, 215, 0, 0.5);
+      z-index: 30;
+      animation: pulse-overdrive 1.0s infinite alternate;
+      display: none;
+    }
+    @keyframes pulse-overdrive {
+      0% { border-color: rgba(255, 215, 0, 0.6); box-shadow: inset 0 0 30px rgba(255, 215, 0, 0.3); }
+      100% { border-color: rgba(255, 240, 100, 1.0); box-shadow: inset 0 0 65px rgba(255, 215, 0, 0.6); }
+    }
+
+    /* 智能导播画中画视窗 (PiP) */
+    .pip-container {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 160px;
+      height: 120px;
+      border: 2px solid #ef4444;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 12px rgba(239, 68, 68, 0.4);
+      background: #0f172a;
+      z-index: 40;
+      cursor: pointer;
+      transition: opacity 0.3s ease, transform 0.2s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .pip-container:hover {
+      transform: scale(1.05);
+      border-color: #f87171;
+    }
+    .pip-canvas {
+      width: 160px;
+      height: 120px;
+      display: block;
+      image-rendering: pixelated;
+    }
+    .pip-badge {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      right: 2px;
+      font-size: 0.62rem;
+      color: #e2e8f0;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 2px;
+      padding: 1px 4px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* 六大上帝神迹玩具抽屉栏 */
+    .miracle-toolbar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      background: var(--panel-bg);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      width: 100%;
+      max-width: 1344px;
+    }
+
+    .miracle-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: 6px 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .miracle-card:hover {
+      background: #25314f;
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    .miracle-card.selected {
+      border-color: #ffd700;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+      background: #2a2412;
+    }
+
+    .miracle-card.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+    }
+
+    .miracle-icon {
+      font-size: 1.25rem;
+    }
+
+    .miracle-name {
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .miracle-meta {
+      font-size: 0.64rem;
+      color: var(--accent-gold);
+      font-family: ui-monospace, monospace;
+    }
+
+    .miracle-cd-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      font-family: ui-monospace, monospace;
+      pointer-events: none;
+    }
 
     /* 快捷切换栏 */
     .viewport-toolbar {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       background: var(--panel-bg);
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 6px;
       border: 1px solid var(--card-border);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      width: 100%;
+      max-width: 1344px;
     }
 
     .toggle-chip {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       cursor: pointer;
-      padding: 3px 8px;
+      padding: 3px 7px;
       border-radius: 4px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -276,10 +509,10 @@
 
     /* 侧边信息与调试面板 */
     .sidebar {
-      width: 420px;
+      width: 440px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       flex-shrink: 0;
     }
 
@@ -287,46 +520,46 @@
       background: var(--panel-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     .card-title {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: #cbd5e1;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 6px;
+      padding-bottom: 5px;
     }
 
     /* 状态统计格栅 */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
     .stat-box {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 4px;
-      padding: 8px;
+      padding: 6px 8px;
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
     }
 
     .stat-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-dim);
     }
 
     .stat-value {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       font-family: ui-monospace, monospace;
     }
@@ -334,10 +567,10 @@
     /* 阶级条形图 */
     .caste-bar-container {
       display: flex;
-      height: 12px;
-      border-radius: 4px;
+      height: 10px;
+      border-radius: 3px;
       overflow: hidden;
-      margin: 8px 0;
+      margin: 6px 0;
       background: #0f172a;
       border: 1px solid var(--card-border);
     }
@@ -350,15 +583,15 @@
     .caste-stats-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      font-size: 0.7rem;
+      gap: 4px;
+      font-size: 0.68rem;
       text-align: center;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .caste-stat-cell {
       background: var(--card-bg);
-      padding: 4px 6px;
+      padding: 3px 4px;
       border-radius: 4px;
       border: 1px solid var(--card-border);
     }
@@ -367,14 +600,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      margin-bottom: 2px;
+      gap: 3px;
+      margin-bottom: 1px;
       font-weight: bold;
     }
 
     .caste-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 1px;
     }
 
@@ -382,8 +615,8 @@
     .organ-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      font-size: 0.7rem;
+      gap: 5px;
+      font-size: 0.68rem;
     }
 
     .organ-chip {
@@ -412,41 +645,86 @@
     .action-btn-group {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
     .action-btn-group .btn {
       justify-content: center;
-      padding: 8px 10px;
-      font-size: 0.78rem;
+      padding: 6px 8px;
+      font-size: 0.74rem;
     }
 
-    /* 种族色彩图例微缩列表 */
-    .race-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      font-size: 0.7rem;
-      max-height: 120px;
+    /* 矮人要塞三声道战报流 */
+    .narrative-stream-box {
+      background: #080c14;
+      border: 1px solid #1e293b;
+      border-radius: 4px;
+      padding: 6px 8px;
+      height: 180px;
       overflow-y: auto;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .race-tag {
+    .narrative-card {
+      background: #111827;
+      border-left: 3px solid #38bdf8;
+      padding: 4px 6px;
+      border-radius: 0 4px 4px 0;
+      line-height: 1.35;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .narrative-header {
       display: flex;
       align-items: center;
-      gap: 5px;
-      background: var(--card-bg);
-      padding: 3px 6px;
-      border-radius: 3px;
-      border: 1px solid var(--card-border);
-      color: #94a3b8;
+      justify-content: space-between;
+      margin-bottom: 2px;
     }
 
-    .race-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 1px;
-      flex-shrink: 0;
+    .narrative-voice-tag {
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-size: 0.62rem;
+    }
+
+    .tag-voice-anatomist {
+      background: rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+      border-left-color: #94a3b8;
+    }
+
+    .tag-voice-bard {
+      background: rgba(192, 132, 252, 0.2);
+      color: #c084fc;
+      border-left-color: #c084fc;
+    }
+
+    .tag-voice-auditor {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+      border-left-color: #f59e0b;
+    }
+
+    .btn-receipt-inspect {
+      background: #27272a;
+      color: #e4e4e7;
+      border: 1px solid #52525b;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 0.62rem;
+      cursor: pointer;
+    }
+    .btn-receipt-inspect:hover {
+      background: #3f3f46;
+      border-color: #ffd700;
+      color: #ffd700;
     }
 
     /* 实时事件日志跑马灯 */
@@ -454,19 +732,19 @@
       background: #090c15;
       border: 1px solid #1e263d;
       border-radius: 4px;
-      padding: 8px;
-      height: 150px;
+      padding: 6px;
+      height: 120px;
       overflow-y: auto;
       font-family: ui-monospace, Consolas, monospace;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
 
     .log-entry {
       color: #94a3b8;
-      line-height: 1.35;
+      line-height: 1.3;
       word-break: break-all;
     }
     .log-entry.warn   { color: #fbbf24; }
@@ -479,22 +757,22 @@
     /* 实体属性检视器 */
     .inspector-content {
       font-family: ui-monospace, monospace;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #93c5fd;
-      line-height: 1.5;
+      line-height: 1.45;
       background: var(--card-bg);
-      padding: 10px;
+      padding: 8px 10px;
       border-radius: 4px;
       border: 1px solid var(--card-border);
-      min-height: 90px;
+      min-height: 80px;
     }
 
     /* M3 战争与政治看板样式 */
     .faction-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      max-height: 240px;
+      gap: 5px;
+      max-height: 180px;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -503,23 +781,17 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 4px;
-      padding: 6px 8px;
+      padding: 5px 8px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-
-    .faction-row.at-war {
-      border-color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
+      gap: 3px;
     }
 
     .faction-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
     }
 
     .faction-badge {
@@ -530,14 +802,14 @@
     }
 
     .faction-color-dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 2px;
     }
 
     .war-status-tag {
       font-size: 0.65rem;
-      padding: 1px 6px;
+      padding: 1px 5px;
       border-radius: 3px;
       font-weight: 600;
     }
@@ -546,18 +818,6 @@
       background: rgba(16, 185, 129, 0.15);
       color: #10b981;
       border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .tag-friction {
-      background: rgba(245, 158, 11, 0.15);
-      color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .tag-skirmish {
-      background: rgba(249, 115, 22, 0.15);
-      color: #f97316;
-      border: 1px solid rgba(249, 115, 22, 0.3);
     }
 
     .tag-war {
@@ -572,17 +832,9 @@
       50% { border-color: rgba(239, 68, 68, 1.0); }
     }
 
-    .tension-bar-wrap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.68rem;
-      color: var(--text-dim);
-    }
-
-    .tension-bar {
-      flex: 1;
-      height: 5px;
+    .tension-bar-container {
+      width: 100%;
+      height: 4px;
       background: #0f172a;
       border-radius: 2px;
       overflow: hidden;
@@ -595,7 +847,100 @@
       transition: width 0.2s ease;
     }
 
-    @media (max-width: 1400px) {
+    /* 弹窗通用遮罩 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    /* 帝国官僚验尸小票弹窗 */
+    .receipt-modal-box {
+      background: #f4ecd8;
+      color: #111111;
+      border-radius: 6px;
+      padding: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95);
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .receipt-canvas-wrap {
+      border: 1px solid #c4b595;
+      background: #f4ecd8;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .receipt-btn-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .receipt-btn-group button {
+      flex: 1;
+      padding: 8px 12px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* 极乐迪斯科濒死思维阁弹窗 */
+    .mind-modal-box {
+      background: #090d16;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
+      width: 540px;
+      max-width: 95%;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .mind-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #f43f5e;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mind-dialogue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .mind-row {
+      padding: 8px 10px;
+      border-radius: 4px;
+      background: #111827;
+      border-left: 3px solid #64748b;
+    }
+
+    .mind-speaker {
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+
+    @media (max-width: 1440px) {
       main {
         flex-direction: column;
       }
@@ -613,7 +958,7 @@
   <header>
     <div class="brand-group">
       <div class="game-title">《神之蛐蛐缸：万族争霸》</div>
-      <div class="badge-milestone">Milestone 3 宏观战争与政治领域全真视窗</div>
+      <div class="badge-milestone">Milestone 4 终极总装端到端视窗</div>
     </div>
 
     <!-- 遥测快报 -->
@@ -636,20 +981,92 @@
       </div>
     </div>
 
-    <!-- 时间流速控制 -->
+    <!-- 神恩进度与 15 秒狂欢时刻 -->
+    <div class="fervor-group">
+      <div class="fervor-label">
+        <span>⚡ Fervor:</span>
+        <span id="fervorValText" style="font-family: monospace;">30/100</span>
+      </div>
+      <div class="fervor-bar-wrap">
+        <div class="fervor-bar-fill" id="fervorBarFill"></div>
+      </div>
+      <button class="btn-overdrive" id="btnOverdrive">
+        🔥 15s 神恩狂欢 [O]
+      </button>
+    </div>
+
+    <!-- Web Audio 8-bit 音效总控 -->
+    <div class="audio-group">
+      <button class="btn" id="btnAudioMute" title="快捷键 M">🔊 音频</button>
+      <input type="range" id="audioVolumeSlider" min="0" max="1" step="0.05" value="1.0" title="主音量">
+    </div>
+
+    <!-- 时间法则倍速控制 -->
     <div class="controls-group">
-      <button class="btn btn-speed" id="btnPause">⏸ 暂停</button>
-      <button class="btn btn-speed active" id="btn1x">▶ 1x</button>
-      <button class="btn btn-speed" id="btn2x">⏩ 2x</button>
-      <button class="btn btn-speed" id="btn5x">🚀 5x</button>
+      <button class="btn btn-speed" id="btnPause" title="快捷键 空格">⏸ 暂停</button>
+      <button class="btn btn-speed" id="btnSlowMo" title="快捷键 1">0.2x 绝杀</button>
+      <button class="btn btn-speed active" id="btn1x" title="快捷键 2">▶ 1x</button>
+      <button class="btn btn-speed" id="btn2x" title="快捷键 3">⏩ 2x</button>
+      <button class="btn btn-speed" id="btn5x" title="快捷键 4">🚀 5x</button>
+      <button class="btn btn-speed" id="btn10x" title="快捷键 5">⚡ 10x</button>
     </div>
   </header>
 
   <!-- 主舞台视窗 -->
   <main>
     <div class="viewport-panel">
+      <!-- 画布容器 -->
       <div class="canvas-container">
         <canvas id="gameCanvas" width="1344" height="864"></canvas>
+
+        <!-- 全屏狂欢金色滤镜外框 -->
+        <div class="overdrive-screen-fx" id="overdriveScreenFx"></div>
+
+        <!-- 右上角智能导播画中画视窗 (PiP) -->
+        <div class="pip-container" id="pipContainer" title="点击平滑巡航至事发热点">
+          <canvas class="pip-canvas" id="pipCanvas" width="160" height="120"></canvas>
+          <div class="pip-badge" id="pipBadge">🚨 实时导播监视中</div>
+        </div>
+      </div>
+
+      <!-- 六大上帝神迹玩具抽屉栏 -->
+      <div class="miracle-toolbar" id="miracleToolbar">
+        <div class="miracle-card" id="cardMiracle0" data-id="0">
+          <div class="miracle-icon">🌧️</div>
+          <div class="miracle-name">生机甘霖 [Q]</div>
+          <div class="miracle-meta">消耗: 20 | CD: 12s</div>
+          <div class="miracle-cd-overlay" id="miracleCd0">12.0s</div>
+        </div>
+        <div class="miracle-card" id="cardMiracle1" data-id="1">
+          <div class="miracle-icon">🍎</div>
+          <div class="miracle-name">神圣果实 [W]</div>
+          <div class="miracle-meta">消耗: 35 | CD: 18s</div>
+          <div class="miracle-cd-overlay" id="miracleCd1">18.0s</div>
+        </div>
+        <div class="miracle-card" id="cardMiracle2" data-id="2">
+          <div class="miracle-icon">⚡</div>
+          <div class="miracle-name">神圣天雷 [E]</div>
+          <div class="miracle-meta">消耗: 40 | CD: 15s</div>
+          <div class="miracle-cd-overlay" id="miracleCd2">15.0s</div>
+        </div>
+        <div class="miracle-card" id="cardMiracle3" data-id="3">
+          <div class="miracle-icon">📯</div>
+          <div class="miracle-name">狂暴圣战 [R]</div>
+          <div class="miracle-meta">消耗: 50 | CD: 30s</div>
+          <div class="miracle-cd-overlay" id="miracleCd3">30.0s</div>
+        </div>
+        <div class="miracle-card" id="cardMiracle4" data-id="4">
+          <div class="miracle-icon">🕊️</div>
+          <div class="miracle-name">神圣休战 [T]</div>
+          <div class="miracle-meta">消耗: 50 | CD: 30s</div>
+          <div class="miracle-cd-overlay" id="miracleCd4">30.0s</div>
+        </div>
+        <div class="miracle-card" id="cardMiracle5" data-id="5">
+          <div class="miracle-icon">☄️</div>
+          <div class="miracle-name">灭世陨石 [Y]</div>
+          <div class="miracle-meta">消耗: 90 | CD: 60s</div>
+          <div class="miracle-cd-overlay" id="miracleCd5">60.0s</div>
+        </div>
       </div>
 
       <!-- 视窗底快捷图层切换 -->
@@ -695,15 +1112,32 @@
 
     <!-- 侧边遥测与交互调试面板 -->
     <div class="sidebar">
-      
-      <!-- 0. 【M3 核心】十六政权地缘与政治张力看板 -->
+
+      <!-- 1. 【M4 核心】矮人要塞三声道滚动战报流 -->
+      <div class="card">
+        <div class="card-title">
+          <span>📜 矮人要塞三声道实时战报流</span>
+          <span style="font-size: 0.65rem; color: #a855f7;">[法医 / 诗人 / 审计员]</span>
+        </div>
+        <div class="narrative-stream-box" id="narrativeLogBox">
+          <div class="narrative-card" style="border-left-color: #38bdf8;">
+            <div class="narrative-header">
+              <span class="narrative-voice-tag tag-voice-bard">【诗人】</span>
+              <span style="color: #64748b; font-size: 0.62rem;">时序 0.0s</span>
+            </div>
+            <div>天地初开，神之蛐蛐缸中的诸族尚未知晓命运的残酷车轮。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 【M3 核心】十六政权地缘格局与战争看门狗 -->
       <div class="card">
         <div class="card-title">
           <span>🏰 十六政权地缘格局与战争看门狗</span>
           <span id="activeFactionsBadge" style="color: #38bdf8;">12 活跃政权</span>
         </div>
         <!-- 战争冲突动态横幅 -->
-        <div id="warStalemateBanner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; font-size: 0.72rem; color: #fca5a5;">
+        <div id="warStalemateBanner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 4px; padding: 5px 8px; margin-bottom: 6px; font-size: 0.7rem; color: #fca5a5;">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
             <span id="warAlertText">⚔️ 战争进行中</span>
             <span id="warWatchdogTimer" style="font-family: monospace; color: #ffd700;">看门狗: 300.0s</span>
@@ -714,8 +1148,8 @@
           <!-- 动态渲染各政权领地面积、张力进度条与外交状态 -->
         </div>
       </div>
-      
-      <!-- 1. 生态小人生理状态监控 -->
+
+      <!-- 3. 生态小人生理状态监控 -->
       <div class="card">
         <div class="card-title">
           <span>📊 生态种群与生理监视器</span>
@@ -749,7 +1183,7 @@
         </div>
       </div>
 
-      <!-- 2. 【M2 核心】四大社会阶级人口结构 -->
+      <!-- 4. 【M2 核心】四大社会阶级人口结构 -->
       <div class="card">
         <div class="card-title">
           <span>🏷️ 四大社会阶级结构 (FSM)</span>
@@ -793,7 +1227,7 @@
         </div>
       </div>
 
-      <!-- 3. 【M2 核心】突变器官群体渗透率 -->
+      <!-- 5. 【M2 核心】突变器官群体渗透率 -->
       <div class="card">
         <div class="card-title">
           <span>🧬 孟德尔突变器官渗透率</span>
@@ -804,53 +1238,55 @@
         </div>
       </div>
 
-      <!-- 3.5 【M3 核心】地缘政治与战争专属实验箱 -->
+      <!-- 6. 【M4 核心】宿怨账本图谱与血仇状态 -->
       <div class="card">
         <div class="card-title">
-          <span>⚔️ M3 地缘政治与战争专属实验箱</span>
+          <span>🩸 宿怨账本图谱与血仇雷达</span>
+          <span id="grudgeCountBadge" style="color: #f43f5e;">0 条宿怨</span>
         </div>
-        <div class="action-btn-group">
-          <button class="btn btn-amber" id="btnBorderFriction">
-            ⚔️ 一键边境偷粮摩擦 (+10)
-          </button>
-          <button class="btn btn-danger" id="btnSchism">
-            💥 一键引爆图腾大裂变 (Voronoi)
-          </button>
-          <button class="btn btn-purple" id="btnDynastySuccession">
-            👑 一键世袭驾崩大转盘 (五大继承)
-          </button>
-          <button class="btn btn-special" id="btnTotemAegis">
-            🛡️ 一键图腾 25% 圣盾波 (震退敌军)
-          </button>
-          <button class="btn btn-danger" id="btnTriggerWar">
-            🚩 阵营决裂宣战 (启动看门狗)
-          </button>
-          <button class="btn" id="btnToggleFlow">
-            🌊 切换大军团流场可视化 [F]
-          </button>
+        <div id="grudgeSummaryText" style="font-size: 0.7rem; color: #94a3b8; line-height: 1.4;">
+          当前大陆尚无刻骨仇怨。在战场遭遇断肢或血亲阵亡将铭刻至血仇图谱中！
         </div>
       </div>
 
-      <!-- 4. M2 端到端交互操作箱 -->
+      <!-- 7. M3/M4 地缘战争与神威实验箱 -->
       <div class="card">
         <div class="card-title">
-          <span>🛠️ M2 系统端到端交互面板</span>
+          <span>⚡ M3/M4 上帝干涉与地缘实验箱</span>
         </div>
         <div class="action-btn-group">
+          <button class="btn btn-amber" id="btnBorderFriction">
+            ⚔️ 边境偷粮摩擦 (+10)
+          </button>
+          <button class="btn btn-danger" id="btnSchism">
+            💥 图腾大裂变 (Voronoi)
+          </button>
+          <button class="btn btn-purple" id="btnDynastySuccession">
+            👑 世袭大转盘 (五大继承)
+          </button>
+          <button class="btn btn-special" id="btnTotemAegis">
+            🛡️ 图腾圣盾波 (震退敌军)
+          </button>
+          <button class="btn btn-danger" id="btnTriggerWar">
+            🚩 决裂宣战 (看门狗)
+          </button>
+          <button class="btn" id="btnToggleFlow">
+            🌊 向量流场开关 [F]
+          </button>
           <button class="btn btn-special" id="btnSpawn100">
-            🎲 生成 100 只小人
+            🎲 点召 100 只小人
           </button>
           <button class="btn btn-purple" id="btnCastAllSkills">
             ⚡ 全员释放种族特技
           </button>
           <button class="btn btn-amber" id="btnRadiateMutation">
-            🧬 诱发辐射器官突变
+            🧬 诱发环境辐射突变
           </button>
-          <button class="btn" id="btnPromoteCastes">
+          <button class="btn btn-promote" id="btnPromoteCastes">
             🎖️ 注入经验阶级晋升
           </button>
           <button class="btn btn-danger" id="btnRegicide">
-            👑 斩首领袖仲裁继承
+            👑 斩首旧领袖 (触发思维阁)
           </button>
           <button class="btn btn-danger" id="btnTriggerFamine">
             ⚠️ 爆发全图大饥荒
@@ -859,50 +1295,79 @@
             🌾 开垦 8 片复合农田
           </button>
           <button class="btn" id="btnResetAll" style="color: #fca5a5;">
-            🔄 重置生态演化系统
+            🔄 彻底重置生态演化
           </button>
         </div>
       </div>
 
-      <!-- 5. 实体全息检视器 -->
+      <!-- 8. 实体全息检视器 -->
       <div class="card">
         <div class="card-title">
-          <span>🔍 实体物理·基因·技能全息检视器</span>
-          <span style="font-size: 0.65rem; color: #64748b;">(点击画布聚焦)</span>
+          <span>🔍 实体全息检视器</span>
+          <span style="font-size: 0.65rem; color: #64748b;">(左键点击或捏起)</span>
         </div>
         <div class="inspector-content" id="inspectorBox">
           点击画布上的小人，实时检视其所属种族、四大阶级、特技冷却、双倍体基因型、表型与聚合物理属性。
         </div>
       </div>
 
-      <!-- 6. 12 始祖种族色彩与技能图例 -->
+      <!-- 9. 12 始祖种族色彩与技能图例 -->
       <div class="card">
         <div class="card-title">
           <span>🎨 12 始祖种族特技矩阵图例</span>
         </div>
-        <div class="race-grid" id="raceGrid">
+        <div class="race-grid" id="raceGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 0.68rem; max-height: 110px; overflow-y: auto;">
           <!-- 动态注入 12 种族图例 -->
         </div>
       </div>
 
-      <!-- 7. 实时生态演化跑马灯 -->
-      <div class="card" style="flex: 1;">
+      <!-- 10. 实时生态与系统日志 -->
+      <div class="card">
         <div class="card-title">
-          <span>📜 生态、阶级与特技领域事件日志</span>
-          <button class="btn" id="btnClearLog" style="padding: 1px 6px; font-size: 0.65rem;">清空</button>
+          <span>📜 生态与系统底层日志</span>
+          <button class="btn" id="btnClearLog" style="padding: 1px 6px; font-size: 0.62rem;">清空</button>
         </div>
         <div class="log-box" id="logBox">
-          <div class="log-entry info">[系统启动] M2 表现层全真集成已装载，原生驱动四大领域构件。</div>
+          <div class="log-entry info">[系统就绪] M4 原生 ESM 总装视窗启动，唯一真实消费者。</div>
         </div>
       </div>
 
     </div>
   </main>
 
+  <!-- 帝国官僚验尸小票弹窗 (Modal) -->
+  <div class="modal-overlay" id="deathReceiptModal">
+    <div class="receipt-modal-box">
+      <div class="receipt-canvas-wrap">
+        <canvas id="receiptCanvas" width="320" height="480"></canvas>
+      </div>
+      <div class="receipt-btn-group">
+        <button class="btn btn-special" id="btnExportReceiptPng">📥 导出验尸单为图片</button>
+        <button class="btn" id="btnCloseReceiptModal">关 闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 极乐迪斯科濒死思维阁弹窗 (Modal) -->
+  <div class="modal-overlay" id="mindCabinetModal">
+    <div class="mind-modal-box">
+      <div class="mind-title">
+        <span>🧠 极乐迪斯科风濒死思维阁</span>
+        <span id="mindSubTitle" style="font-size: 0.72rem; color: #94a3b8;">领袖断气前最后一瞬</span>
+      </div>
+      <div class="mind-dialogue-list" id="mindDialogueList">
+        <!-- 动态注入四大潜意识声部 -->
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+        <button class="btn btn-purple" id="btnCloseMindCabinet">合上眼睑 (关闭)</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 引入原生 ESM 主调度脚本 -->
   <script type="module">
     // ==========================================
-    // 原生导入 M1/M2/M3 真实构件与基础设施 (LL-003 严防两张皮)
+    // 原生导入 M0 ~ M4 真实系统构件 (LL-003 绝无假演化)
     // ==========================================
     import {
       MiniRenderer,
@@ -946,6 +1411,7 @@
     import {
       ECS,
       MAX_ENTITIES,
+      NULL_ENTITY,
       TRANSFORM_STRIDE,
       TF_OFFSET_X,
       TF_OFFSET_Y,
@@ -963,7 +1429,9 @@
       PHY_OFFSET_HUNGER,
       PHY_OFFSET_EMERGENCY_LOCK,
       IDENTITY_STRIDE,
-      ID_OFFSET_FACTION
+      ID_OFFSET_FACTION,
+      MORALE_STRIDE,
+      MORALE_OFFSET_VAL
     } from './src/core/ECS.js';
 
     import {
@@ -980,12 +1448,14 @@
       IS_PANICKED,
       IS_SACRED_BODY,
       IS_STATIC_ANCHOR,
+      IS_HELD,
+      IS_AIRBORNE,
+      IS_ECSTASY,
       hasStatus,
       setStatus,
       clearStatus
     } from './src/components/UnitStatusFlags.js';
 
-    // M2 真实领域系统构件
     import {
       SocialCasteSystem
     } from './src/profession/SocialCasteSystem.js';
@@ -1047,13 +1517,9 @@
       EntityPhysicalAggregator
     } from './src/systems/EntityPhysicalAggregator.js';
 
-    // M3 宏观战争、大军团寻路与政治演化真实领域系统构件 (LL-003)
     import {
       BorderFrictionSystem,
-      FrictionStage,
-      FRICTION_STOLEN_FOOD,
-      FRICTION_BRAWL_INJURY,
-      FRICTION_VIP_KILLED
+      FrictionStage
     } from './src/warfare/BorderFrictionSystem.js';
 
     import {
@@ -1068,13 +1534,7 @@
     } from './src/warfare/MoraleSystem.js';
 
     import {
-      DamageCalculator
-    } from './src/warfare/DamageCalculator.js';
-
-    import {
-      WarWatchdogSystem,
-      WAR_MAX_DURATION,
-      WAR_STALEMATE_TIMEOUT
+      WarWatchdogSystem
     } from './src/warfare/WarWatchdogSystem.js';
 
     import {
@@ -1106,22 +1566,35 @@
       MAX_FACTIONS,
       FACTION_STRIDE,
       FAC_OFFSET_TOTEM_ID,
-      FAC_OFFSET_CIVIC_ID,
-      FAC_OFFSET_TENSION,
-      FAC_OFFSET_POP_COUNT,
       FAC_OFFSET_FLAGS,
       FactionFlags,
       InitialFactions
     } from './src/data/FactionData.js';
 
+    // M4 构件导入
+    import { Camera2D, MIN_ZOOM, MAX_ZOOM } from './src/camera/Camera2D.js';
+    import { TimeScale, TimeScaleMode } from './src/core/TimeScale.js';
+    import { HandOfGodSystem } from './src/god/HandOfGodSystem.js';
+    import { DivineMiraclesSystem, MiracleId, MiracleConfig } from './src/god/DivineMiraclesSystem.js';
+    import { DivineOverdrive, OVERDRIVE_DURATION_SECONDS } from './src/god/DivineOverdrive.js';
+    import { SmartDirector, HighlightEventType } from './src/director/SmartDirector.js';
+    import { TriVocalEngine, VocalVoice } from './src/narrative/TriVocalEngine.js';
+    import { ContextSlabPool } from './src/narrative/ContextSlabPool.js';
+    import { BloodLedger } from './src/narrative/BloodLedger.js';
+    import { MindCabinet, MindVoiceType, MindVoiceColors } from './src/narrative/MindCabinet.js';
+    import { DeathAuditReceipt } from './src/narrative/DeathAuditReceipt.js';
+    import { WebAudioBusManager } from './src/audio/WebAudioBusManager.js';
+    import { Synth8Bit } from './src/audio/Synth8Bit.js';
+    import { MegaAtlasDollCache } from './src/rendering/MegaAtlasDollCache.js';
+
     // ==========================================
-    // 实例化核心系统 (真实 M1/M2/M3 架构)
+    // 实例化全量真实系统 (M0 ~ M4 架构总装)
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const renderer = new MiniRenderer(canvas);
     const prng = new PRNG(1337);
 
-    // 1. 实体与事件总线基础设施
+    // 1. 核心基础设施
     const ecs = new ECS();
     const eventBus = new DomainEventBus();
 
@@ -1130,23 +1603,23 @@
     const mapGen = new MapGenerator(42);
     mapGen.generate(tileGrid);
 
-    // 3. 连续地脉养分扩散场 (绑定瓦片底温)
+    // 3. 养分地脉扩散场
     const nutrientField = new NutrientField(tileGrid);
     nutrientField.syncBaseHeatFromGrid();
 
-    // 4. 2x2 农田四阶演替系统
+    // 4. 2x2 农田系统
     const farmlandSys = new FarmlandSystem();
 
-    // 5. 生存代谢与饥饿系统
+    // 5. 代谢与生理饥饿
     const metabolismSys = new MetabolismSystem(ecs, nutrientField, eventBus);
     const emergencySys = new EmergencyMetabolismSystem(ecs, eventBus, prng);
 
-    // 6. M2 四大领域系统原生实例化
+    // 6. M2 领域系统
     const casteSys = new SocialCasteSystem(ecs, eventBus);
     const geneticsSys = new MendelianGeneticsSystem(ecs, eventBus, prng);
     const raceSkillSys = new RaceSkillSystem(ecs, eventBus, { tileGrid, nutrientField });
 
-    // 7. M3 宏观战争、地缘政治与反向流场系统原生实例化 (LL-003)
+    // 7. M3 战争、流场与政治系统
     const factionBuffer = new Int32Array(MAX_FACTIONS * FACTION_STRIDE);
     const totemDefenseSys = new TotemDefenseSystem(ecs, eventBus);
     const moraleSys = new MoraleSystem(ecs, eventBus, totemDefenseSys);
@@ -1159,11 +1632,46 @@
     const dynastySys = new DynastySuccessionSystem(ecs, factionBuffer, eventBus, prng, geneticsSys.genetics);
     const postWarSys = new PostWarTreatySystem(ecs, tileGrid, factionBuffer, eventBus);
 
-    // 运行状态与时间倍速
-    let timeScale = 1;
+    // 8. M4 摄像机与时间法则控制器
+    const camera = new Camera2D(1344, 864, WORLD_WIDTH, WORLD_HEIGHT);
+    const timeScaleController = new TimeScale();
+
+    // 9. M4 上帝之手与六大神迹
+    const handOfGodSys = new HandOfGodSystem(ecs, tileGrid, eventBus, factionBuffer);
+    const divineMiraclesSys = new DivineMiraclesSystem(ecs, tileGrid, eventBus, factionBuffer, borderFrictionSys);
+    const divineOverdriveSys = new DivineOverdrive(ecs, divineMiraclesSys, eventBus);
+
+    // 10. M4 智能导播画中画
+    const pipCanvas = document.getElementById('pipCanvas');
+    const smartDirector = new SmartDirector(pipCanvas);
+
+    // 11. M4 叙事、宿怨账本、思维阁与验尸小票
+    const slabPool = new ContextSlabPool(256);
+    const triVocalEngine = new TriVocalEngine(slabPool);
+    const bloodLedger = new BloodLedger(eventBus);
+    const mindCabinet = new MindCabinet();
+    const deathAuditReceipt = new DeathAuditReceipt();
+
+    // 12. M4 Web Audio 8-bit 音效总线
+    const audioBus = new WebAudioBusManager();
+    const synth = new Synth8Bit(audioBus);
+
+    // 用户交互解锁音频标志
+    let audioUnlocked = false;
+    const unlockAudio = () => {
+      if (!audioUnlocked) {
+        audioBus.resume();
+        audioUnlocked = true;
+      }
+    };
+    window.addEventListener('pointerdown', unlockAudio, { once: true });
+    window.addEventListener('keydown', unlockAudio, { once: true });
+
+    // 运行状态与时间
     let simTicks = 0;
     let simElapsedSec = 0;
     let selectedEntityId = 0;
+    let selectedMiracle = -1;
 
     // 性能监测
     let lastFpsUpdate = performance.now();
@@ -1201,8 +1709,19 @@
     const inspectorBox = document.getElementById('inspectorBox');
     const logBox = document.getElementById('logBox');
 
+    const fervorValText = document.getElementById('fervorValText');
+    const fervorBarFill = document.getElementById('fervorBarFill');
+    const btnOverdrive = document.getElementById('btnOverdrive');
+    const overdriveScreenFx = document.getElementById('overdriveScreenFx');
+
+    const pipContainer = document.getElementById('pipContainer');
+    const pipBadge = document.getElementById('pipBadge');
+    const narrativeLogBox = document.getElementById('narrativeLogBox');
+    const grudgeCountBadge = document.getElementById('grudgeCountBadge');
+    const grudgeSummaryText = document.getElementById('grudgeSummaryText');
+
     // ==========================================
-    // 领域事件监听与跑马灯
+    // 底层日志与三声道战报流输出
     // ==========================================
     function addLog(text, level = 'info') {
       const entry = document.createElement('div');
@@ -1210,7 +1729,7 @@
       const timeStr = Math.floor(simElapsedSec) + 's';
       entry.textContent = `[${timeStr}] ${text}`;
       logBox.appendChild(entry);
-      if (logBox.children.length > 70) {
+      if (logBox.children.length > 80) {
         logBox.removeChild(logBox.firstChild);
       }
       logBox.scrollTop = logBox.scrollHeight;
@@ -1220,9 +1739,94 @@
       logBox.innerHTML = '';
     });
 
-    // 订阅 M1 领域事件
+    function pushNarrativeCard(voiceType, text, entityId = 0, isRegicide = false) {
+      const card = document.createElement('div');
+      card.className = 'narrative-card';
+
+      let voiceTag = '【法医】';
+      let tagClass = 'tag-voice-anatomist';
+      let borderColor = '#94a3b8';
+
+      if (voiceType === VocalVoice.BARD) {
+        voiceTag = '【诗人】';
+        tagClass = 'tag-voice-bard';
+        borderColor = '#c084fc';
+      } else if (voiceType === VocalVoice.AUDITOR) {
+        voiceTag = '【审计员】';
+        tagClass = 'tag-voice-auditor';
+        borderColor = '#f59e0b';
+      }
+      card.style.borderLeftColor = borderColor;
+
+      const header = document.createElement('div');
+      header.className = 'narrative-header';
+      header.innerHTML = `
+        <span class="narrative-voice-tag ${tagClass}">${voiceTag}</span>
+        <span style="color: #64748b; font-size: 0.62rem;">${simElapsedSec.toFixed(1)}s</span>
+      `;
+
+      const content = document.createElement('div');
+      content.textContent = text;
+
+      card.appendChild(header);
+      card.appendChild(content);
+
+      if (entityId > 0) {
+        const actionRow = document.createElement('div');
+        actionRow.style.marginTop = '4px';
+        actionRow.style.display = 'flex';
+        actionRow.style.justifyContent = 'flex-end';
+        actionRow.style.gap = '6px';
+
+        const inspectBtn = document.createElement('button');
+        inspectBtn.className = 'btn-receipt-inspect';
+        inspectBtn.textContent = '📑 帝国验尸小票';
+        inspectBtn.onclick = () => {
+          showDeathReceiptModal(entityId);
+        };
+        actionRow.appendChild(inspectBtn);
+
+        if (isRegicide) {
+          const mindBtn = document.createElement('button');
+          mindBtn.className = 'btn-receipt-inspect';
+          mindBtn.style.borderColor = '#f43f5e';
+          mindBtn.style.color = '#fca5a5';
+          mindBtn.textContent = '🧠 濒死思维阁';
+          mindBtn.onclick = () => {
+            showMindCabinetModal(entityId, 0);
+          };
+          actionRow.appendChild(mindBtn);
+        }
+
+        card.appendChild(actionRow);
+      }
+
+      narrativeLogBox.appendChild(card);
+      if (narrativeLogBox.children.length > 50) {
+        narrativeLogBox.removeChild(narrativeLogBox.firstChild);
+      }
+      narrativeLogBox.scrollTop = narrativeLogBox.scrollHeight;
+    }
+
+    triVocalEngine.onNarrativeReady((slab) => {
+      if (slab.voiceAnatomist) {
+        pushNarrativeCard(VocalVoice.ANATOMIST, slab.voiceAnatomist, slab.dstEntityId, slab.isRegicide);
+      }
+      if (slab.voiceBard) {
+        pushNarrativeCard(VocalVoice.BARD, slab.voiceBard, slab.dstEntityId, slab.isRegicide);
+      }
+      if (slab.voiceAuditor) {
+        pushNarrativeCard(VocalVoice.AUDITOR, slab.voiceAuditor, slab.dstEntityId, slab.isRegicide);
+      }
+    });
+
+    // ==========================================
+    // 订阅 M1/M2/M3/M4 全量领域事件
+    // ==========================================
     eventBus.subscribe(DomainEvents.EVT_DEATH_STARVATION, (type, srcId) => {
       addLog(`💀 [饥饿衰竭] 实体 #${srcId} 饥荒耗竭，骨肥归流地脉！`, 'danger');
+      triVocalEngine.recordEvent(type, srcId, 0, 0, 0, simElapsedSec);
+      synth.playHit({ freq: 110, duration: 0.1 });
     });
 
     eventBus.subscribe(DomainEvents.EVT_BRAWL_RATION, (type, srcId, dstId) => {
@@ -1230,35 +1834,34 @@
       if (dstId > 0 && ecs.isAlive(dstId)) {
         casteSys.recordCombat(dstId, 15.0, false);
       }
+      synth.playHit();
     });
 
-    // 订阅 M2 阶级晋升与新王即位事件
     eventBus.subscribe(DomainEvents.EVT_CASTE_PROMOTED, (type, srcId, dstId, p1, p2) => {
       const casteNames = ['平民', '工匠', '士兵', '领袖'];
       const cName = casteNames[p2] || '未知';
       addLog(`🎖️ [社会阶级跃迁] 实体 #${srcId} 晋升为【${cName}】！`, 'green');
+      triVocalEngine.recordEvent(type, srcId, dstId, p1, p2, simElapsedSec);
+      synth.playMiracleChime();
     });
 
     eventBus.subscribe(DomainEvents.EVT_HEIR_CROWNED, (type, srcId, dstId, p1) => {
       addLog(`👑 [王朝加冕] 阵营 #${p1} 新王加冕！新领袖为实体 #${srcId}！`, 'green');
+      triVocalEngine.recordEvent(type, srcId, dstId, p1, 0, simElapsedSec);
+      synth.playWarHorn();
     });
 
-    // 订阅 M2 技能触发与缴械事件
     eventBus.subscribe(DomainEvents.EVT_RACE_SKILL_TRIGGERED, (type, srcId, dstId, p1) => {
       addLog(`⚡ [特技激活] 实体 #${srcId} 激发特技 (ID: ${p1})！`, 'purple');
+      synth.playHit({ freq: 350, duration: 0.06 });
     });
 
-    eventBus.subscribe(DomainEvents.EVT_WEAPON_DISARMED, (type, srcId) => {
-      addLog(`🗡️ [兵刃打落] 实体 #${srcId} 兵器被打落，进入 6s 缴械状态！`, 'warn');
+    eventBus.subscribe(DomainEvents.EVT_ORGAN_MUTATED, (type, srcId, dstId, p1) => {
+      addLog(`🧬 [表型突变] 实体 #${srcId} 诞生突变器官！位掩码: 0x${p1.toString(16)}`, 'green');
+      triVocalEngine.recordEvent(type, srcId, dstId, p1, 0, simElapsedSec);
+      synth.playMiracleChime();
     });
 
-    eventBus.subscribe(DomainEvents.EVT_ACTION_MUTEX_BLOCKED, (type, srcId) => {
-      addLog(`🛑 [通道仲裁阻断] 实体 #${srcId} 动作轨道冲突被阻断打断！`, 'info');
-    });
-
-    // ==========================================
-    // 订阅 M3 宏观战争、地缘与政治事件 (LL-003)
-    // ==========================================
     eventBus.subscribe(DomainEvents.EVT_TOTEM_AEGIS_TRIGGERED, (evt, facId, totemId) => {
       if (totemId > 0 && ecs.isAlive(totemId)) {
         const tx = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X];
@@ -1268,22 +1871,21 @@
       const facConf = InitialFactions[facId - 1];
       const facName = facConf ? facConf.name : `阵营 #${facId}`;
       addLog(`🛡️ 【${facName}】图腾生命跌破 25%，触发圣火涅槃冲击波！震退敌军并开启 12s 金身圣盾！`, 'green');
+      synth.playThunder({ duration: 1.0 });
     });
 
     eventBus.subscribe(DomainEvents.EVT_WAR_DECLARED, (evt, srcFac, dstFac) => {
-      const srcConf = InitialFactions[srcFac - 1];
-      const dstConf = InitialFactions[dstFac - 1];
-      const srcName = srcConf ? srcConf.name : `阵营 #${srcFac}`;
-      const dstName = dstConf ? dstConf.name : `阵营 #${dstFac}`;
+      const srcName = InitialFactions[srcFac - 1]?.name || `阵营 #${srcFac}`;
+      const dstName = InitialFactions[dstFac - 1]?.name || `阵营 #${dstFac}`;
       addLog(`⚔️ 战争爆发！【${srcName}】与【${dstName}】爆发全面战争！300s 战争看门狗已启动！`, 'danger');
+      synth.playWarHorn();
     });
 
     eventBus.subscribe(DomainEvents.EVT_PAX_DIVINA_FORCED, (evt, srcFac, dstFac) => {
-      const srcConf = InitialFactions[srcFac - 1];
-      const dstConf = InitialFactions[dstFac - 1];
-      const srcName = srcConf ? srcConf.name : `阵营 #${srcFac}`;
-      const dstName = dstConf ? dstConf.name : `阵营 #${dstFac}`;
-      addLog(`🕊️ 神圣休战！【${srcName}】与【${dstName}】交火达 300s，看门狗强制休战并退回离心边界！`, 'purple');
+      const srcName = InitialFactions[srcFac - 1]?.name || `阵营 #${srcFac}`;
+      const dstName = InitialFactions[dstFac - 1]?.name || `阵营 #${dstFac}`;
+      addLog(`🕊️ 神圣休战！【${srcName}】与【${dstName}】交火达 300s，看门狗强制休战！`, 'purple');
+      synth.playWhisper();
     });
 
     eventBus.subscribe(DomainEvents.EVT_LAST_STAND_ACTIVATED, (evt, facId, eid) => {
@@ -1293,13 +1895,147 @@
     eventBus.subscribe(DomainEvents.EVT_SCHISM_TRIGGERED, (evt, motherFac, rebelFac) => {
       addLog(`💥 领地大分裂！母国 #${motherFac} 政治张力爆表，裂变生成新叛乱军政权 #${rebelFac}！`, 'danger');
       renderer.invalidateTerrain();
+      triVocalEngine.recordEvent(evt, motherFac, rebelFac, 0, 0, simElapsedSec);
+      synth.playThunder();
     });
 
     eventBus.subscribe(DomainEvents.EVT_SUCCESSION_ROULETTE, (evt, facId, rType, newLeaderId) => {
       const rNames = ['正常顺位', '离奇横死', '幼主摄政', '兄弟掷骰', '私生子夺嫡'];
       const rName = rNames[rType] || '大转盘继承';
-      addLog(`👑 【阵营 #${facId}】驾崩大转盘结算：【${rName}】，新主 #${newLeaderId} 继承加冕原子锁 3.0s！`, 'purple');
+      addLog(`👑 【阵营 #${facId}】驾崩大转盘结算：【${rName}】，新王加冕为 #${newLeaderId}！`, 'purple');
     });
+
+    eventBus.subscribe(DomainEvents.EVT_DIVINE_ACTION_BLOCKED, (evt, eid) => {
+      addLog(`🛑 [天意受阻] 图腾是神圣不可动摇的信仰基石，严禁抓取移动！`, 'warn');
+      synth.playHit({ freq: 80, duration: 0.15 });
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_DIVINE_BACKFIRE, (evt, eid) => {
+      addLog(`⚡ [天命反噬] 继承人强留悬空超过 5 秒，降下天雷反噬并加冕加冕金身！`, 'danger');
+      if (eid > 0 && ecs.isAlive(eid)) {
+        const tx = ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X];
+        const ty = ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y];
+        renderer.spawnThunderStrike(tx, ty);
+      }
+      synth.playThunder();
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_RULER_DIED, (evt, rulerId, killerId) => {
+      addLog(`👑⚡ 【弑君绝杀】领袖 #${rulerId} 惨烈阵亡！唤醒电影级定格慢动作与思维阁！`, 'danger');
+      timeScaleController.triggerCinematicFreeze(1.2);
+      divineMiraclesSys.addFervor(15.0);
+      showMindCabinetModal(rulerId, killerId);
+      synth.playThunder({ duration: 1.2 });
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_VENDETTA_TRIGGERED, (evt, srcId, targetId) => {
+      addLog(`🩸 [血仇狂暴] 战士 #${srcId} 遭遇血海仇敌 #${targetId}，杀意沸腾破除疲劳！`, 'danger');
+      triVocalEngine.recordEvent(evt, srcId, targetId, 0, 0, simElapsedSec);
+      synth.playWarHorn();
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_OVERDRIVE_STARTED, () => {
+      addLog(`🔥 【神恩满溢狂欢】15 秒黄金超载降临！全技能 0 消耗 0 冷却，全图生灵欢腾！`, 'amber');
+      renderer.isOverdriveActive = true;
+      overdriveScreenFx.style.display = 'block';
+      synth.playThunder();
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_OVERDRIVE_ENDED, () => {
+      renderer.isOverdriveActive = false;
+      overdriveScreenFx.style.display = 'none';
+      const rep = divineOverdriveSys.getSummaryReport();
+      addLog(`🎉 【狂欢纪元快报】狂欢落幕！施展神迹 ${rep.miraclesCast} 次，击杀 ${rep.killsCount} 单位！`, 'green');
+      synth.playMiracleChime();
+    });
+
+    // ==========================================
+    // 验尸小票与极乐迪斯科思维阁弹窗逻辑
+    // ==========================================
+    const deathReceiptModal = document.getElementById('deathReceiptModal');
+    const receiptCanvas = document.getElementById('receiptCanvas');
+    const btnCloseReceiptModal = document.getElementById('btnCloseReceiptModal');
+    const btnExportReceiptPng = document.getElementById('btnExportReceiptPng');
+
+    function showDeathReceiptModal(entityId) {
+      const facId = ecs.identities[entityId * IDENTITY_STRIDE + ID_OFFSET_FACTION] || 1;
+      const race = RaceList[(facId - 1) % 12] || RaceList[0];
+      const facName = InitialFactions[facId - 1]?.name || `氏族 #${facId}`;
+      const cType = casteSys.getCaste(entityId);
+      const cNames = ['平民', '工匠', '士兵', '领袖'];
+
+      const receiptData = deathAuditReceipt.generateReceipt({
+        entityId,
+        deceasedName: `${cNames[cType]} #${entityId}`,
+        title: cNames[cType],
+        factionName: facName,
+        raceName: race.name,
+        timestamp: simElapsedSec,
+        causeOfDeath: '胸腹部贯穿撕裂致心包填塞与创伤性休克',
+        killerName: '敌对精锐前锋',
+        salvageValue: 18,
+        pensionBase: 60,
+        debtFood: 6,
+        taxArrears: 12,
+        burialFee: 24
+      });
+
+      deathAuditReceipt.renderToCanvas(receiptCanvas, receiptData);
+      deathReceiptModal.style.display = 'flex';
+      synth.playUI();
+    }
+
+    btnCloseReceiptModal.onclick = () => {
+      deathReceiptModal.style.display = 'none';
+      synth.playUI();
+    };
+
+    btnExportReceiptPng.onclick = () => {
+      const dataUrl = deathAuditReceipt.exportAsPngDataUrl(receiptCanvas);
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `DeathAudit_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      addLog(`📥 验尸小票已导出为 PNG 图像！`, 'green');
+      synth.playUI();
+    };
+
+    const mindCabinetModal = document.getElementById('mindCabinetModal');
+    const mindDialogueList = document.getElementById('mindDialogueList');
+    const btnCloseMindCabinet = document.getElementById('btnCloseMindCabinet');
+
+    function showMindCabinetModal(leaderId, killerId) {
+      const facId = ecs.identities[leaderId * IDENTITY_STRIDE + ID_OFFSET_FACTION] || 1;
+      const race = RaceList[(facId - 1) % 12] || RaceList[0];
+      const facName = InitialFactions[facId - 1]?.name || `氏族 #${facId}`;
+
+      const dto = mindCabinet.triggerCabinet(leaderId, killerId, simElapsedSec, {
+        raceName: race.name,
+        factionName: facName
+      });
+
+      mindDialogueList.innerHTML = '';
+      dto.dialogue.forEach((d) => {
+        const row = document.createElement('div');
+        row.className = 'mind-row';
+        row.style.borderLeftColor = d.color;
+        row.innerHTML = `
+          <div class="mind-speaker" style="color: ${d.color};">${d.speaker}</div>
+          <div style="color: #cbd5e1;">${d.text}</div>
+        `;
+        mindDialogueList.appendChild(row);
+      });
+
+      mindCabinetModal.style.display = 'flex';
+    }
+
+    btnCloseMindCabinet.onclick = () => {
+      mindCabinet.close();
+      mindCabinetModal.style.display = 'none';
+      synth.playUI();
+    };
 
     // ==========================================
     // 初始化 12 始祖种族色彩与技能图例
@@ -1308,10 +2044,11 @@
     RaceList.forEach((race, idx) => {
       const tag = document.createElement('div');
       tag.className = 'race-tag';
+      tag.style.cssText = 'display: flex; align-items: center; gap: 4px; background: var(--card-bg); padding: 2px 5px; border-radius: 3px; border: 1px solid var(--card-border); color: #94a3b8;';
       const skill = RaceSkills[race.id];
       const skillName = skill ? skill.active.displayName : '基础';
       tag.innerHTML = `
-        <div class="race-dot" style="background: ${RACE_COLORS[idx]};"></div>
+        <div class="race-dot" style="width: 7px; height: 7px; border-radius: 1px; flex-shrink: 0; background: ${RACE_COLORS[idx]};"></div>
         <span title="${race.name} - 特技: ${skillName}">${race.name}</span>
       `;
       raceGrid.appendChild(tag);
@@ -1334,15 +2071,14 @@
     });
 
     // ==========================================
-    // 真实实体生成管理 (写入连续 TypedArray 与 M2 构件)
+    // 真实实体生成管理 (写入 ECS 与 M2/M3/M4 构件)
     // ==========================================
     function spawnUnit(raceIndex, targetX, targetY, isLeader = false) {
       const eid = ecs.allocateEntity();
-      if (eid === 0) return 0; // 内存池已满
+      if (eid === 0) return 0;
 
       const race = RaceList[raceIndex] || RaceList[0];
 
-      // 坐标定位在陆地上
       let x = targetX;
       let y = targetY;
       if (!x || !y) {
@@ -1351,7 +2087,6 @@
           const testY = prng.nextFloat(40, WORLD_HEIGHT - 40);
           const tIdx = tileGrid.worldToTileIndex(testX, testY);
           const tType = tileGrid.tileTypes[tIdx];
-          // 避开深水绝壁 (3)
           if (tType !== 3) {
             x = testX;
             y = testY;
@@ -1364,11 +2099,9 @@
         }
       }
 
-      // 1. TransformComponent
       ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = x;
       ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = y;
 
-      // 2. PhysicsComponent
       const angle = prng.nextFloat(0, Math.PI * 2);
       const speed = (race.baseSpeed || 50.0) * 0.45;
       ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_VX] = Math.cos(angle) * speed;
@@ -1376,25 +2109,20 @@
       ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_MASS] = race.mass || 60.0;
       ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_INVMASS] = 1.0 / (race.mass || 60.0);
 
-      // 3. HealthComponent
       const hp = race.baseHp || 100.0;
       ecs.health[eid * HEALTH_STRIDE + HP_OFFSET_CURRENT] = hp;
       ecs.health[eid * HEALTH_STRIDE + HP_OFFSET_MAX] = hp;
 
-      // 4. PhysiologyComponent (初始饥饿度 20~55)
       const initHunger = prng.nextFloat(20, 55);
       ecs.physiology[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] = initHunger;
       ecs.physiology[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_EMERGENCY_LOCK] = 0.0;
 
-      // 5. Identities (factionId: 1-12)
       const factionId = raceIndex + 1;
       ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = factionId;
 
-      // 6. M2: 种族关联绑定
       raceSkillSys.setEntityRace(eid, race.id);
       casteSys.setEntityRace(eid, race.id);
 
-      // 7. M2/M3: 阶级系统与世袭王位绑定
       const initialCaste = isLeader ? CasteType.LEADER : CasteType.CIVILIAN;
       initSocialCaste(casteSys.castes, eid, initialCaste);
       if (isLeader) {
@@ -1402,7 +2130,6 @@
         dynastySys.setLeader(factionId, eid);
       }
 
-      // 8. M2: 遗传基因初始化 (始祖带部分突变器官，严格受 TabooFilter 禁忌拦截)
       let maternalOrgan = 0;
       let paternalOrgan = 0;
       if (prng.nextFloat(0, 1) < 0.25) {
@@ -1418,22 +2145,18 @@
       initGenetics(geneticsSys.genetics, eid, maternalOrgan, paternalOrgan, 1);
       const phenotype = geneticsSys.genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
 
-      // 9. M2: 技能槽位初始化
       initRaceSkill(raceSkillSys.skills, eid);
 
-      // 10. UnitStatusFlags
       let flags = IS_ALIVE;
       if (isLeader) flags |= IS_LEADER;
       if (phenotype !== 0) flags |= IS_MUTANT;
       ecs.statusFlags[eid] = flags;
 
-      // 11. M2: 动态物理聚合 (质量、护甲与移速结合器官位掩码)
       EntityPhysicalAggregator.aggregate(ecs, eid, race.id, phenotype);
 
       return eid;
     }
 
-    // 批量生成小人
     function spawnBatch(count = 100) {
       let created = 0;
       for (let i = 0; i < count; i++) {
@@ -1442,10 +2165,9 @@
         const eid = spawnUnit(raceIdx, 0, 0, isLeader);
         if (eid > 0) created++;
       }
-      addLog(`成功向生态箱注入 ${created} 只 M2 多元种族实体！`, 'green');
+      addLog(`成功向生态箱注入 ${created} 只 M4 多元种族实体！`, 'green');
     }
 
-    // 初始化真实 2x2 农田
     function initStarterFarms() {
       const spots = [
         [14, 10], [18, 12], [22, 14], [26, 11],
@@ -1454,21 +2176,18 @@
       spots.forEach((pt, i) => {
         const farmId = farmlandSys.createFarmland(pt[0], pt[1], (i % 3) + 1);
         if (farmId >= 0) {
-          farmlandSys.farmStage[farmId] = i % 4; // 错峰演替
+          farmlandSys.farmStage[farmId] = i % 4;
           farmlandSys.farmTimer[farmId] = prng.nextFloat(0, 6);
         }
       });
       addLog(`成功开垦 8 片 2x2 复合农田！`, 'info');
     }
 
-    // ==========================================
-    // M3 初始化 12 大文明阵营的中心图腾与地缘领地
-    // ==========================================
     function initFactionsAndTerritories() {
       const cols = 4;
       const rows = 3;
-      const cellW = (GRID_WIDTH / cols) | 0; // 14
-      const cellH = (GRID_HEIGHT / rows) | 0; // 12
+      const cellW = (GRID_WIDTH / cols) | 0;
+      const cellH = (GRID_HEIGHT / rows) | 0;
 
       for (let f = 1; f <= 12; f++) {
         const idx = f - 1;
@@ -1480,7 +2199,6 @@
         const worldX = centerX * TILE_SIZE + 12;
         const worldY = centerY * TILE_SIZE + 12;
 
-        // 生成不可摧毁的静态图腾实体
         const totemId = ecs.allocateEntity();
         ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X] = worldX;
         ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_Y] = worldY;
@@ -1489,17 +2207,13 @@
         ecs.health[totemId * HEALTH_STRIDE + HP_OFFSET_MAX] = 600.0;
         ecs.statusFlags[totemId] = IS_ALIVE | IS_STATIC_ANCHOR;
 
-        // 注册到图腾防御机制与战争看门狗
         totemDefenseSys.registerTotem(f, totemId);
         warWatchdogSys.registerTotem(f, totemId);
 
-        // 写入政权运行时缓冲区
         const facOffset = (f - 1) * FACTION_STRIDE;
         factionBuffer[facOffset + FAC_OFFSET_TOTEM_ID] = totemId;
         factionBuffer[facOffset + FAC_OFFSET_FLAGS] = FactionFlags.ACTIVE;
-        factionBuffer[facOffset + FAC_OFFSET_TENSION] = 10 + prng.nextInt(0, 10);
 
-        // 为该阵营划定以图腾为中心的地缘领地 (半径 4 瓦片圆形)
         const rad = 4;
         for (let dy = -rad; dy <= rad; dy++) {
           const ty = centerY + dy;
@@ -1514,7 +2228,6 @@
         }
       }
 
-      // 默认反向 BFS 寻路向量流场以阵营 2 (森灵) 图腾为集结靶心
       const t2Id = totemDefenseSys.totemEntityIds[2];
       if (t2Id > 0) {
         flowFieldSys.generateField(
@@ -1524,23 +2237,18 @@
       }
     }
 
-    // 零 GC 复用流场采样对象
     const _flowSample = { x: 0, y: 0, distance: 0, tileX: 0, tileY: 0 };
 
     // ==========================================
-    // 真实系统驱动单步更新 (Update Tick)
+    // 真实系统单步更新 (Update Tick)
     // ==========================================
     function updateSimulation(dt) {
       simTicks++;
       simElapsedSec += dt;
 
-      // 1. 地脉养分连续拉普拉斯扩散步进
       nutrientField.update(dt, true);
-
-      // 2. 真实 2x2 农田四阶演替迭代
       farmlandSys.update(dt, nutrientField);
 
-      // 3. 实体平滑漫游、远征疲劳阻尼与流场微观牵引
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       const flags = ecs.statusFlags;
@@ -1551,8 +2259,7 @@
         const eid = dense[i];
         if ((flags[eid] & IS_ALIVE) === 0) continue;
 
-        // 图腾静态锚点绝对锁死
-        if (hasStatus(flags, eid, IS_STATIC_ANCHOR)) {
+        if (hasStatus(flags, eid, IS_STATIC_ANCHOR) || hasStatus(flags, eid, IS_HELD)) {
           const phyOff = eid * PHYSICS_STRIDE;
           phy[phyOff + PHY_OFFSET_VX] = 0.0;
           phy[phyOff + PHY_OFFSET_VY] = 0.0;
@@ -1562,7 +2269,6 @@
         const phyOff = eid * PHYSICS_STRIDE;
         const tfOff = eid * TRANSFORM_STRIDE;
 
-        // 若处于 10s 应急互斥锁或定身 (IS_IMMOBILIZED) 中，速度归零
         if (hasStatus(flags, eid, IS_EMERGENCY_LOCK) || hasStatus(flags, eid, IS_IMMOBILIZED)) {
           phy[phyOff + PHY_OFFSET_VX] = 0.0;
           phy[phyOff + PHY_OFFSET_VY] = 0.0;
@@ -1574,17 +2280,14 @@
         const tileIdx = tileGrid.worldToTileIndex(curX, curY);
         const tileType = tileGrid.tileTypes[tileIdx];
 
-        // 地形避障：深水绝壁 (3) 与高山 (1) 弹性转向
         if (tileType === 3 || tileType === 1) {
           phy[phyOff + PHY_OFFSET_VX] = -phy[phyOff + PHY_OFFSET_VX];
           phy[phyOff + PHY_OFFSET_VY] = -phy[phyOff + PHY_OFFSET_VY];
         } else if (tileType === 2 || tileType === 4) {
-          // 涉水阻力
           phy[phyOff + PHY_OFFSET_VX] *= 0.96;
           phy[phyOff + PHY_OFFSET_VY] *= 0.96;
         }
 
-        // 大军团反向 BFS 向量流场微观引导
         if (flowFieldSys.targetTileX >= 0) {
           flowFieldSys.sampleField(curX, curY, _flowSample);
           if (_flowSample.distance !== 65535 && (_flowSample.x !== 0 || _flowSample.y !== 0)) {
@@ -1593,66 +2296,44 @@
           }
         }
 
-        // 随机漫游巡航
         if (prng.nextFloat(0, 1) < 0.025) {
           const angle = prng.nextFloat(0, Math.PI * 2);
-          const speed = 25.0 + prng.nextFloat(0, 20.0);
+          const speed = (hasStatus(flags, eid, IS_ECSTASY) ? 40.0 : 25.0) + prng.nextFloat(0, 20.0);
           phy[phyOff + PHY_OFFSET_VX] = Math.cos(angle) * speed;
           phy[phyOff + PHY_OFFSET_VY] = Math.sin(angle) * speed;
         }
       }
 
-      // 4. 物理刚体刚性边界 Clamp 守门器
       WorldBoundaryGuard.updateAll(ecs, dt);
-
-      // 5. 生存代谢与饥饿更新
       metabolismSys.update(dt);
-
-      // 6. 极端饥荒应急生存网
       emergencySys.update(dt);
 
-      // 7. M2 四大社会阶级动态晋升与领袖即位 FSM 推进
       casteSys.update(dt);
-
-      // 8. M2 12 始祖种族特异技能与动作轨道仲裁系统推进
       raceSkillSys.update(dt);
-
-      // 9. M2 实体物理属性动态聚合管线推进 (质量、护甲、移速即时同步)
       EntityPhysicalAggregator.aggregateAll(ecs, geneticsSys.genetics);
 
-      // 10. M3 边境摩擦系统推进
       borderFrictionSys.update(dt);
-
-      // 11. M3 部族微观普查与政治张力推进 (60-Tick 周期普查)
       clanCensusSys.update(dt);
-
-      // 12. M3 政治大分裂系统推进
       schismSys.update(dt);
-
-      // 13. M3 王朝世袭与继承推进
       dynastySys.update(dt);
-
-      // 14. M3 叛乱军自由之怒时钟推进
       rebelWrathSys.update(dt);
-
-      // 15. M3 四级士气动态状态机推进
       moraleSys.update(dt);
-
-      // 16. M3 图腾防卫机制推进 (圣盾与生命监测)
       totemDefenseSys.update(dt);
-
-      // 17. M3 战争超时双门限防伪看门狗推进 (TC-EDGE-04)
       warWatchdogSys.update(dt);
-
-      // 18. M3 战后条约与荒原释放推进
       postWarSys.update(dt);
 
-      // 19. 领域事件总线 Flush 分发
+      handOfGodSys.update(dt);
+      divineMiraclesSys.update(dt);
+      divineOverdriveSys.update(dt, simTicks);
+      smartDirector.update(dt, ecs, camera, totemDefenseSys);
+      triVocalEngine.update(dt);
+      camera.update(dt);
+
       eventBus.flush();
     }
 
     // ==========================================
-    // 仪表盘遥测数据刷新 (0.2s 节流)
+    // 仪表盘遥测与 UI 界面刷新 (0.2s 节流)
     // ==========================================
     function updateTelemetryUI() {
       const activeCount = ecs.getActiveCount();
@@ -1669,13 +2350,11 @@
       let dying = 0;
       let totalHunger = 0;
 
-      // 阶级统计
       let countCivilian = 0;
       let countArtisan = 0;
       let countSoldier = 0;
       let countLeader = 0;
 
-      // 突变器官渗透率统计 (9 大正交器官)
       const organTally = {};
       organKeys.forEach(k => organTally[k] = 0);
       let mutantCount = 0;
@@ -1697,7 +2376,6 @@
         if (curHp <= maxHp * 0.2) dying++;
         if (hunger < 50.0 && curHp > maxHp * 0.5) healthy++;
 
-        // 阶级统计
         const cType = castes[eid * CASTE_STRIDE + CASTE_OFFSET_TYPE] | 0;
         if (cType === CasteType.LEADER || hasStatus(flags, eid, IS_LEADER)) {
           countLeader++;
@@ -1709,7 +2387,6 @@
           countCivilian++;
         }
 
-        // 突变统计
         const pheno = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
         if (pheno !== 0) {
           mutantCount++;
@@ -1722,7 +2399,6 @@
         }
       }
 
-      // 更新生理指示
       statHealthy.textContent = healthy;
       statHungry.textContent = hungry;
       statMutex.textContent = mutexLocked;
@@ -1736,7 +2412,6 @@
       const s = Math.floor(simElapsedSec % 60);
       statTime.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-      // 更新阶级面板
       casteTotalBadge.textContent = `${activeCount} 人口`;
       const popSafe = Math.max(1, activeCount);
       const pctCiv = (countCivilian / popSafe * 100).toFixed(0);
@@ -1754,7 +2429,6 @@
       statSoldier.textContent = `${countSoldier} (${pctSol}%)`;
       statLeader.textContent = `${countLeader} (${pctLea}%)`;
 
-      // 更新突变器官渗透率
       mutantTotalBadge.textContent = `变异数: ${mutantCount} (${(mutantCount / popSafe * 100).toFixed(1)}%)`;
       organKeys.forEach((mask) => {
         const valElem = document.getElementById(`organVal_${mask}`);
@@ -1765,7 +2439,62 @@
         }
       });
 
-      // 更新十六政权地缘格局与战争看门狗看板
+      const fervor = divineMiraclesSys.fervor;
+      fervorValText.textContent = `${fervor.toFixed(0)}/100`;
+      fervorBarFill.style.width = `${fervor}%`;
+
+      if (divineOverdriveSys.isActive) {
+        btnOverdrive.classList.add('active');
+        btnOverdrive.classList.remove('ready');
+        btnOverdrive.textContent = `🔥 狂欢中 (${divineOverdriveSys.remainingTime.toFixed(1)}s)`;
+      } else if (fervor >= 100.0) {
+        btnOverdrive.classList.add('ready');
+        btnOverdrive.classList.remove('active');
+        btnOverdrive.textContent = `⚡ 开启狂欢 [O]`;
+      } else {
+        btnOverdrive.classList.remove('ready', 'active');
+        btnOverdrive.textContent = `🔥 15s 神恩狂欢 [O]`;
+      }
+
+      for (let i = 0; i < 6; i++) {
+        const cd = divineMiraclesSys.cooldowns[i];
+        const card = document.getElementById(`cardMiracle${i}`);
+        const cdOverlay = document.getElementById(`miracleCd${i}`);
+        const canCast = divineMiraclesSys.canCast(i, divineOverdriveSys.isActive);
+
+        if (card) {
+          card.classList.toggle('disabled', !canCast);
+          card.classList.toggle('selected', selectedMiracle === i);
+        }
+        if (cdOverlay) {
+          if (cd > 0 && !divineOverdriveSys.isActive) {
+            cdOverlay.style.display = 'flex';
+            cdOverlay.textContent = cd.toFixed(1) + 's';
+          } else {
+            cdOverlay.style.display = 'none';
+          }
+        }
+      }
+
+      if (smartDirector.isActive) {
+        pipContainer.style.opacity = smartDirector.opacity;
+        pipContainer.style.pointerEvents = 'auto';
+        pipBadge.textContent = smartDirector.currentEvent.title || '🚨 突发事态';
+        smartDirector.renderPiP(tileGrid, ecs);
+      } else {
+        pipContainer.style.opacity = 0;
+        pipContainer.style.pointerEvents = 'none';
+      }
+
+      let totalGrudges = 0;
+      for (let i = 0; i < bloodLedger.counts.length; i++) {
+        totalGrudges += bloodLedger.counts[i];
+      }
+      grudgeCountBadge.textContent = `${totalGrudges} 条宿怨`;
+      if (totalGrudges > 0) {
+        grudgeSummaryText.textContent = `当前大陆已铭刻 ${totalGrudges} 条刻骨血仇！仇敌狭路相逢将即刻触发【宿仇狂暴】！`;
+      }
+
       let activeFactionCount = 0;
       let factionListHtml = '';
       let activeWarFound = null;
@@ -1789,7 +2518,7 @@
         const terrCount = territoryCounts[f];
         const tension = clanCensusSys.getTension(f);
         const borderCol = FACTION_BORDER_COLORS[f] || '#ffffff';
-        const rConf = InitialFactions[f - 1] || { name: `叛乱政权 #${f}`, color: borderCol };
+        const rConf = InitialFactions[f - 1] || { name: `政权 #${f}`, color: borderCol };
 
         let isWar = false;
         let warEnemy = 0;
@@ -1844,18 +2573,15 @@
           warBanner.style.display = 'block';
           const dur = activeWarFound.duration;
           const rem = Math.max(0, 300.0 - dur).toFixed(1);
-          const facAName = InitialFactions[activeWarFound.facA - 1]?.name || `#${activeWarFound.facA}`;
-          const facBName = InitialFactions[activeWarFound.facB - 1]?.name || `#${activeWarFound.facB}`;
           const alertElem = document.getElementById('warAlertText');
           const timerElem = document.getElementById('warWatchdogTimer');
-          if (alertElem) alertElem.textContent = `⚔️ ${facAName} vs ${facBName} 决战交火中`;
+          if (alertElem) alertElem.textContent = `⚔️ #${activeWarFound.facA} vs #${activeWarFound.facB} 决战交火中`;
           if (timerElem) timerElem.textContent = `300s 看门狗: ${rem}s`;
         } else {
           warBanner.style.display = 'none';
         }
       }
 
-      // 更新实体全息检视器
       if (selectedEntityId > 0 && ecs.isAlive(selectedEntityId)) {
         const eid = selectedEntityId;
         const curHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_CURRENT] | 0;
@@ -1865,49 +2591,24 @@
         const race = RaceList[(facId - 1) % 12] || RaceList[0];
         const isL = hasStatus(flags, eid, IS_LEADER);
 
-        // 阶级
         const cType = castes[eid * CASTE_STRIDE + CASTE_OFFSET_TYPE] | 0;
-        const casteNames = ['平民 (Civilian)', '工匠 (Artisan)', '士兵 (Soldier)', '领袖 (Leader)'];
-        const expL = castes[eid * CASTE_STRIDE + CASTE_OFFSET_EXP_LABOR].toFixed(1);
-        const expC = castes[eid * CASTE_STRIDE + CASTE_OFFSET_EXP_COMBAT].toFixed(1);
-        const cCd = castes[eid * CASTE_STRIDE + CASTE_OFFSET_COOLDOWN].toFixed(1);
+        const casteNames = ['平民', '工匠', '士兵', '领袖'];
 
-        // 技能
-        const skCd = raceSkillSys.skills[eid * SKILL_STRIDE + SKILL_OFFSET_COOLDOWN].toFixed(1);
-        const skDur = raceSkillSys.skills[eid * SKILL_STRIDE + SKILL_OFFSET_DURATION].toFixed(1);
-        const skConfig = RaceSkills[race.id];
-        const isCasting = hasStatus(flags, eid, IS_CASTING);
-        const isDisarmed = hasStatus(flags, eid, IS_DISARMED);
-
-        // M3 士气与远征后勤疲劳
         const mState = moraleSys.getMoraleState(eid);
-        const mVal = ecs.morale[eid * MORALE_STRIDE + MORALE_OFFSET_VAL].toFixed(1);
-        const mStateNames = ['稳固 (SOLID)', '动摇 (WAVERING)', '惊恐后撤 (DISORGANIZED)', '溃不成军 (ROUTED)'];
-        const mStateColors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
-        const isLastStand = hasStatus(flags, eid, IS_LAST_STAND);
-        const fatigue = totemDefenseSys.getExpeditionFatigue(eid);
+        const mStateNames = ['稳固', '动摇', '后撤', '溃败'];
 
-        // 遗传
-        const mat = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_MATERNAL];
-        const pat = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PATERNAL];
         const pheno = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
-        const gen = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_GENERATION];
-        const matNames = getOrganFlagNames(mat).join(',') || '野生型';
-        const patNames = getOrganFlagNames(pat).join(',') || '野生型';
         const phenoNames = getOrganFlagNames(pheno).join(' + ') || '标准表型';
 
-        // 物理
         const mass = ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_MASS].toFixed(1);
         const armor = ecs.combatStats[eid * COMBAT_STRIDE + CS_OFFSET_ARMOR].toFixed(1);
+        const isHeld = hasStatus(flags, eid, IS_HELD);
 
         inspectorBox.innerHTML = `
-          <strong>[实体 #${eid}]</strong> ${isL ? '👑 ' : ''}${race.name} (阵营 #${facId})<br>
+          <strong>[实体 #${eid}]</strong> ${isL ? '👑 ' : ''}${race.name} (阵营 #${facId}) ${isHeld ? '<span style="color:#ffd700;">[神手悬空中]</span>' : ''}<br>
           <div style="margin-top: 4px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
-            <strong>社会阶级:</strong> <span style="color: #ffd700;">${casteNames[cType]}</span> | 劳作: ${expL} | 战功: ${expC} | 防抖锁: ${cCd}s<br>
-            <strong>种族特技:</strong> 【${skConfig ? skConfig.active.displayName : '无'}】 | ICD: ${skCd}s | 持续: ${skDur}s ${isCasting ? '⏳施法中' : ''} ${isDisarmed ? '🗡️缴械中' : ''}<br>
-            <strong>心智士气:</strong> <span style="color: ${mStateColors[mState] || '#fff'}; font-weight: bold;">${mStateNames[mState] || '稳固'}</span> (${mVal}/100) ${isLastStand ? '🔥破釜沉舟死战' : ''} | 远征疲劳: ${fatigue.layers} 层 (移速 ${(fatigue.speedMod * 100).toFixed(0)}%, 伤害 ${(fatigue.damageMod * 100).toFixed(0)}%)<br>
-            <strong>孟德尔基因 (F${gen}):</strong> 母系[${matNames}] / 父系[${patNames}]<br>
-            <strong>表达表型:</strong> <span style="color: #38bdf8;">${phenoNames}</span><br>
+            <strong>社会阶级:</strong> <span style="color: #ffd700;">${casteNames[cType]}</span> | <strong>士气:</strong> ${mStateNames[mState]}<br>
+            <strong>突变表型:</strong> <span style="color: #38bdf8;">${phenoNames}</span><br>
             <strong>聚合物理:</strong> 质量: ${mass}kg | 护甲: ${armor} | 生命: ${curHp}/${maxHp} | 饥饿: ${hg}/100
           </div>
         `;
@@ -1915,132 +2616,362 @@
     }
 
     // ==========================================
-    // 交互操作逻辑 (直接驱动真实 M2/M3 系统，LL-003)
+    // 上帝之手与六大神迹交互系统
     // ==========================================
-    // M3 专属: 1. 一键边境偷粮摩擦 (+10)
-    const btnBorderFriction = document.getElementById('btnBorderFriction');
-    if (btnBorderFriction) {
-      btnBorderFriction.addEventListener('click', () => {
-        borderFrictionSys.recordFriction(1, 2, 10.0);
-        const f = borderFrictionSys.getFriction(1, 2);
-        const stage = borderFrictionSys.getStage(1, 2);
-        const stageNames = ['中立相安', '私怨打砸', '边境械斗', '全面战争'];
-        addLog(`⚔️ 边境突发越界偷粮摩擦！阵营 #1 与 阵营 #2 摩擦张力增至 ${f.toFixed(1)}/100 (阶段: ${stageNames[stage]})`, 'amber');
-      });
+    let isMouseDown = false;
+    let isPanningView = false;
+    let lastPanScreenX = 0;
+    let lastPanScreenY = 0;
+
+    const _mouseWorldPos = { x: 0, y: 0 };
+
+    function getCanvasCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        screenX: (e.clientX - rect.left) * scaleX,
+        screenY: (e.clientY - rect.top) * scaleY
+      };
     }
 
-    // M3 专属: 2. 一键引爆图腾大裂变 (Voronoi)
-    const btnSchism = document.getElementById('btnSchism');
-    if (btnSchism) {
-      btnSchism.addEventListener('click', () => {
-        let bestFac = 1;
-        let maxTerr = 0;
-        for (let i = 1; i <= 12; i++) {
-          const cnt = schismSys.countTerritory(i);
-          if (cnt > maxTerr) {
-            maxTerr = cnt;
-            bestFac = i;
-          }
-        }
-        clanCensusSys.setTension(bestFac, 100.0);
-        const success = schismSys.attemptSchism(bestFac);
-        if (success) {
-          renderer.invalidateTerrain();
-          addLog(`💥 【图腾大裂变】母国 #${bestFac} 内部政治张力爆表！Voronoi 双核切分成功并消除孤岛飞地！`, 'danger');
-        } else {
-          addLog(`⚠️ 母国 #${bestFac} 裂变未触发（可能已达 16 国上限或触发防碎片守门拦截）`, 'warn');
-        }
-      });
-    }
-
-    // M3 专属: 3. 一键世袭驾崩大转盘 (五大继承)
-    const btnDynastySuccession = document.getElementById('btnDynastySuccession');
-    if (btnDynastySuccession) {
-      btnDynastySuccession.addEventListener('click', () => {
-        const facId = 1;
-        const currentRuler = dynastySys.getLeader(facId);
-        const deadKing = currentRuler > 0 ? currentRuler : NULL_ENTITY;
-        const newKing = dynastySys.triggerSuccession(facId, deadKing, 0);
-        addLog(`👑 阵营 #${facId} 旧王驾崩！世袭五大驾崩大转盘启动，新王加冕为实体 #${newKing}！`, 'purple');
-      });
-    }
-
-    // M3 专属: 4. 一键图腾 25% 圣盾波 (震退敌军)
-    const btnTotemAegis = document.getElementById('btnTotemAegis');
-    if (btnTotemAegis) {
-      btnTotemAegis.addEventListener('click', () => {
-        const facId = 1;
-        totemDefenseSys.resetTotemTrigger(facId);
-        totemDefenseSys.triggerTotemAegis(facId);
-        const totemId = totemDefenseSys.totemEntityIds[facId];
-        if (totemId > 0 && ecs.isAlive(totemId)) {
-          const tx = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X];
-          const ty = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_Y];
-          renderer.addShockwave(tx, ty, 144.0, 220.0);
-        }
-        addLog(`🛡️ 阵营 #${facId} 图腾圣火涅槃冲击波激活！震退 6 瓦片敌军，施加 2.5s 眩晕并赋予 12s 金身圣盾！`, 'green');
-      });
-    }
-
-    // M3 专属: 5. 阵营决裂宣战 (启动看门狗)
-    const btnTriggerWar = document.getElementById('btnTriggerWar');
-    if (btnTriggerWar) {
-      btnTriggerWar.addEventListener('click', () => {
-        borderFrictionSys.declareWar(1, 2);
-        warWatchdogSys.startWar(1, 2);
-        addLog(`🚩 阵营 #1 对 阵营 #2 正式宣战！300s 战争交火防伪看门狗启动！`, 'danger');
-      });
-    }
-
-    // M3 专属: 6. 切换大军团流场可视化 [F]
-    const btnToggleFlow = document.getElementById('btnToggleFlow');
-    if (btnToggleFlow) {
-      btnToggleFlow.addEventListener('click', () => {
-        renderer.showFlowField = !renderer.showFlowField;
-        const chip = document.getElementById('toggleFlowField');
-        if (chip) chip.classList.toggle('active', renderer.showFlowField);
-        addLog(`🌊 大军团反向 BFS 流场向量网格可视化: ${renderer.showFlowField ? '开启' : '关闭'}`, 'info');
-      });
-    }
-
-    // 快捷键 [F] 监听
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'f' || e.key === 'F') {
-        renderer.showFlowField = !renderer.showFlowField;
-        const chip = document.getElementById('toggleFlowField');
-        if (chip) chip.classList.toggle('active', renderer.showFlowField);
-        addLog(`🌊 [快捷键 F] 大军团流场可视化: ${renderer.showFlowField ? '开启' : '关闭'}`, 'info');
+    pipContainer.addEventListener('click', () => {
+      if (smartDirector.isActive) {
+        camera.smoothPanTo(smartDirector.currentEvent.targetWorldX, smartDirector.currentEvent.targetWorldY);
+        addLog(`🎥 导播镜头切换：摄像机正以 1200px/s 巡航至事发热点！`, 'info');
+        synth.playUI();
       }
     });
 
-    // M2: 7. 生成 100 只小人
-    document.getElementById('btnSpawn100').addEventListener('click', () => {
-      spawnBatch(100);
+    for (let i = 0; i < 6; i++) {
+      const card = document.getElementById(`cardMiracle${i}`);
+      if (card) {
+        card.addEventListener('click', () => {
+          if (selectedMiracle === i) {
+            selectedMiracle = -1;
+            canvas.className = '';
+          } else {
+            selectedMiracle = i;
+            canvas.className = 'aim-cursor';
+          }
+          updateTelemetryUI();
+          synth.playUI();
+        });
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      const coords = getCanvasCoords(e);
+      camera.screenToWorld(coords.screenX, coords.screenY, _mouseWorldPos);
+
+      if (e.button === 2 || e.button === 1) {
+        isPanningView = true;
+        lastPanScreenX = e.clientX;
+        lastPanScreenY = e.clientY;
+        return;
+      }
+
+      if (e.button === 0) {
+        isMouseDown = true;
+
+        if (selectedMiracle >= 0) {
+          const isOverdrive = divineOverdriveSys.isActive;
+          const success = divineMiraclesSys.castMiracle(selectedMiracle, _mouseWorldPos.x, _mouseWorldPos.y, isOverdrive);
+          if (success) {
+            if (isOverdrive) divineOverdriveSys.recordMiracleCast();
+            const names = ['生机甘霖', '神圣果实', '神圣天雷', '狂暴圣战', '神圣休战', '灭世陨石'];
+            addLog(`⚡ 【神迹降临】神明在坐标 (${_mouseWorldPos.x|0}, ${_mouseWorldPos.y|0}) 施展了【${names[selectedMiracle]}】！`, 'green');
+
+            if (selectedMiracle === MiracleId.DIVINE_RAIN) {
+              synth.playRainDrop();
+            } else if (selectedMiracle === MiracleId.HOLY_FRUIT) {
+              synth.playMiracleChime();
+            } else if (selectedMiracle === MiracleId.HOLY_THUNDER) {
+              synth.playThunder();
+              renderer.spawnThunderStrike(_mouseWorldPos.x, _mouseWorldPos.y);
+            } else if (selectedMiracle === MiracleId.WAR_HORN) {
+              synth.playWarHorn();
+            } else if (selectedMiracle === MiracleId.PAX_DIVINA) {
+              synth.playWhisper();
+            } else if (selectedMiracle === MiracleId.METEOR_CATACLYSM) {
+              synth.playMeteor();
+              renderer.spawnMeteorImpact(_mouseWorldPos.x, _mouseWorldPos.y);
+            }
+          } else {
+            addLog(`⚠️ 神恩不足或技能处于冷却中！`, 'warn');
+            synth.playHit({ freq: 100, duration: 0.1 });
+          }
+
+          selectedMiracle = -1;
+          canvas.className = '';
+          updateTelemetryUI();
+          return;
+        }
+
+        let closestId = 0;
+        let minDisSq = (28 / camera.zoom) * (28 / camera.zoom);
+        const activeCount = ecs.getActiveCount();
+        const dense = ecs.getActiveEntities();
+        const tf = ecs.transforms;
+
+        for (let i = 0; i < activeCount; i++) {
+          const eid = dense[i];
+          if (!ecs.isAlive(eid)) continue;
+          const x = tf[eid * TRANSFORM_STRIDE + TF_OFFSET_X];
+          const y = tf[eid * TRANSFORM_STRIDE + TF_OFFSET_Y];
+          const disSq = (x - _mouseWorldPos.x) * (x - _mouseWorldPos.x) + (y - _mouseWorldPos.y) * (y - _mouseWorldPos.y);
+          if (disSq < minDisSq) {
+            minDisSq = disSq;
+            closestId = eid;
+          }
+        }
+
+        if (closestId > 0) {
+          selectedEntityId = closestId;
+          const success = handOfGodSys.pickup(closestId);
+          if (success) {
+            canvas.className = 'grabbing-cursor';
+            addLog(`✋ 上帝之手捏起了实体 #${closestId}！`, 'info');
+            synth.playHit({ freq: 280, duration: 0.08 });
+          }
+          updateTelemetryUI();
+        } else {
+          const raceIdx = prng.nextInt(0, 11);
+          const eid = spawnUnit(raceIdx, _mouseWorldPos.x, _mouseWorldPos.y, false);
+          selectedEntityId = eid;
+          addLog(`在坐标 (${_mouseWorldPos.x|0}, ${_mouseWorldPos.y|0}) 点召了一只 ${RaceList[raceIdx].name}！`, 'info');
+          synth.playMiracleChime();
+        }
+      }
     });
 
-    // M2: 8. 全员释放种族特技
-    document.getElementById('btnCastAllSkills').addEventListener('click', () => {
+    window.addEventListener('mousemove', (e) => {
+      if (isPanningView) {
+        const dx = e.clientX - lastPanScreenX;
+        const dy = e.clientY - lastPanScreenY;
+        lastPanScreenX = e.clientX;
+        lastPanScreenY = e.clientY;
+        camera.pan(-dx / camera.zoom, -dy / camera.zoom);
+        return;
+      }
+
+      if (isMouseDown && handOfGodSys.heldEntity > NULL_ENTITY) {
+        const coords = getCanvasCoords(e);
+        camera.screenToWorld(coords.screenX, coords.screenY, _mouseWorldPos);
+        handOfGodSys.moveHeld(_mouseWorldPos.x, _mouseWorldPos.y, 0.016);
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (e.button === 2 || e.button === 1) {
+        isPanningView = false;
+      }
+      if (e.button === 0) {
+        isMouseDown = false;
+        if (handOfGodSys.heldEntity > NULL_ENTITY) {
+          handOfGodSys.release(0, 0);
+          canvas.className = '';
+          synth.playHit({ freq: 160, duration: 0.1 });
+        }
+      }
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const coords = getCanvasCoords(e);
+      const factor = e.deltaY < 0 ? 1.12 : 0.88;
+      camera.zoomAt(coords.screenX, coords.screenY, factor);
+    }, { passive: false });
+
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    canvas.addEventListener('dblclick', (e) => {
+      if (selectedEntityId > 0 && ecs.isAlive(selectedEntityId)) {
+        const tf = ecs.transforms;
+        const x = tf[selectedEntityId * TRANSFORM_STRIDE + TF_OFFSET_X];
+        const y = tf[selectedEntityId * TRANSFORM_STRIDE + TF_OFFSET_Y];
+        camera.smoothPanTo(x, y);
+        synth.playUI();
+      }
+    });
+
+    // 快捷键
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+
+      const panStep = 45 / camera.zoom;
+      if (key === 'w' && selectedMiracle !== 1) camera.pan(0, -panStep);
+      if (key === 's') camera.pan(0, panStep);
+      if (key === 'a') camera.pan(-panStep, 0);
+      if (key === 'd') camera.pan(panStep, 0);
+
+      if (e.key === 'q' || e.key === 'Q') document.getElementById('cardMiracle0').click();
+      if (e.key === 'w' || e.key === 'W') {
+        if (e.ctrlKey || e.metaKey) return;
+        document.getElementById('cardMiracle1').click();
+      }
+      if (e.key === 'e' || e.key === 'E') document.getElementById('cardMiracle2').click();
+      if (e.key === 'r' || e.key === 'R') document.getElementById('cardMiracle3').click();
+      if (e.key === 't' || e.key === 'T') document.getElementById('cardMiracle4').click();
+      if (e.key === 'y' || e.key === 'Y') document.getElementById('cardMiracle5').click();
+
+      if (key === 'o') {
+        btnOverdrive.click();
+      }
+
+      if (key === 'm') {
+        document.getElementById('btnAudioMute').click();
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        document.getElementById('btnPause').click();
+      }
+      if (e.key === '1') document.getElementById('btnSlowMo').click();
+      if (e.key === '2') document.getElementById('btn1x').click();
+      if (e.key === '3') document.getElementById('btn2x').click();
+      if (e.key === '4') document.getElementById('btn5x').click();
+      if (e.key === '5') document.getElementById('btn10x').click();
+
+      if (key === 'f') {
+        renderer.showFlowField = !renderer.showFlowField;
+        const chip = document.getElementById('toggleFlowField');
+        if (chip) chip.classList.toggle('active', renderer.showFlowField);
+      }
+    });
+
+    const speedMap = [
+      { id: 'btnPause', scale: TimeScaleMode.PAUSED },
+      { id: 'btnSlowMo', scale: TimeScaleMode.SLOW_MO },
+      { id: 'btn1x', scale: TimeScaleMode.NORMAL },
+      { id: 'btn2x', scale: TimeScaleMode.FAST_2X },
+      { id: 'btn5x', scale: TimeScaleMode.FAST_5X },
+      { id: 'btn10x', scale: TimeScaleMode.FAST_10X }
+    ];
+
+    speedMap.forEach(item => {
+      const btn = document.getElementById(item.id);
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        timeScaleController.setScale(item.scale);
+        speedMap.forEach(b => {
+          const el = document.getElementById(b.id);
+          if (el) el.classList.remove('active');
+        });
+        btn.classList.add('active');
+        addLog(`时间流速调谐至: ${item.scale === 0 ? '暂停 ⏸' : item.scale + 'x'}`, 'info');
+        synth.playUI();
+      });
+    });
+
+    btnOverdrive.addEventListener('click', () => {
+      const success = divineOverdriveSys.triggerOverdrive(simTicks, false);
+      if (success) {
+        addLog(`⚡ 神明敲响了黄金钟！15 秒狂欢时刻开启！`, 'green');
+      } else {
+        addLog(`⚠️ 信仰神恩未达 100 阈值，无法开启狂欢时刻！`, 'warn');
+        synth.playHit({ freq: 90, duration: 0.1 });
+      }
+    });
+
+    const btnAudioMute = document.getElementById('btnAudioMute');
+    const audioVolumeSlider = document.getElementById('audioVolumeSlider');
+
+    btnAudioMute.addEventListener('click', () => {
+      const isMuted = !audioBus.isMuted;
+      audioBus.setMuted(isMuted);
+      btnAudioMute.textContent = isMuted ? '🔇 静音' : '🔊 音频';
+      synth.playUI();
+    });
+
+    audioVolumeSlider.addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      audioBus.setMasterVolume(vol);
+    });
+
+    // 专属实验操作箱
+    document.getElementById('btnBorderFriction')?.addEventListener('click', () => {
+      borderFrictionSys.recordFriction(1, 2, 10.0);
+      addLog(`⚔️ 边境偷粮摩擦！阵营 #1 与 阵营 #2 摩擦张力增至 ${borderFrictionSys.getFriction(1, 2).toFixed(1)}/100`, 'amber');
+      synth.playHit();
+    });
+
+    document.getElementById('btnSchism')?.addEventListener('click', () => {
+      let bestFac = 1;
+      let maxTerr = 0;
+      for (let i = 1; i <= 12; i++) {
+        const cnt = schismSys.countTerritory(i);
+        if (cnt > maxTerr) {
+          maxTerr = cnt;
+          bestFac = i;
+        }
+      }
+      clanCensusSys.setTension(bestFac, 100.0);
+      const success = schismSys.attemptSchism(bestFac);
+      if (success) {
+        renderer.invalidateTerrain();
+        addLog(`💥 【图腾大裂变】母国 #${bestFac} 内部政治大分裂成功！`, 'danger');
+        synth.playThunder();
+      }
+    });
+
+    document.getElementById('btnDynastySuccession')?.addEventListener('click', () => {
+      const currentRuler = dynastySys.getLeader(1);
+      const newKing = dynastySys.triggerSuccession(1, currentRuler > 0 ? currentRuler : NULL_ENTITY, 0);
+      addLog(`👑 阵营 #1 世袭驾崩大转盘启动，新王加冕为实体 #${newKing}！`, 'purple');
+      synth.playWarHorn();
+    });
+
+    document.getElementById('btnTotemAegis')?.addEventListener('click', () => {
+      totemDefenseSys.resetTotemTrigger(1);
+      totemDefenseSys.triggerTotemAegis(1);
+      const totemId = totemDefenseSys.totemEntityIds[1];
+      if (totemId > 0 && ecs.isAlive(totemId)) {
+        const tx = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X];
+        const ty = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_Y];
+        renderer.addShockwave(tx, ty, 144.0, 220.0);
+      }
+      addLog(`🛡️ 阵营 #1 图腾圣火涅槃冲击波激活！震退敌军并开启 12s 圣盾！`, 'green');
+      synth.playThunder();
+    });
+
+    document.getElementById('btnTriggerWar')?.addEventListener('click', () => {
+      borderFrictionSys.declareWar(1, 2);
+      warWatchdogSys.startWar(1, 2);
+      addLog(`🚩 阵营 #1 对 阵营 #2 正式宣战！300s 战争看门狗启动！`, 'danger');
+      synth.playWarHorn();
+    });
+
+    document.getElementById('btnToggleFlow')?.addEventListener('click', () => {
+      renderer.showFlowField = !renderer.showFlowField;
+      const chip = document.getElementById('toggleFlowField');
+      if (chip) chip.classList.toggle('active', renderer.showFlowField);
+      synth.playUI();
+    });
+
+    document.getElementById('btnSpawn100')?.addEventListener('click', () => {
+      spawnBatch(100);
+      synth.playMiracleChime();
+    });
+
+    document.getElementById('btnCastAllSkills')?.addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       let triggered = 0;
-
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if (!ecs.isAlive(eid)) continue;
         const raceKey = raceSkillSys.getEntityRaceKey(eid);
-        if (raceSkillSys.triggerSkill(eid, raceKey)) {
-          triggered++;
-        }
+        if (raceSkillSys.triggerSkill(eid, raceKey)) triggered++;
       }
-      addLog(`⚡ 全军号令激活！共激发 ${triggered} 名战士的种族特技！`, 'purple');
+      addLog(`⚡ 全军号令！共激发 ${triggered} 名战士的种族特技！`, 'purple');
+      synth.playWarHorn();
     });
 
-    // M2: 9. 诱发环境辐射突变 (通过 TabooFilter 禁忌过滤与重映射)
-    document.getElementById('btnRadiateMutation').addEventListener('click', () => {
+    document.getElementById('btnRadiateMutation')?.addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       let mutated = 0;
-
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if (!ecs.isAlive(eid)) continue;
@@ -2055,80 +2986,64 @@
           mutated++;
         }
       }
-      addLog(`🧬 沃土神辐射洗礼！共促发 ${mutated} 名单位产生合法表型突变！`, 'green');
+      addLog(`🧬 沃土神辐射洗礼！促发 ${mutated} 名单位产生表型突变！`, 'green');
+      synth.playMiracleChime();
     });
 
-    // M2: 10. 战备动员与劳作晋升 (向平民注入劳作经验/战备经验)
-    document.getElementById('btnPromoteCastes').addEventListener('click', () => {
+    document.getElementById('btnPromoteCastes')?.addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       let expInjected = 0;
-
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if (!ecs.isAlive(eid)) continue;
-        const cType = casteSys.getCaste(eid);
-        if (cType === CasteType.CIVILIAN) {
-          if (prng.nextFloat(0, 1) < 0.5) {
-            casteSys.recordLabor(eid, 6.0);
-          } else {
-            casteSys.recordCombat(eid, 60.0, true);
-          }
+        if (casteSys.getCaste(eid) === CasteType.CIVILIAN) {
+          casteSys.recordCombat(eid, 60.0, true);
           expInjected++;
         }
       }
-      addLog(`🎖️ 战备号召与工匠大竞赛！注入履历促进 ${expInjected} 名平民跃迁！`, 'amber');
+      addLog(`🎖️ 战备号召！注入战功促进 ${expInjected} 名平民晋升！`, 'amber');
+      synth.playMiracleChime();
     });
 
-    // M2: 11. 斩首领袖仲裁继承
-    document.getElementById('btnRegicide').addEventListener('click', () => {
+    document.getElementById('btnRegicide')?.addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       let killed = 0;
-
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if (ecs.isAlive(eid) && hasStatus(ecs.statusFlags, eid, IS_LEADER)) {
+          eventBus.emit(DomainEvents.EVT_RULER_DIED, eid, 0, 0, 0);
           casteSys.onLeaderDied(eid);
           ecs.destroyEntity(eid);
           killed++;
         }
       }
       if (killed > 0) {
-        addLog(`👑 王座动荡！处决了 ${killed} 名旧领袖，各阵营进入 3s 空位继承期！`, 'danger');
-      } else {
-        addLog(`当前无在位领袖，尝试由功勋氏族加冕新王！`, 'info');
+        addLog(`👑 处决了 ${killed} 名旧领袖！唤醒濒死思维阁与世袭大转盘！`, 'danger');
       }
     });
 
-    // M2: 12. 一键引发饥荒
-    document.getElementById('btnTriggerFamine').addEventListener('click', () => {
+    document.getElementById('btnTriggerFamine')?.addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       const phys = ecs.physiology;
-
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if (ecs.isAlive(eid)) {
           phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] = 95.0;
         }
       }
-
-      for (let i = 0; i < farmlandSys.maxCapacity; i++) {
-        if (farmlandSys.farmActive[i] === 1) {
-          farmlandSys.pillageFarmland(i, nutrientField);
-        }
-      }
-      addLog(`🚨 全图神罚大饥荒爆发！饥饿升至 95，农田全毁，触发 10s 互斥锁！`, 'danger');
+      addLog(`🚨 全图神罚大饥荒爆发！饥饿升至 95，触发 10s 互斥锁！`, 'danger');
+      synth.playThunder();
     });
 
-    // M2: 13. 种植 8 片农田
-    document.getElementById('btnSpawnFarms').addEventListener('click', () => {
+    document.getElementById('btnSpawnFarms')?.addEventListener('click', () => {
       initStarterFarms();
+      synth.playMiracleChime();
     });
 
-    // 14. 彻底重置生态与地缘格局
-    document.getElementById('btnResetAll').addEventListener('click', () => {
+    document.getElementById('btnResetAll')?.addEventListener('click', () => {
       ecs.reset();
       nutrientField.reset(20.0);
       nutrientField.syncBaseHeatFromGrid();
@@ -2138,7 +3053,6 @@
       geneticsSys.genetics.fill(0);
       raceSkillSys.skills.fill(0);
 
-      // 重置 M3 状态
       tileGrid.territoryFaction.fill(0);
       moraleSys.moraleStates.fill(0);
       borderFrictionSys.frictionMatrix.fill(0);
@@ -2157,16 +3071,17 @@
       initStarterFarms();
       spawnBatch(120);
       renderer.invalidateTerrain();
-      addLog(`生态与地缘政治系统彻底重置，重新划分 12 始祖领地并孕育 120 只小人！`, 'info');
+      addLog(`生态与地缘政治系统彻底重置！`, 'info');
+      synth.playUI();
     });
 
-    // 15. 图层快捷切换
     const bindToggle = (id, prop) => {
       const btn = document.getElementById(id);
       if (!btn) return;
       btn.addEventListener('click', () => {
         renderer[prop] = !renderer[prop];
         btn.classList.toggle('active', renderer[prop]);
+        synth.playUI();
       });
     };
     bindToggle('toggleTerritories', 'showTerritories');
@@ -2182,67 +3097,8 @@
     bindToggle('toggleSkills', 'showSkills');
     bindToggle('toggleGrid', 'showGrid');
 
-    // 16. 倍速切换
-    const speedBtns = [
-      { id: 'btnPause', val: 0 },
-      { id: 'btn1x', val: 1 },
-      { id: 'btn2x', val: 2 },
-      { id: 'btn5x', val: 5 }
-    ];
-
-    speedBtns.forEach(item => {
-      const btn = document.getElementById(item.id);
-      if (!btn) return;
-      btn.addEventListener('click', () => {
-        timeScale = item.val;
-        speedBtns.forEach(b => {
-          const el = document.getElementById(b.id);
-          if (el) el.classList.remove('active');
-        });
-        btn.classList.add('active');
-        addLog(`时间流速调谐至: ${timeScale === 0 ? '暂停 ⏸' : timeScale + 'x'}`, 'info');
-      });
-    });
-
-    // 17. 画布点击选定实体全息检视
-    canvas.addEventListener('click', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const clickX = (e.clientX - rect.left) * scaleX;
-      const clickY = (e.clientY - rect.top) * scaleY;
-
-      let closestId = 0;
-      let minDisSq = 32 * 32;
-      const activeCount = ecs.getActiveCount();
-      const dense = ecs.getActiveEntities();
-      const tf = ecs.transforms;
-
-      for (let i = 0; i < activeCount; i++) {
-        const eid = dense[i];
-        if (!ecs.isAlive(eid)) continue;
-        const x = tf[eid * TRANSFORM_STRIDE + TF_OFFSET_X];
-        const y = tf[eid * TRANSFORM_STRIDE + TF_OFFSET_Y];
-        const disSq = (x - clickX) * (x - clickX) + (y - clickY) * (y - clickY);
-        if (disSq < minDisSq) {
-          minDisSq = disSq;
-          closestId = eid;
-        }
-      }
-
-      if (closestId > 0) {
-        selectedEntityId = closestId;
-        updateTelemetryUI();
-      } else {
-        const raceIdx = prng.nextInt(0, 11);
-        const eid = spawnUnit(raceIdx, clickX, clickY, false);
-        selectedEntityId = eid;
-        addLog(`在坐标 (${clickX|0}, ${clickY|0}) 点召了一只 ${RaceList[raceIdx].name}！`, 'info');
-      }
-    });
-
     // ==========================================
-    // 启动 60 FPS 定步长 GameLoop (原生驱动 M1+M2+M3)
+    // 启动 60 FPS 定步长 GameLoop (原生驱动 M1+M2+M3+M4)
     // ==========================================
     initFactionsAndTerritories();
     initStarterFarms();
@@ -2250,15 +3106,14 @@
 
     const gameLoop = new GameLoop(
       (fixedDt) => {
-        if (timeScale > 0) {
-          for (let step = 0; step < timeScale; step++) {
-            updateSimulation(fixedDt);
-          }
+        const scaledDt = timeScaleController.update(fixedDt);
+        if (scaledDt > 0.0) {
+          updateSimulation(scaledDt);
         }
       },
       (interpolation) => {
         const t0 = performance.now();
-        // 传入真实 M1/M2/M3 领域系统驱动原生渲染
+
         renderer.render(
           tileGrid,
           ecs,
@@ -2269,11 +3124,14 @@
           raceSkillSys,
           flowFieldSys,
           moraleSys,
-          totemDefenseSys
+          totemDefenseSys,
+          camera,
+          handOfGodSys
         );
-        lastFrameDurationMs = performance.now() - t0;
 
+        lastFrameDurationMs = performance.now() - t0;
         frameCount++;
+
         if (t0 - lastFpsUpdate >= 200) {
           const fps = ((frameCount * 1000) / (t0 - lastFpsUpdate)).toFixed(1);
           statFps.textContent = fps;
@@ -2287,7 +3145,7 @@
     );
 
     gameLoop.start();
-    addLog(`60 FPS M3 宏观战争与地缘政治端到端领域视窗已就绪，全量构件原生运转中！`, 'green');
+    addLog(`60 FPS M4 表现层端到端全真视窗已启动，原生编排驱动全量系统！`, 'green');
   </script>
 </body>
 </html>

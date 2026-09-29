@@ -30,6 +30,8 @@ export const DomainEvents = Object.freeze({
   EVT_GENE_ASSIMILATED:     0x8011, // 模式 A 基因驱动全族同化完成 (Param1: factionId, Param2: organMask) [M2新增]
   EVT_TOTEM_AEGIS_TRIGGERED:0x8012, // 图腾 25% 圣盾击退波爆发 (Param1: 阵营ID, Param2: 图腾ID) [M3新增]
   EVT_SCHISM_ENCLAVE_PURGED:0x8013, // 裂变非连通孤岛飞地注销 (Param1: 阵营ID, Param2: 瓦片Index) [M3新增]
+  EVT_DIVINE_ACTION_BLOCKED:0x8016, // 上帝之手操作被图腾锁拦截 (Param1: entityId, Param2: reason) [M4新增]
+  EVT_DIVINE_BACKFIRE:      0x8017, // 天命悬空防死锁神威反噬震脱 (Param1: entityId, Param2: factionId) [M4新增]
 
   // ================= 瞬态表现通道 (0x0001 起始，可降频抽帧) =================
   EVT_DAMAGE_APPLIED:       0x0001, // 实体受创 (Param1: 实际扣血量, Param2: 伤害类型掩码)
@@ -48,7 +50,14 @@ export const DomainEvents = Object.freeze({
   EVT_ACTION_MUTEX_BLOCKED: 0x0012, // 动作轨道互斥阻断打断 (Param1: entityId, Param2: blockedChannel) [M2新增]
   EVT_MORALE_STATE_CHANGED: 0x0013, // 士兵士气四阶状态改变 (Param1: 实体ID, Param2: 新士气等级) [M3新增]
   EVT_FRICTION_ESCALATED:   0x0014, // 边境摩擦阶梯升级 (Param1: 阵营A, Param2: 阵营B) [M3新增]
-  EVT_LAST_STAND_ACTIVATED: 0x0015  // 图腾 5 格破釜沉舟绝地死战激活 (Param1: 实体ID, Param2: 0) [M3新增]
+  EVT_LAST_STAND_ACTIVATED: 0x0015, // 图腾 5 格破釜沉舟绝地死战激活 (Param1: 实体ID, Param2: 0) [M3新增]
+  EVT_MIRACLE_RAIN:         0x0020, // 生机甘霖释放 (Param1: 瓦片Index, Param2: 半径) [M4新增]
+  EVT_MIRACLE_FRUIT:        0x0021, // 神圣金苹果空投 (Param1: 瓦片Index, Param2: 0) [M4新增]
+  EVT_MIRACLE_THUNDER:      0x0022, // 神圣天雷轰击 (Param1: 瓦片Index, Param2: 伤害量) [M4新增]
+  EVT_MIRACLE_WAR_HORN:     0x0023, // 狂暴圣战号角吹响 (Param1: 0, Param2: 0) [M4新增]
+  EVT_MIRACLE_METEOR:       0x0024, // 灭世陨石天降 (Param1: 瓦片Index, Param2: 伤害量) [M4新增]
+  EVT_VENDETTA_TRIGGERED:   0x0025, // 宿怨对账狂暴触发 (Param1: 实体ID, Param2: 仇人ID) [M4新增]
+  EVT_CORONATION_CEREMONY:  0x0026  // 皇室登基大典特写 (Param1: 领袖ID, Param2: 阵营ID) [M4新增]
 });
 
 /**

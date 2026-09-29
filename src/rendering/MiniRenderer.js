@@ -30,6 +30,8 @@ import {
 
 import {
   IS_ALIVE,
+  IS_HELD,
+  IS_AIRBORNE,
   IS_LEADER,
   IS_EMERGENCY_LOCK,
   IN_COMBAT,
@@ -40,7 +42,8 @@ import {
   IS_LAST_STAND,
   IS_PANICKED,
   IS_SACRED_BODY,
-  IS_STATIC_ANCHOR
+  IS_STATIC_ANCHOR,
+  IS_ECSTASY
 } from '../components/UnitStatusFlags.js';
 
 import {
@@ -63,6 +66,8 @@ import {
   SKILL_OFFSET_COOLDOWN,
   SKILL_OFFSET_DURATION
 } from '../components/RaceSkillComponent.js';
+
+import { MegaAtlasDollCache } from './MegaAtlasDollCache.js';
 
 // ==========================================
 // 世界规格与常量
@@ -248,6 +253,21 @@ export const COLOR_LAST_STAND_CORE = '#ef4444';  // 气焰亮红焰芯
 export const COLOR_TOTEM_SHIELD    = '#ffd700';  // 金身圣盾亮金
 export const COLOR_TOTEM_SHOCKWAVE = 'rgba(255, 215, 0, 0.85)'; // 金色环形冲击波
 
+// ==========================================
+// M4 上帝之手、神恩神迹与狂欢时刻调色板 (契约 §5.3)
+// ==========================================
+export const COLOR_GOD_HAND_LINE      = 'rgba(251, 191, 36, 0.85)'; // 金色抓取牵引线
+export const COLOR_HELD_SHADOW        = 'rgba(0, 0, 0, 0.35)';       // 悬空实体地面投影
+export const COLOR_RAIN_DROP          = '#38bdf8';                   // 甘霖雨丝青蓝
+export const COLOR_THUNDER_BOLT       = '#ffffff';                   // 天雷电芒白炽
+export const COLOR_THUNDER_AURA       = 'rgba(96, 165, 250, 0.4)';   // 天雷外晕
+export const COLOR_METEOR_CORE        = '#ef4444';                   // 陨石火球中心
+export const COLOR_METEOR_TRAIL       = '#f97316';                   // 陨石烈焰拖尾
+export const COLOR_FIREWORK_GOLD      = '#ffd700';                   // 狂欢礼花金
+export const COLOR_FIREWORK_CYAN      = '#38bdf8';                   // 狂欢礼花蓝
+export const COLOR_FIREWORK_PURPLE    = '#c084fc';                   // 狂欢礼花紫
+export const COLOR_OVERDRIVE_BORDER   = 'rgba(251, 191, 36, 0.45)';  // 狂欢全屏金光呼吸边框
+
 /**
  * MiniRenderer 类
  * 纯原生 Canvas 2D 渲染引擎，热路径零 GC
@@ -287,6 +307,27 @@ export class MiniRenderer {
     this.showFlowField = false;   // 是否绘制大军团向量流场与集结靶心 (按 F 键切换)
     this.showMorale = true;      // 是否绘制士气微表情与破釜沉舟死战气焰
     this.showTotemShield = true; // 是否绘制图腾 25% 金身圣盾与环形冲击波
+
+    // M4 上帝之手、神恩神迹与享元图集缓存
+    this.dollCache = new MegaAtlasDollCache();
+    this.useMegaAtlas = true;     // 启用 1024x1024 享元图集单次贴图 (< 1.8ms)
+    this.showGodHand = true;      // 是否绘制上帝之手牵引线与悬空挣扎微表情
+    this.showMiracleVfx = true;   // 是否绘制神圣甘霖/天雷/陨石粒子
+    this.isOverdriveActive = false; // 15s 神恩满溢狂欢时刻激活状态
+    this.overdrivePulse = 0.0;
+
+    // 预分配神圣神迹粒子池 (容量 128，绝对零 GC)
+    this.maxParticles = 128;
+    this.partActive = new Uint8Array(128);
+    this.partX = new Float32Array(128);
+    this.partY = new Float32Array(128);
+    this.partVx = new Float32Array(128);
+    this.partVy = new Float32Array(128);
+    this.partLife = new Float32Array(128);
+    this.partMaxLife = new Float32Array(128);
+    this.partType = new Uint8Array(128); // 1: RAIN, 2: THUNDER, 3: METEOR, 4: FIREWORK
+    this.partColor = new Array(128);
+    this.partColor.fill('#ffffff');
 
     // 预分配图腾圣火涅槃冲击波定长环形缓冲池 (容量 16，绝对零 GC)
     this.maxShockwaves = 16;
@@ -369,6 +410,124 @@ export class MiniRenderer {
   }
 
   /**
+   * 添加单个神圣粒子到预分配缓冲池 (零 GC)
+   * @param {number} type 1: RAIN, 2: THUNDER, 3: METEOR, 4: FIREWORK
+   * @param {number} x 
+   * @param {number} y 
+   * @param {number} vx 
+   * @param {number} vy 
+   * @param {number} life 
+   * @param {string} [color='#ffffff']
+   */
+  addParticle(type, x, y, vx, vy, life, color = '#ffffff') {
+    for (let i = 0; i < this.maxParticles; i++) {
+      if (this.partActive[i] === 0) {
+        this.partActive[i] = 1;
+        this.partType[i] = type;
+        this.partX[i] = x;
+        this.partY[i] = y;
+        this.partVx[i] = vx;
+        this.partVy[i] = vy;
+        this.partLife[i] = life;
+        this.partMaxLife[i] = life;
+        this.partColor[i] = color;
+        return;
+      }
+    }
+  }
+
+  /**
+   * 触发神圣甘霖青蓝雨丝粒子
+   */
+  spawnRain(centerX, centerY, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const rx = centerX + (Math.random() * 96 - 48);
+      const ry = centerY - 48 + (Math.random() * 40 - 20);
+      this.addParticle(1, rx, ry, (Math.random() - 0.5) * 8, 120 + Math.random() * 60, 0.45, COLOR_RAIN_DROP);
+    }
+  }
+
+  /**
+   * 触发神圣天雷刺目电芒与焦黑雷坑
+   */
+  spawnThunderStrike(x, y) {
+    this.addParticle(2, x, y, 0, 0, 0.25, COLOR_THUNDER_BOLT);
+    this.addShockwave(x, y, 48.0, 180.0);
+  }
+
+  /**
+   * 触发灭世陨石烈焰火球与大冲击波
+   */
+  spawnMeteorImpact(x, y) {
+    this.addParticle(3, x, y, 0, 0, 0.6, COLOR_METEOR_CORE);
+    this.addShockwave(x, y, 120.0, 240.0);
+  }
+
+  /**
+   * 触发狂欢时刻像素烟花粒子
+   */
+  spawnFireworks(x, y) {
+    const colors = [COLOR_FIREWORK_GOLD, COLOR_FIREWORK_CYAN, COLOR_FIREWORK_PURPLE];
+    for (let i = 0; i < 16; i++) {
+      const angle = (i / 16) * Math.PI * 2;
+      const spd = 60 + Math.random() * 80;
+      const vx = Math.cos(angle) * spd;
+      const vy = Math.sin(angle) * spd;
+      const col = colors[i % colors.length];
+      this.addParticle(4, x, y, vx, vy, 0.7, col);
+    }
+  }
+
+  /**
+   * 渲染并推进神圣粒子池 (绝对零 GC)
+   * @private
+   */
+  _renderMiracleParticles(ctx, dt = 0.016) {
+    for (let i = 0; i < this.maxParticles; i++) {
+      if (this.partActive[i] === 0) continue;
+
+      this.partLife[i] -= dt;
+      if (this.partLife[i] <= 0.0) {
+        this.partActive[i] = 0;
+        continue;
+      }
+
+      this.partX[i] += this.partVx[i] * dt;
+      this.partY[i] += this.partVy[i] * dt;
+
+      const px = this.partX[i];
+      const py = this.partY[i];
+      const type = this.partType[i];
+
+      ctx.fillStyle = this.partColor[i] || '#ffffff';
+
+      if (type === 1) {
+        // 雨丝: 1x4 竖线
+        ctx.fillRect(px, py, 1, 4);
+      } else if (type === 2) {
+        // 天雷: 刺目白折线与地面焦坑
+        ctx.strokeStyle = COLOR_THUNDER_BOLT;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px - 10, py * 0.35);
+        ctx.lineTo(px + 8, py * 0.7);
+        ctx.lineTo(px, py);
+        ctx.stroke();
+        ctx.fillRect(px - 6, py - 2, 12, 4);
+      } else if (type === 3) {
+        // 陨石: 8x8 赤红核心与火星
+        ctx.fillRect(px - 4, py - 4, 8, 8);
+        ctx.fillStyle = COLOR_METEOR_TRAIL;
+        ctx.fillRect(px - 2, py - 8, 4, 6);
+      } else if (type === 4) {
+        // 烟花微粒: 2x2 像素
+        ctx.fillRect(px - 1, py - 1, 2, 2);
+      }
+    }
+  }
+
+  /**
    * 完整主渲染管线 (主循环热路径，严格零 GC)
    * 
    * @param {object} world 世界地图实例 (包含 tiles/tileTypes, nutrients/nutrientFloor, territoryFaction)
@@ -381,6 +540,8 @@ export class MiniRenderer {
    * @param {import('../pathfinding/VectorFlowFieldSystem.js').VectorFlowFieldSystem|null} [flowField=null] 大军团反向 BFS 流场
    * @param {import('../warfare/MoraleSystem.js').MoraleSystem|null} [moraleSystem=null] 四级士气状态机系统
    * @param {import('../warfare/TotemDefenseSystem.js').TotemDefenseSystem|null} [totemDefense=null] 图腾防卫与圣盾系统
+   * @param {import('../camera/Camera2D.js').Camera2D|null} [camera=null] 2D 摄像机视口变换矩阵 (M4)
+   * @param {import('../god/HandOfGodSystem.js').HandOfGodSystem|null} [handOfGod=null] 上帝之手系统 (M4)
    */
   render(
     world,
@@ -392,9 +553,16 @@ export class MiniRenderer {
     skillBuffer = null,
     flowField = null,
     moraleSystem = null,
-    totemDefense = null
+    totemDefense = null,
+    camera = null,
+    handOfGod = null
   ) {
     const ctx = this.ctx;
+
+    // 0. 视口矩阵映射 (若传入 camera 则单次 applyTransform 应用平移缩放)
+    if (camera && typeof camera.applyTransform === 'function') {
+      camera.applyTransform(ctx);
+    }
 
     // 1. 绘制静态地形瓦片底图 (若脏则重新烘焙，否则单次 blit 极速贴图)
     if (this.isTerrainDirty) {
@@ -449,7 +617,12 @@ export class MiniRenderer {
       this._renderTotemDefenseEffects(ctx, ecs, totemDefense);
     }
 
-    // 8. 绘制 4096 连续内存小人实体群 (解析 M2/M3 状态)
+    // 8. 绘制神圣粒子层 (甘霖雨丝、天雷火花、陨石冲击波、烟花)
+    if (this.showMiracleVfx) {
+      this._renderMiracleParticles(ctx, 0.016);
+    }
+
+    // 9. 绘制 4096 连续内存小人实体群 (解析 M2/M3/M4 状态)
     if (ecs && ecs.activeCount > 0) {
       let castes = null;
       if (casteBuffer) {
@@ -467,9 +640,21 @@ export class MiniRenderer {
       this._renderEntities(ctx, ecs, castes, genetics, skills, moraleSystem);
     }
 
-    // 9. 绘制图腾圣火涅槃环形冲击波
+    // 10. 绘制图腾圣火涅槃环形冲击波
     if (this.showTotemShield) {
       this._renderShockwaves(ctx);
+    }
+
+    // 11. 狂欢时刻全屏金色呼吸边框滤镜
+    if (this.isOverdriveActive) {
+      ctx.strokeStyle = COLOR_OVERDRIVE_BORDER;
+      ctx.lineWidth = 6;
+      ctx.strokeRect(3, 3, this.width - 6, this.height - 6);
+    }
+
+    // 12. 若应用了摄像机矩阵，在全帧绘制结束后统一复位状态机 (绝对 0 次 save/restore 铁律)
+    if (camera && typeof ctx.setTransform === 'function') {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
   }
 
@@ -1092,6 +1277,36 @@ export class MiniRenderer {
         ctx.fillRect(rx + 7, ry - 3, 2, 2);
         ctx.fillRect(rx - 3, ry + 7, 2, 2);
         ctx.fillRect(rx + 7, ry + 7, 2, 2);
+      }
+
+      // 13. M4 上帝之手悬空抓取状态 (IS_HELD)
+      if (this.showGodHand && (flag & IS_HELD) !== 0) {
+        // (1) 地面深色椭圆投射阴影
+        ctx.fillStyle = COLOR_HELD_SHADOW;
+        ctx.fillRect(rx - 2, ry + 16, 10, 3);
+
+        // (2) 金色上帝之手牵引线 (自天际垂降至头顶)
+        ctx.strokeStyle = COLOR_GOD_HAND_LINE;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(rx + 3, 0);
+        ctx.lineTo(rx + 3, ry - 4);
+        ctx.stroke();
+
+        // (3) 四角手舞足蹈挣扎微点
+        ctx.fillStyle = COLOR_GOD_HAND_LINE;
+        ctx.fillRect(rx - 2, ry - 1, 1, 1);
+        ctx.fillRect(rx + 7, ry - 1, 1, 1);
+        ctx.fillRect(rx - 2, ry + 6, 1, 1);
+        ctx.fillRect(rx + 7, ry + 6, 1, 1);
+      }
+
+      // 14. M4 狂欢狂喜状态 (IS_ECSTASY)
+      if ((flag & IS_ECSTASY) !== 0 || this.isOverdriveActive) {
+        ctx.fillStyle = COLOR_FIREWORK_GOLD;
+        ctx.fillRect(rx + 2, ry - 4, 2, 1);
+        ctx.fillRect(rx - 2, ry + 2, 1, 2);
+        ctx.fillRect(rx + 7, ry + 2, 1, 2);
       }
     }
   }

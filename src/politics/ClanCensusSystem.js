@@ -19,6 +19,10 @@ import {
   PHY_OFFSET_HUNGER
 } from '../core/ECS.js';
 import {
+  IS_PETRIFIED,
+  hasStatus
+} from '../components/UnitStatusFlags.js';
+import {
   MAX_FACTIONS,
   FACTION_STRIDE,
   FAC_OFFSET_TENSION,
@@ -115,6 +119,10 @@ export class ClanCensusSystem {
       const eid = dense[i];
       if (eid === NULL_ENTITY) continue;
 
+      // 石化魔像与沉寂古代遗迹标记解耦 (TC-EDGE-09)
+      if (hasStatus(this.ecs.statusFlags, eid, IS_PETRIFIED)) continue;
+      if (this.ecs.isDormant && this.ecs.isDormant[eid]) continue;
+
       const facId = this.ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION];
       if (facId < 1 || facId > MAX_FACTIONS) continue;
 
@@ -131,8 +139,10 @@ export class ClanCensusSystem {
       const baseOffset = (f - 1) * FACTION_STRIDE;
       const flags = this.factionBuffer[baseOffset + FAC_OFFSET_FLAGS];
 
-      // 仅普查活跃非灭亡阵营
-      if ((flags & FactionFlags.ACTIVE) === 0 || (flags & FactionFlags.DESTROYED) !== 0) {
+      // 仅普查活跃且非古代遗迹非灭亡政权 (TC-EDGE-09)
+      if ((flags & FactionFlags.ACTIVE) === 0 || 
+          (flags & FactionFlags.DESTROYED) !== 0 || 
+          (flags & FactionFlags.IS_RUINS) !== 0) {
         continue;
       }
 
@@ -172,6 +182,48 @@ export class ClanCensusSystem {
           this.eventBus.emit(DomainEvents.EVT_FACTION_SCHISM, f, 0, 0, 0);
         }
       }
+    }
+  }
+
+  /**
+   * 彻底覆灭指定阵营 (TC-EDGE-09)
+   * 领地瓦片全部释放为中立，残兵转为流寇，阵营永久置位 DESTROYED
+   * @param {number} factionId 
+   * @param {import('../world/TileGrid.js').TileGrid|null} [tileGrid=null]
+   */
+  destroyFaction(factionId, tileGrid = null) {
+    if (factionId < 1 || factionId > MAX_FACTIONS) return;
+
+    const baseOffset = (factionId - 1) * FACTION_STRIDE;
+    this.factionBuffer[baseOffset + FAC_OFFSET_FLAGS] = FactionFlags.DESTROYED;
+    this.factionBuffer[baseOffset + FAC_OFFSET_POP_COUNT] = 0;
+    this.factionBuffer[baseOffset + FAC_OFFSET_TENSION] = 0;
+
+    // 释放全部领地瓦片为中立荒原 (0)
+    if (tileGrid && tileGrid.territoryFaction) {
+      const tFac = tileGrid.territoryFaction;
+      const totalTiles = tileGrid.totalTiles || tFac.length;
+      for (let i = 0; i < totalTiles; i++) {
+        if (tFac[i] === factionId) {
+          tFac[i] = 0;
+        }
+      }
+    }
+
+    // 残兵改写为流寇或无国籍 (0)
+    const dense = this.ecs.denseEntities;
+    const total = this.ecs.activeCount;
+    for (let i = 0; i < total; i++) {
+      const eid = dense[i];
+      if (eid === NULL_ENTITY) continue;
+      const f = this.ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION];
+      if (f === factionId) {
+        this.ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = 0; // 中立/流寇
+      }
+    }
+
+    if (this.eventBus) {
+      this.eventBus.emit(DomainEvents.EVT_FACTION_DESTROYED, factionId, 0, 0, 0);
     }
   }
 

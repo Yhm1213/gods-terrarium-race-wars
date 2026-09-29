@@ -6,8 +6,8 @@
   "scripts": {
     "start": "python3 -m http.server 3000",
     "serve": "node server.js",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "NODE_OPTIONS=\"--expose-gc\" vitest run",
+    "test:watch": "NODE_OPTIONS=\"--expose-gc\" vitest"
   },
   "keywords": [
     "game",

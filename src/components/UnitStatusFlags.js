@@ -31,6 +31,7 @@ export const IS_CASTING            = ((1 << 19) >>> 0); // 0x80000: 正在施法
 export const IS_DISARMED           = ((1 << 20) >>> 0); // 0x100000: 处于缴械状态 (拔出备用短刀)
 export const IS_GENE_DRIVEN        = ((1 << 21) >>> 0); // 0x200000: 携带模式 A 基因驱动显性偏向
 export const IS_IMMOBILIZED        = ((1 << 22) >>> 0); // 0x400000: 处于定身状态 (机动轨锁死)
+export const IS_ECSTASY            = ((1 << 23) >>> 0); // 0x800000: 狂恩狂喜状态 (移速+50%, 饱食消耗定格0)
 
 export const StatusFlags = Object.freeze({
   IS_ALIVE,
@@ -55,7 +56,8 @@ export const StatusFlags = Object.freeze({
   IS_CASTING,
   IS_DISARMED,
   IS_GENE_DRIVEN,
-  IS_IMMOBILIZED
+  IS_IMMOBILIZED,
+  IS_ECSTASY
 });
 
 /**

@@ -37,7 +37,13 @@ import {
   COLOR_LAST_STAND_AURA,
   COLOR_LAST_STAND_CORE,
   COLOR_TOTEM_SHIELD,
-  COLOR_TOTEM_SHOCKWAVE
+  COLOR_TOTEM_SHOCKWAVE,
+  COLOR_GOD_HAND_LINE,
+  COLOR_HELD_SHADOW,
+  COLOR_RAIN_DROP,
+  COLOR_THUNDER_BOLT,
+  COLOR_METEOR_CORE,
+  COLOR_OVERDRIVE_BORDER
 } from '../../src/rendering/MiniRenderer.js';
 
 import {
@@ -57,6 +63,8 @@ import {
 
 import {
   IS_ALIVE,
+  IS_HELD,
+  IS_AIRBORNE,
   IS_LEADER,
   IS_EMERGENCY_LOCK,
   IN_COMBAT,
@@ -66,8 +74,11 @@ import {
   IS_LAST_STAND,
   IS_PANICKED,
   IS_SACRED_BODY,
-  IS_STATIC_ANCHOR
+  IS_STATIC_ANCHOR,
+  IS_ECSTASY
 } from '../../src/components/UnitStatusFlags.js';
+
+import { Camera2D } from '../../src/camera/Camera2D.js';
 
 import {
   MoraleState
@@ -108,7 +119,8 @@ function createMockCanvas() {
     restore: 0,
     beginPath: 0,
     stroke: 0,
-    arc: 0
+    arc: 0,
+    setTransform: []
   };
 
   const ctx = {
@@ -140,6 +152,9 @@ function createMockCanvas() {
     }),
     stroke: vi.fn(() => {
       contextCalls.stroke++;
+    }),
+    setTransform: vi.fn((a, b, c, d, e, f) => {
+      contextCalls.setTransform.push({ a, b, c, d, e, f });
     })
   };
 
@@ -848,6 +863,213 @@ describe('MiniRenderer Pipeline & Zero-GC Specification Suite', () => {
       }
 
       // 核心守门铁律验证: 0 save, 0 restore, 0 逃逸
+      expect(mock.contextCalls.save).toBe(savesBefore);
+      expect(mock.contextCalls.restore).toBe(restoresBefore);
+      expect(mock.ctx.save).not.toHaveBeenCalled();
+      expect(mock.ctx.restore).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('12. M4 上帝之手、神恩神迹与视口矩阵变换断言 (WP-4.4)', () => {
+    it('传入 Camera2D 实例，渲染执行前后正确调用 setTransform 变换与复位，全程 0 次 save/restore', () => {
+      const camera = new Camera2D(800, 600, 1344, 864);
+      camera.zoom = 1.5;
+      camera.x = 100;
+      camera.y = 50;
+
+      mock.contextCalls.setTransform = [];
+      const savesBefore = mock.contextCalls.save;
+      const restoresBefore = mock.contextCalls.restore;
+
+      renderer.render(
+        mockWorld,
+        ecs,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        camera
+      );
+
+      // 断言调用了 setTransform 进行摄像机视口变换与末尾复位
+      expect(mock.ctx.setTransform).toHaveBeenCalled();
+      const lastCall = mock.contextCalls.setTransform[mock.contextCalls.setTransform.length - 1];
+      expect(lastCall).toEqual({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
+
+      // 全程绝对 0 次 save / restore 铁律
+      expect(mock.contextCalls.save).toBe(savesBefore);
+      expect(mock.contextCalls.restore).toBe(restoresBefore);
+      expect(mock.ctx.save).not.toHaveBeenCalled();
+      expect(mock.ctx.restore).not.toHaveBeenCalled();
+    });
+
+    it('实体携带 IS_HELD 状态时，绘制地面椭圆投影与金色上帝之手牵引线', () => {
+      const heldId = ecs.allocateEntity();
+      const tfOff = heldId * TRANSFORM_STRIDE;
+      ecs.transforms[tfOff + TF_OFFSET_X] = 300;
+      ecs.transforms[tfOff + TF_OFFSET_Y] = 200;
+      ecs.statusFlags[heldId] = IS_ALIVE | IS_HELD;
+
+      mock.contextCalls.fillRect = [];
+      mock.contextCalls.stroke = 0;
+
+      renderer.render(mockWorld, ecs);
+
+      // 断言绘制了地面深色投影
+      const shadowFill = mock.contextCalls.fillRect.find(f => f.fillStyle === COLOR_HELD_SHADOW);
+      expect(shadowFill).toBeDefined();
+
+      // 断言绘制了金色牵引线
+      expect(mock.contextCalls.stroke).toBeGreaterThan(0);
+    });
+
+    it('神圣甘霖、天雷与陨石粒子正确生成并在主渲染中按寿命更新', () => {
+      renderer.spawnRain(100, 100, 6);
+      renderer.spawnThunderStrike(200, 200);
+      renderer.spawnMeteorImpact(300, 300);
+      renderer.spawnFireworks(400, 400);
+
+      // 验证粒子池中已激活粒子
+      let activeCount = 0;
+      for (let i = 0; i < renderer.maxParticles; i++) {
+        if (renderer.partActive[i] === 1) activeCount++;
+      }
+      expect(activeCount).toBeGreaterThan(10);
+
+      mock.contextCalls.fillRect = [];
+      renderer.render(mockWorld, ecs);
+
+      // 验证各神圣粒子颜色参与填充
+      const rainFill = mock.contextCalls.fillRect.find(f => f.fillStyle === COLOR_RAIN_DROP);
+      const meteorFill = mock.contextCalls.fillRect.find(f => f.fillStyle === COLOR_METEOR_CORE);
+      expect(rainFill).toBeDefined();
+      expect(meteorFill).toBeDefined();
+    });
+
+    it('狂欢时刻激活时，在视口四周绘制金色呼吸边框', () => {
+      renderer.isOverdriveActive = true;
+      mock.contextCalls.strokeRect = [];
+
+      renderer.render(mockWorld, ecs);
+
+      const borderStroke = mock.contextCalls.strokeRect.find(f => f.strokeStyle === COLOR_OVERDRIVE_BORDER);
+      expect(borderStroke).toBeDefined();
+
+      renderer.isOverdriveActive = false;
+    });
+
+    it('挂载 MegaAtlasDollCache 享元图集，正常初始化并可调用 drawDoll', () => {
+      expect(renderer.dollCache).toBeDefined();
+      expect(typeof renderer.dollCache.drawDoll).toBe('function');
+      expect(renderer.useMegaAtlas).toBe(true);
+    });
+  });
+
+  describe('13. M1+M2+M3+M4 终极全要素全负载 100 帧 0 次 save/restore 守门断言', () => {
+    it('在 M1+M2+M3+M4 极限全要素全负载下连续运行 100 帧，绝对 0 次 save/restore 且零 GC 逃逸', () => {
+      // 1. 全量瓦片与国界
+      const fullTileGrid = {
+        tileTypes: new Uint8Array(TOTAL_TILES),
+        territoryFaction: new Uint8Array(TOTAL_TILES)
+      };
+      for (let i = 0; i < TOTAL_TILES; i++) {
+        fullTileGrid.tileTypes[i] = i % 7;
+        fullTileGrid.territoryFaction[i] = (i % 16) + 1;
+      }
+
+      // 2. 养分与农田
+      const fullNutrientField = {
+        current: new Float32Array(TOTAL_TILES).fill(25.0)
+      };
+      const fullFarmlands = {
+        maxCapacity: 16,
+        farmActive: new Uint8Array(16).fill(1),
+        farmX: new Uint16Array(16),
+        farmY: new Uint16Array(16),
+        farmStage: new Uint8Array(16)
+      };
+
+      // 3. M3 流场、士气、图腾
+      const flowFieldSys = {
+        targetTileX: 20,
+        targetTileY: 15,
+        vectorFieldX: new Float32Array(TOTAL_TILES).fill(0.707),
+        vectorFieldY: new Float32Array(TOTAL_TILES).fill(0.707)
+      };
+      const moraleSys = {
+        getMoraleState: (id) => (id % 4)
+      };
+      const totemSys = {
+        totemEntityIds: new Uint16Array(17),
+        aegisDuration: new Float32Array(17).fill(5.0)
+      };
+
+      // 4. M4 摄像机与粒子
+      const camera = new Camera2D(1344, 864, 1344, 864);
+      camera.zoom = 1.25;
+      camera.x = 50;
+      camera.y = 50;
+
+      // 分配 100 个融合 M1+M2+M3+M4 全部状态的测试实体
+      for (let i = 0; i < 100; i++) {
+        const id = ecs.allocateEntity();
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_X] = 40 + (i % 20) * 35;
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_Y] = 40 + ((i / 20) | 0) * 45;
+        ecs.identities[id * IDENTITY_STRIDE + ID_OFFSET_FACTION] = (i % 16) + 1;
+        ecs.statusFlags[id] = IS_ALIVE |
+          (i % 10 === 0 ? IS_LEADER : 0) |
+          (i % 4 === 0 ? IS_CASTING : 0) |
+          (i % 5 === 0 ? IS_LAST_STAND : 0) |
+          (i % 6 === 0 ? IS_PANICKED : 0) |
+          (i % 7 === 0 ? IS_SACRED_BODY : 0) |
+          (i % 8 === 0 ? IS_HELD : 0) |
+          (i % 9 === 0 ? IS_ECSTASY : 0);
+      }
+
+      // 激活粒子与冲击波
+      renderer.spawnRain(200, 200, 10);
+      renderer.spawnThunderStrike(300, 300);
+      renderer.addShockwave(500, 400);
+      renderer.isOverdriveActive = true;
+
+      // 开启全图层
+      renderer.showTerritories = true;
+      renderer.showFlowField = true;
+      renderer.showMorale = true;
+      renderer.showTotemShield = true;
+      renderer.showNutrients = true;
+      renderer.showFarmlands = true;
+      renderer.showCastes = true;
+      renderer.showMutations = true;
+      renderer.showSkills = true;
+      renderer.showGodHand = true;
+      renderer.showMiracleVfx = true;
+
+      const savesBefore = mock.contextCalls.save;
+      const restoresBefore = mock.contextCalls.restore;
+
+      // 连续全负载渲染 100 帧
+      for (let f = 0; f < 100; f++) {
+        renderer.render(
+          fullTileGrid,
+          ecs,
+          fullFarmlands,
+          fullNutrientField,
+          null,
+          null,
+          null,
+          flowFieldSys,
+          moraleSys,
+          totemSys,
+          camera
+        );
+      }
+
+      // 核心终极守门断言: 0 次 save, 0 次 restore, 绝对零 GC 逃逸
       expect(mock.contextCalls.save).toBe(savesBefore);
       expect(mock.contextCalls.restore).toBe(restoresBefore);
       expect(mock.ctx.save).not.toHaveBeenCalled();

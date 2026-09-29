@@ -35,6 +35,8 @@ import {
   FAC_OFFSET_TOTEM_ID,
   FAC_OFFSET_TENSION,
   FAC_OFFSET_POP_COUNT,
+  FAC_OFFSET_FOOD,
+  FAC_OFFSET_ORE,
   FAC_OFFSET_WAR_COOLDOWN,
   FAC_OFFSET_FLAGS,
   FactionFlags
@@ -106,7 +108,9 @@ export class SchismSystem {
     for (let f = 1; f <= MAX_FACTIONS; f++) {
       const baseOff = (f - 1) * FACTION_STRIDE;
       const flags = this.factionBuffer[baseOff + FAC_OFFSET_FLAGS];
-      if ((flags & FactionFlags.ACTIVE) !== 0 && (flags & FactionFlags.DESTROYED) === 0) {
+      if ((flags & FactionFlags.ACTIVE) !== 0 && 
+          (flags & FactionFlags.DESTROYED) === 0 && 
+          (flags & FactionFlags.IS_RUINS) === 0) {
         active++;
       }
     }
@@ -296,12 +300,22 @@ export class SchismSystem {
       }
     }
 
-    // 7. 注册并初始化新叛军政权缓冲区
+    // 7. 注册并初始化新叛军政权缓冲区与仓储物料守恒划分 (TC-EDGE-08)
     const baseOffsetR = (rebelFac - 1) * FACTION_STRIDE;
     this.factionBuffer[baseOffsetR + FAC_OFFSET_TOTEM_ID] = rebelTotem;
     this.factionBuffer[baseOffsetR + FAC_OFFSET_TENSION] = 0;
     this.factionBuffer[baseOffsetR + FAC_OFFSET_WAR_COOLDOWN] = 300; // 300s 凝聚保护锁
     this.factionBuffer[baseOffsetR + FAC_OFFSET_FLAGS] = FactionFlags.ACTIVE | FactionFlags.IS_REBEL;
+
+    // 仓储物料严格整数守恒划分 (∑Food_new === ∑Food_old, ∑Ore_new === ∑Ore_old)
+    const oldFood = this.factionBuffer[baseOffsetM + FAC_OFFSET_FOOD];
+    const oldOre = this.factionBuffer[baseOffsetM + FAC_OFFSET_ORE];
+    const rebelFood = Math.floor(oldFood / 2);
+    const rebelOre = Math.floor(oldOre / 2);
+    this.factionBuffer[baseOffsetR + FAC_OFFSET_FOOD] = rebelFood;
+    this.factionBuffer[baseOffsetR + FAC_OFFSET_ORE] = rebelOre;
+    this.factionBuffer[baseOffsetM + FAC_OFFSET_FOOD] = oldFood - rebelFood;
+    this.factionBuffer[baseOffsetM + FAC_OFFSET_ORE] = oldOre - rebelOre;
 
     // 母国张力清零并进入 300s 分裂凝聚冷却
     this.factionBuffer[baseOffsetM + FAC_OFFSET_TENSION] = 0;
