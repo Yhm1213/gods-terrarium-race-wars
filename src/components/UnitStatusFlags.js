@@ -26,6 +26,11 @@ export const IS_SACRED_BODY       = ((1 << 14) >>> 0); // 0x4000: 反加冕金�
 export const IS_REGENT            = ((1 << 15) >>> 0); // 0x8000: 摄政王身份 (幼主摄政代行王权)
 export const IN_COMBAT            = ((1 << 16) >>> 0); // 0x10000: 交火交战状态中
 export const IS_PANICKED          = ((1 << 17) >>> 0); // 0x20000: 士气崩溃逃窜状态中
+export const IS_SKILL_ACTIVE       = ((1 << 18) >>> 0); // 0x40000: 主动技能效果持续生效中
+export const IS_CASTING            = ((1 << 19) >>> 0); // 0x80000: 正在施法读条中 (动作轨道占用)
+export const IS_DISARMED           = ((1 << 20) >>> 0); // 0x100000: 处于缴械状态 (拔出备用短刀)
+export const IS_GENE_DRIVEN        = ((1 << 21) >>> 0); // 0x200000: 携带模式 A 基因驱动显性偏向
+export const IS_IMMOBILIZED        = ((1 << 22) >>> 0); // 0x400000: 处于定身状态 (机动轨锁死)
 
 export const StatusFlags = Object.freeze({
   IS_ALIVE,
@@ -45,7 +50,12 @@ export const StatusFlags = Object.freeze({
   IS_SACRED_BODY,
   IS_REGENT,
   IN_COMBAT,
-  IS_PANICKED
+  IS_PANICKED,
+  IS_SKILL_ACTIVE,
+  IS_CASTING,
+  IS_DISARMED,
+  IS_GENE_DRIVEN,
+  IS_IMMOBILIZED
 });
 
 /**

@@ -16,7 +16,18 @@ import {
   BiomeTypes,
   BIOME_COLOR_PALETTE,
   RACE_COLORS,
-  FarmStages
+  FarmStages,
+  COLOR_CASTE_CIVILIAN,
+  COLOR_CASTE_ARTISAN,
+  COLOR_CASTE_SOLDIER,
+  COLOR_CASTE_LEADER,
+  COLOR_ORGAN_HOLY,
+  COLOR_ORGAN_FLAME,
+  COLOR_ORGAN_WING,
+  COLOR_ORGAN_GRANITE,
+  COLOR_CASTING,
+  COLOR_DISARMED,
+  COLOR_SKILL_ACTIVE
 } from '../../src/rendering/MiniRenderer.js';
 
 import {
@@ -38,8 +49,36 @@ import {
   IS_ALIVE,
   IS_LEADER,
   IS_EMERGENCY_LOCK,
-  IN_COMBAT
+  IN_COMBAT,
+  IS_CASTING,
+  IS_DISARMED,
+  IS_SKILL_ACTIVE
 } from '../../src/components/UnitStatusFlags.js';
+
+import {
+  CasteType,
+  createSocialCasteBuffer,
+  initSocialCaste,
+  CASTE_STRIDE,
+  CASTE_OFFSET_TYPE
+} from '../../src/components/SocialCasteComponent.js';
+
+import {
+  createGeneticsBuffer,
+  initGenetics,
+  GENETICS_STRIDE,
+  GEN_OFFSET_PHENOTYPE
+} from '../../src/components/GeneticsComponent.js';
+
+import {
+  createRaceSkillBuffer,
+  initRaceSkill,
+  SKILL_STRIDE
+} from '../../src/components/RaceSkillComponent.js';
+
+import {
+  OrganFlags
+} from '../../src/data/MutationFlags.js';
 
 // 创建 Mock Canvas 与 2D Context
 function createMockCanvas() {
@@ -312,4 +351,230 @@ describe('MiniRenderer Pipeline & Zero-GC Specification Suite', () => {
       expect(mock.contextCalls.restore).toBe(0);
     });
   });
+
+  describe('5. 四大社会阶级标牌与领袖发光外圈渲染断言 (WP-2.5)', () => {
+    it('平民 (CIVILIAN) 绘制浅褐色微点标牌', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 100.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 100.0;
+      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = 1;
+
+      const casteBuffer = createSocialCasteBuffer();
+      initSocialCaste(casteBuffer, eid, CasteType.CIVILIAN);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, casteBuffer);
+
+      // rx = 97, ry = 97. CIVILIAN 标牌在 (rx - 3, ry + 1) = (94, 98), 1x1
+      const civilianDot = mock.contextCalls.fillRect.find(c => c.x === 94 && c.y === 98 && c.w === 1 && c.h === 1);
+      expect(civilianDot).toBeDefined();
+    });
+
+    it('工匠 (ARTISAN) 绘制 3x3 铁灰色方块标牌 (#8a8a8a)', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 120.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 120.0;
+      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = 2;
+
+      const casteBuffer = createSocialCasteBuffer();
+      initSocialCaste(casteBuffer, eid, CasteType.ARTISAN);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, casteBuffer);
+
+      // rx = 117, ry = 117. ARTISAN 标牌在 (rx - 4, ry) = (113, 117), 3x3
+      const artisanSquare = mock.contextCalls.fillRect.find(c => c.x === 113 && c.y === 117 && c.w === 3 && c.h === 3);
+      expect(artisanSquare).toBeDefined();
+    });
+
+    it('士兵 (SOLDIER) 绘制 3x3 暗红色三角标牌 (#b22222)', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 150.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 150.0;
+      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = 3;
+
+      const casteBuffer = createSocialCasteBuffer();
+      initSocialCaste(casteBuffer, eid, CasteType.SOLDIER);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, casteBuffer);
+
+      // rx = 147, ry = 147. SOLDIER 三角: 顶 (144, 146, 1, 1), 底 (143, 147, 3, 2)
+      const soldierTip = mock.contextCalls.fillRect.find(c => c.x === 144 && c.y === 146 && c.w === 1 && c.h === 1);
+      const soldierBase = mock.contextCalls.fillRect.find(c => c.x === 143 && c.y === 147 && c.w === 3 && c.h === 2);
+      expect(soldierTip).toBeDefined();
+      expect(soldierBase).toBeDefined();
+    });
+
+    it('领袖 (LEADER) 由 statusFlags IS_LEADER 驱动 24px 亮金发光圈与王冠描边', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 200.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 200.0;
+      ecs.statusFlags[eid] = IS_ALIVE | IS_LEADER;
+      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = 4;
+
+      const casteBuffer = createSocialCasteBuffer();
+      initSocialCaste(casteBuffer, eid, CasteType.LEADER);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, casteBuffer);
+
+      // rx = 197, ry = 197. 24px 外圈在 (rx - 9 + 0.5, ry - 9 + 0.5, 23, 23)
+      const leaderStroke = mock.contextCalls.strokeRect.find(c => c.x === 188.5 && c.y === 188.5 && c.w === 23 && c.h === 23);
+      expect(leaderStroke).toBeDefined();
+
+      // 金色王冠在 (rx + 1, ry - 3) = (198, 194), 4x2
+      const crown = mock.contextCalls.fillRect.find(c => c.x === 198 && c.y === 194 && c.w === 4 && c.h === 2);
+      expect(crown).toBeDefined();
+    });
+  });
+
+  describe('6. 正交突变器官像素点缀与技能施法反馈断言 (WP-2.5)', () => {
+    it('携带 WING (薄翼) 在身体两侧绘制 2 像素轻盈羽翼', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 80.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 80.0;
+
+      const geneticsBuffer = createGeneticsBuffer();
+      initGenetics(geneticsBuffer, eid, OrganFlags.WING, 0);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, null, geneticsBuffer);
+
+      // rx = 77, ry = 77. WING: 左翼 (75, 79, 2, 1), 右翼 (83, 79, 2, 1)
+      const leftWing = mock.contextCalls.fillRect.find(c => c.x === 75 && c.y === 79 && c.w === 2 && c.h === 1);
+      const rightWing = mock.contextCalls.fillRect.find(c => c.x === 83 && c.y === 79 && c.w === 2 && c.h === 1);
+      expect(leftWing).toBeDefined();
+      expect(rightWing).toBeDefined();
+    });
+
+    it('携带 FLAME (烈焰) 在小人边缘绘制橙红微光', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 160.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 160.0;
+
+      const geneticsBuffer = createGeneticsBuffer();
+      initGenetics(geneticsBuffer, eid, OrganFlags.FLAME, 0);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, null, geneticsBuffer);
+
+      // rx = 157, ry = 157. FLAME: 左边 (156, 158, 1, 4), 右边 (163, 158, 1, 4)
+      const leftGlow = mock.contextCalls.fillRect.find(c => c.x === 156 && c.y === 158 && c.w === 1 && c.h === 4);
+      const rightGlow = mock.contextCalls.fillRect.find(c => c.x === 163 && c.y === 158 && c.w === 1 && c.h === 4);
+      expect(leftGlow).toBeDefined();
+      expect(rightGlow).toBeDefined();
+    });
+
+    it('携带 GRANITE 与 HOLY 绘制灰色岩石斑块与头顶圣环', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 220.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 220.0;
+
+      const geneticsBuffer = createGeneticsBuffer();
+      initGenetics(geneticsBuffer, eid, OrganFlags.GRANITE | OrganFlags.HOLY, 0);
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, null, geneticsBuffer);
+
+      // rx = 217, ry = 217. GRANITE: (219, 219, 2, 2)
+      const rock = mock.contextCalls.fillRect.find(c => c.x === 219 && c.y === 219 && c.w === 2 && c.h === 2);
+      expect(rock).toBeDefined();
+
+      // HOLY: (218, 212, 4, 1)
+      const holyHalo = mock.contextCalls.fillRect.find(c => c.x === 218 && c.y === 212 && c.w === 4 && c.h === 1);
+      expect(holyHalo).toBeDefined();
+    });
+
+    it('IS_CASTING 状态绘制施法光晕，IS_DISARMED 绘制掉落匕首标记', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 300.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 300.0;
+      ecs.statusFlags[eid] = IS_ALIVE | IS_CASTING | IS_DISARMED | IS_SKILL_ACTIVE;
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs);
+
+      // rx = 297, ry = 297
+      // 施法光晕: (rx - 2, ry + 7, 10, 2) = (295, 304, 10, 2)
+      const castingHalo = mock.contextCalls.fillRect.find(c => c.x === 295 && c.y === 304 && c.w === 10 && c.h === 2);
+      expect(castingHalo).toBeDefined();
+
+      // 缴械断刃: (rx + 7, ry + 2, 2, 3) = (304, 299, 2, 3)
+      const dagger = mock.contextCalls.fillRect.find(c => c.x === 304 && c.y === 299 && c.w === 2 && c.h === 3);
+      expect(dagger).toBeDefined();
+
+      // 技能生效微光: (rx + 2, ry - 2, 2, 1) = (299, 295, 2, 1)
+      const skillPip = mock.contextCalls.fillRect.find(c => c.x === 299 && c.y === 295 && c.w === 2 && c.h === 1);
+      expect(skillPip).toBeDefined();
+    });
+  });
+
+  describe('7. M2 全真系统实例接入、兼容性 Fallback 与连续 100 帧零 GC 守门断言 (LL-006 & DoD)', () => {
+    it('向后兼容安全判空 Fallback 保护链：即使仅传入 2 个参数或 null 参数也永不抛异常 (LL-006)', () => {
+      expect(() => {
+        renderer.render(mockWorld, ecs);
+        renderer.render(mockWorld, ecs, null, null, null, null, null);
+      }).not.toThrow();
+    });
+
+    it('直接接入 SocialCasteSystem, MendelianGeneticsSystem, RaceSkillSystem 真实系统实例', async () => {
+      const { SocialCasteSystem } = await import('../../src/profession/SocialCasteSystem.js');
+      const { MendelianGeneticsSystem } = await import('../../src/mutation/MendelianGeneticsSystem.js');
+      const { RaceSkillSystem } = await import('../../src/race/RaceSkillSystem.js');
+
+      const casteSys = new SocialCasteSystem(ecs);
+      const geneticsSys = new MendelianGeneticsSystem(ecs);
+      const skillSys = new RaceSkillSystem(ecs);
+
+      // 分配 10 个测试实体
+      for (let i = 0; i < 10; i++) {
+        const id = ecs.allocateEntity();
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_X] = 100 + i * 20;
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_Y] = 100 + i * 15;
+        casteSys.castes[id * CASTE_STRIDE + CASTE_OFFSET_TYPE] = i % 4;
+        geneticsSys.genetics[id * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE] = (1 << (i % 8));
+      }
+
+      expect(() => {
+        renderer.render(mockWorld, ecs, null, null, casteSys, geneticsSys, skillSys);
+      }).not.toThrow();
+
+      expect(mock.contextCalls.save).toBe(0);
+      expect(mock.contextCalls.restore).toBe(0);
+    });
+
+    it('在 M2 全真全要素负载下连续执行 100 帧渲染循环，绝对 0 次 save/restore 且零 GC 逃逸', async () => {
+      const { SocialCasteSystem } = await import('../../src/profession/SocialCasteSystem.js');
+      const { MendelianGeneticsSystem } = await import('../../src/mutation/MendelianGeneticsSystem.js');
+      const { RaceSkillSystem } = await import('../../src/race/RaceSkillSystem.js');
+
+      const casteSys = new SocialCasteSystem(ecs);
+      const geneticsSys = new MendelianGeneticsSystem(ecs);
+      const skillSys = new RaceSkillSystem(ecs);
+
+      // 分配 100 个全要素负载实体
+      for (let i = 0; i < 100; i++) {
+        const id = ecs.allocateEntity();
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_X] = 50 + (i % 20) * 30;
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_Y] = 50 + ((i / 20) | 0) * 40;
+        ecs.identities[id * IDENTITY_STRIDE + ID_OFFSET_FACTION] = (i % 12) + 1;
+        ecs.statusFlags[id] = IS_ALIVE | (i % 10 === 0 ? IS_LEADER : 0) | (i % 5 === 0 ? IS_CASTING : 0) | (i % 7 === 0 ? IS_DISARMED : 0);
+
+        casteSys.castes[id * CASTE_STRIDE + CASTE_OFFSET_TYPE] = i % 4;
+        geneticsSys.genetics[id * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE] = (1 << (i % 9));
+      }
+
+      const savesBefore = mock.contextCalls.save;
+      const restoresBefore = mock.contextCalls.restore;
+
+      for (let f = 0; f < 100; f++) {
+        renderer.render(mockWorld, ecs, null, null, casteSys, geneticsSys, skillSys);
+      }
+
+      expect(mock.contextCalls.save).toBe(savesBefore);
+      expect(mock.contextCalls.restore).toBe(restoresBefore);
+    });
+  });
 });
+

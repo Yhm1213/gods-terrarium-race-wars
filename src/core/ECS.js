@@ -95,6 +95,11 @@ import {
   IS_REGENT,
   IN_COMBAT,
   IS_PANICKED,
+  IS_SKILL_ACTIVE,
+  IS_CASTING,
+  IS_DISARMED,
+  IS_GENE_DRIVEN,
+  IS_IMMOBILIZED,
   createStatusFlagsBuffer
 } from '../components/UnitStatusFlags.js';
 
@@ -106,6 +111,37 @@ import {
   createIdentitiesBuffer,
   resetIdentities
 } from '../components/Identities.js';
+
+import {
+  SKILL_STRIDE,
+  SKILL_OFFSET_COOLDOWN,
+  SKILL_OFFSET_DURATION,
+  SKILL_OFFSET_CHANNEL,
+  SKILL_OFFSET_PARAM,
+  createRaceSkillBuffer,
+  resetRaceSkill
+} from '../components/RaceSkillComponent.js';
+
+import {
+  CASTE_STRIDE,
+  CASTE_OFFSET_TYPE,
+  CASTE_OFFSET_EXP_LABOR,
+  CASTE_OFFSET_EXP_COMBAT,
+  CASTE_OFFSET_COOLDOWN,
+  CasteType,
+  createSocialCasteBuffer,
+  resetSocialCaste
+} from '../components/SocialCasteComponent.js';
+
+import {
+  GENETICS_STRIDE,
+  GEN_OFFSET_MATERNAL,
+  GEN_OFFSET_PATERNAL,
+  GEN_OFFSET_PHENOTYPE,
+  GEN_OFFSET_GENERATION,
+  createGeneticsBuffer,
+  resetGenetics
+} from '../components/GeneticsComponent.js';
 
 export const NULL_ENTITY = 0;
 
@@ -150,7 +186,34 @@ export {
   IDENTITY_STRIDE,
   ID_OFFSET_FACTION,
   ID_OFFSET_PROD_JOB,
-  ID_OFFSET_COMBAT_JOB
+  ID_OFFSET_COMBAT_JOB,
+  SKILL_STRIDE,
+  SKILL_OFFSET_COOLDOWN,
+  SKILL_OFFSET_DURATION,
+  SKILL_OFFSET_CHANNEL,
+  SKILL_OFFSET_PARAM,
+  createRaceSkillBuffer,
+  resetRaceSkill,
+  CASTE_STRIDE,
+  CASTE_OFFSET_TYPE,
+  CASTE_OFFSET_EXP_LABOR,
+  CASTE_OFFSET_EXP_COMBAT,
+  CASTE_OFFSET_COOLDOWN,
+  CasteType,
+  createSocialCasteBuffer,
+  resetSocialCaste,
+  GENETICS_STRIDE,
+  GEN_OFFSET_MATERNAL,
+  GEN_OFFSET_PATERNAL,
+  GEN_OFFSET_PHENOTYPE,
+  GEN_OFFSET_GENERATION,
+  createGeneticsBuffer,
+  resetGenetics,
+  IS_SKILL_ACTIVE,
+  IS_CASTING,
+  IS_DISARMED,
+  IS_GENE_DRIVEN,
+  IS_IMMOBILIZED
 };
 
 export class ECS {

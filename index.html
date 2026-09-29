@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《神之蛐蛐缸：万族争霸》 - Milestone 1 宏观生态视窗</title>
+  <title>《神之蛐蛐缸：万族争霸》 - Milestone 2 宏观生态与全真领域视窗</title>
   <style>
     /* ==========================================
        像素复古深色控制台主题 (Dark Retro Pixel UI)
@@ -20,6 +20,7 @@
       --accent-amber: #f59e0b;
       --accent-rose: #f43f5e;
       --accent-gold: #ffd700;
+      --accent-purple: #c084fc;
     }
 
     * {
@@ -166,6 +167,30 @@
       box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
     }
 
+    .btn-purple {
+      background: #3b0764;
+      border-color: #7e22ce;
+      color: #d8b4fe;
+    }
+    .btn-purple:hover {
+      background: #9333ea;
+      border-color: #c084fc;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+    }
+
+    .btn-amber {
+      background: #451a03;
+      border-color: #d97706;
+      color: #fcd34d;
+    }
+    .btn-amber:hover {
+      background: #d97706;
+      border-color: #fde68a;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
+    }
+
     /* 主布局容器 */
     main {
       flex: 1;
@@ -251,7 +276,7 @@
 
     /* 侧边信息与调试面板 */
     .sidebar {
-      width: 380px;
+      width: 420px;
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -306,17 +331,94 @@
       font-family: ui-monospace, monospace;
     }
 
-    /* 交互操作面板 */
-    .action-btn-group {
+    /* 阶级条形图 */
+    .caste-bar-container {
+      display: flex;
+      height: 12px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+    }
+
+    .caste-bar-seg {
+      height: 100%;
+      transition: width 0.2s ease;
+    }
+
+    .caste-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .caste-stat-cell {
+      background: var(--card-bg);
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    .caste-name-tag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 2px;
+      font-weight: bold;
+    }
+
+    .caste-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 1px;
+    }
+
+    /* 突变器官渗透率网格 */
+    .organ-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      font-size: 0.7rem;
+    }
+
+    .organ-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 4px 6px;
       display: flex;
       flex-direction: column;
+      gap: 2px;
+    }
+
+    .organ-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-dim);
+    }
+
+    .organ-ratio {
+      font-weight: bold;
+      color: #38bdf8;
+      font-family: ui-monospace, monospace;
+    }
+
+    /* 交互操作面板 */
+    .action-btn-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
     .action-btn-group .btn {
       justify-content: center;
-      padding: 8px 12px;
-      font-size: 0.85rem;
+      padding: 8px 10px;
+      font-size: 0.78rem;
     }
 
     /* 种族色彩图例微缩列表 */
@@ -325,7 +427,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 6px;
       font-size: 0.7rem;
-      max-height: 130px;
+      max-height: 120px;
       overflow-y: auto;
     }
 
@@ -371,6 +473,8 @@
     .log-entry.danger { color: #f87171; font-weight: bold; }
     .log-entry.info   { color: #38bdf8; }
     .log-entry.green  { color: #4ade80; }
+    .log-entry.purple { color: #c084fc; }
+    .log-entry.amber  { color: #f59e0b; }
 
     /* 实体属性检视器 */
     .inspector-content {
@@ -379,9 +483,10 @@
       color: #93c5fd;
       line-height: 1.5;
       background: var(--card-bg);
-      padding: 8px;
+      padding: 10px;
       border-radius: 4px;
       border: 1px solid var(--card-border);
+      min-height: 90px;
     }
 
     @media (max-width: 1400px) {
@@ -391,7 +496,7 @@
       .sidebar {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       }
     }
   </style>
@@ -402,7 +507,7 @@
   <header>
     <div class="brand-group">
       <div class="game-title">《神之蛐蛐缸：万族争霸》</div>
-      <div class="badge-milestone">M1 端到端系统视窗</div>
+      <div class="badge-milestone">Milestone 2 领域全真视窗</div>
     </div>
 
     <!-- 遥测快报 -->
@@ -453,7 +558,16 @@
           <span>🩸 实体生命血条</span>
         </div>
         <div class="toggle-chip active" id="toggleStatusPips">
-          <span>⚠️ 饥饿/互斥锁状态小点</span>
+          <span>⚠️ 饥饿/互斥锁小点</span>
+        </div>
+        <div class="toggle-chip active" id="toggleCastes">
+          <span>🏷️ 四大阶级标牌</span>
+        </div>
+        <div class="toggle-chip active" id="toggleMutations">
+          <span>🧬 突变器官点缀</span>
+        </div>
+        <div class="toggle-chip active" id="toggleSkills">
+          <span>⚡ 技能施法反馈</span>
         </div>
         <div class="toggle-chip" id="toggleGrid">
           <span>📐 24px 网格参考线</span>
@@ -464,7 +578,7 @@
     <!-- 侧边遥测与交互调试面板 -->
     <div class="sidebar">
       
-      <!-- 生态小人生理状态监控 -->
+      <!-- 1. 生态小人生理状态监控 -->
       <div class="card">
         <div class="card-title">
           <span>📊 生态种群与生理监视器</span>
@@ -498,56 +612,123 @@
         </div>
       </div>
 
-      <!-- 交互调试操作箱 -->
+      <!-- 2. 【M2 核心】四大社会阶级人口结构 -->
       <div class="card">
         <div class="card-title">
-          <span>🛠️ M1 系统端到端交互面板</span>
+          <span>🏷️ 四大社会阶级结构 (FSM)</span>
+          <span id="casteTotalBadge" style="color: #ffd700;">0 人口</span>
+        </div>
+        <div class="caste-bar-container">
+          <div id="casteBarCivilian" class="caste-bar-seg" style="background: #a88d75; width: 100%;"></div>
+          <div id="casteBarArtisan" class="caste-bar-seg" style="background: #8a8a8a; width: 0%;"></div>
+          <div id="casteBarSoldier" class="caste-bar-seg" style="background: #b22222; width: 0%;"></div>
+          <div id="casteBarLeader" class="caste-bar-seg" style="background: #ffd700; width: 0%;"></div>
+        </div>
+        <div class="caste-stats-row">
+          <div class="caste-stat-cell">
+            <div class="caste-name-tag">
+              <div class="caste-dot" style="background: #a88d75;"></div>
+              <span>平民</span>
+            </div>
+            <div id="statCivilian" style="font-weight: bold; color: #a88d75;">0 (0%)</div>
+          </div>
+          <div class="caste-stat-cell">
+            <div class="caste-name-tag">
+              <div class="caste-dot" style="background: #8a8a8a;"></div>
+              <span>工匠</span>
+            </div>
+            <div id="statArtisan" style="font-weight: bold; color: #8a8a8a;">0 (0%)</div>
+          </div>
+          <div class="caste-stat-cell">
+            <div class="caste-name-tag">
+              <div class="caste-dot" style="background: #b22222;"></div>
+              <span>士兵</span>
+            </div>
+            <div id="statSoldier" style="font-weight: bold; color: #b22222;">0 (0%)</div>
+          </div>
+          <div class="caste-stat-cell">
+            <div class="caste-name-tag">
+              <div class="caste-dot" style="background: #ffd700;"></div>
+              <span>领袖</span>
+            </div>
+            <div id="statLeader" style="font-weight: bold; color: #ffd700;">0 (0%)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 【M2 核心】突变器官群体渗透率 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🧬 孟德尔突变器官渗透率</span>
+          <span id="mutantTotalBadge" style="color: #c084fc;">变异数: 0</span>
+        </div>
+        <div class="organ-grid" id="organGrid">
+          <!-- 动态注入 9 大器官渗透率 -->
+        </div>
+      </div>
+
+      <!-- 4. M2 端到端交互操作箱 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🛠️ M2 系统端到端交互面板</span>
         </div>
         <div class="action-btn-group">
           <button class="btn btn-special" id="btnSpawn100">
-            🎲 一键生成 100 只随机种族小人
+            🎲 生成 100 只小人
+          </button>
+          <button class="btn btn-purple" id="btnCastAllSkills">
+            ⚡ 全员释放种族特技
+          </button>
+          <button class="btn btn-amber" id="btnRadiateMutation">
+            🧬 诱发辐射器官突变
+          </button>
+          <button class="btn" id="btnPromoteCastes">
+            🎖️ 注入经验阶级晋升
+          </button>
+          <button class="btn btn-danger" id="btnRegicide">
+            👑 斩首领袖仲裁继承
           </button>
           <button class="btn btn-danger" id="btnTriggerFamine">
-            ⚠️ 一键引发饥荒 (饥饿95 + 损毁农田 -> 触发 10s 互斥锁)
+            ⚠️ 爆发全图大饥荒
           </button>
           <button class="btn" id="btnSpawnFarms">
-            🌾 开垦 8 片 2x2 复合农田
+            🌾 开垦 8 片复合农田
           </button>
           <button class="btn" id="btnResetAll" style="color: #fca5a5;">
-            🔄 重置生态系统回初始状态
+            🔄 重置生态演化系统
           </button>
         </div>
       </div>
 
-      <!-- 实体检视器 -->
+      <!-- 5. 实体全息检视器 -->
       <div class="card">
         <div class="card-title">
-          <span>🔍 实体/瓦片精准检视器</span>
+          <span>🔍 实体物理·基因·技能全息检视器</span>
           <span style="font-size: 0.65rem; color: #64748b;">(点击画布聚焦)</span>
         </div>
         <div class="inspector-content" id="inspectorBox">
-          点击画布上的小人或瓦片以检视实时物理坐标、生理饥饿与 10s 互斥锁倒计时。
+          点击画布上的小人，实时检视其所属种族、四大阶级、特技冷却、双倍体基因型、表型与聚合物理属性。
         </div>
       </div>
 
-      <!-- 12 始祖种族色彩图例 -->
+      <!-- 6. 12 始祖种族色彩与技能图例 -->
       <div class="card">
         <div class="card-title">
-          <span>🎨 12 始祖种族调色图例</span>
+          <span>🎨 12 始祖种族特技矩阵图例</span>
         </div>
         <div class="race-grid" id="raceGrid">
           <!-- 动态注入 12 种族图例 -->
         </div>
       </div>
 
-      <!-- 实时生态演化跑马灯 -->
+      <!-- 7. 实时生态演化跑马灯 -->
       <div class="card" style="flex: 1;">
         <div class="card-title">
-          <span>📜 生态与互斥锁运行日志</span>
+          <span>📜 生态、阶级与特技领域事件日志</span>
           <button class="btn" id="btnClearLog" style="padding: 1px 6px; font-size: 0.65rem;">清空</button>
         </div>
         <div class="log-box" id="logBox">
-          <div class="log-entry info">[系统初始化] M1 全真系统已装配完成。</div>
+          <div class="log-entry info">[系统启动] M2 表现层全真集成已装载，原生驱动四大领域构件。</div>
         </div>
       </div>
 
@@ -557,7 +738,7 @@
   <!-- 引入原生 ESM 主调度脚本 -->
   <script type="module">
     // ==========================================
-    // 原生导入 M1 核心五大系统与基础设施
+    // 原生导入 M1/M2 真实构件与基础设施 (LL-003 严防两张皮)
     // ==========================================
     import {
       MiniRenderer,
@@ -569,45 +750,25 @@
       TOTAL_TILES,
       FarmStages,
       RACE_COLORS,
-      BIOME_COLOR_PALETTE
+      BIOME_COLOR_PALETTE,
+      COLOR_CASTE_CIVILIAN,
+      COLOR_CASTE_ARTISAN,
+      COLOR_CASTE_SOLDIER,
+      COLOR_CASTE_LEADER
     } from './src/rendering/MiniRenderer.js';
 
-    import {
-      TileGrid
-    } from './src/world/TileGrid.js';
-
-    import {
-      MapGenerator
-    } from './src/world/MapGenerator.js';
-
-    import {
-      WorldBoundaryGuard
-    } from './src/world/WorldBoundaryGuard.js';
-
-    import {
-      NutrientField
-    } from './src/ecosystem/NutrientField.js';
-
-    import {
-      FarmlandSystem,
-      FarmlandStage
-    } from './src/ecosystem/FarmlandSystem.js';
-
-    import {
-      MetabolismSystem
-    } from './src/ecosystem/MetabolismSystem.js';
-
-    import {
-      EmergencyMetabolismSystem
-    } from './src/ecosystem/EmergencyMetabolismSystem.js';
-
-    import {
-      DomainEventBus
-    } from './src/core/DomainEventBus.js';
-
-    import {
-      DomainEvents
-    } from './src/data/DomainEvents.js';
+    import { TileGrid } from './src/world/TileGrid.js';
+    import { MapGenerator } from './src/world/MapGenerator.js';
+    import { WorldBoundaryGuard } from './src/world/WorldBoundaryGuard.js';
+    import { NutrientField } from './src/ecosystem/NutrientField.js';
+    import { FarmlandSystem, FarmlandStage } from './src/ecosystem/FarmlandSystem.js';
+    import { MetabolismSystem } from './src/ecosystem/MetabolismSystem.js';
+    import { EmergencyMetabolismSystem } from './src/ecosystem/EmergencyMetabolismSystem.js';
+    import { DomainEventBus } from './src/core/DomainEventBus.js';
+    import { DomainEvents } from './src/data/DomainEvents.js';
+    import { PRNG } from './src/core/PRNG.js';
+    import { GameLoop } from './src/core/GameLoop.js';
+    import { RaceList, Races } from './src/data/RaceData.js';
 
     import {
       ECS,
@@ -623,6 +784,8 @@
       HEALTH_STRIDE,
       HP_OFFSET_CURRENT,
       HP_OFFSET_MAX,
+      COMBAT_STRIDE,
+      CS_OFFSET_ARMOR,
       PHYSIOLOGY_STRIDE,
       PHY_OFFSET_HUNGER,
       PHY_OFFSET_EMERGENCY_LOCK,
@@ -633,24 +796,88 @@
     import {
       IS_ALIVE,
       IS_LEADER,
+      IS_MUTANT,
       IS_EMERGENCY_LOCK,
+      IN_COMBAT,
+      IS_CASTING,
+      IS_DISARMED,
+      IS_SKILL_ACTIVE,
+      IS_IMMOBILIZED,
       hasStatus,
       setStatus,
       clearStatus
     } from './src/components/UnitStatusFlags.js';
 
-    import { RaceList, Races } from './src/data/RaceData.js';
-    import { PRNG } from './src/core/PRNG.js';
-    import { GameLoop } from './src/core/GameLoop.js';
+    // M2 真实领域系统构件
+    import {
+      SocialCasteSystem
+    } from './src/profession/SocialCasteSystem.js';
+
+    import {
+      CasteType,
+      CASTE_STRIDE,
+      CASTE_OFFSET_TYPE,
+      CASTE_OFFSET_EXP_LABOR,
+      CASTE_OFFSET_EXP_COMBAT,
+      CASTE_OFFSET_COOLDOWN,
+      initSocialCaste
+    } from './src/components/SocialCasteComponent.js';
+
+    import {
+      MendelianGeneticsSystem,
+      BASE_MUTATION_RATE
+    } from './src/mutation/MendelianGeneticsSystem.js';
+
+    import {
+      GENETICS_STRIDE,
+      GEN_OFFSET_MATERNAL,
+      GEN_OFFSET_PATERNAL,
+      GEN_OFFSET_PHENOTYPE,
+      GEN_OFFSET_GENERATION,
+      initGenetics,
+      updatePhenotype
+    } from './src/components/GeneticsComponent.js';
+
+    import {
+      RaceSkillSystem
+    } from './src/race/RaceSkillSystem.js';
+
+    import {
+      SKILL_STRIDE,
+      SKILL_OFFSET_COOLDOWN,
+      SKILL_OFFSET_DURATION,
+      SKILL_OFFSET_CHANNEL,
+      initRaceSkill
+    } from './src/components/RaceSkillComponent.js';
+
+    import {
+      RaceSkills,
+      SkillIds,
+      getRaceSkill
+    } from './src/data/RaceSkillData.js';
+
+    import {
+      OrganFlags,
+      OrganFlagNames,
+      getOrganFlagNames
+    } from './src/data/MutationFlags.js';
+
+    import {
+      filterAndRemapOrgans
+    } from './src/mutation/TabooFilter.js';
+
+    import {
+      EntityPhysicalAggregator
+    } from './src/systems/EntityPhysicalAggregator.js';
 
     // ==========================================
-    // 实例化核心系统 (真实 M1 架构)
+    // 实例化核心系统 (真实 M1/M2 架构)
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const renderer = new MiniRenderer(canvas);
     const prng = new PRNG(1337);
 
-    // 1. 实体与事件基础设施
+    // 1. 实体与事件总线基础设施
     const ecs = new ECS();
     const eventBus = new DomainEventBus();
 
@@ -666,11 +893,14 @@
     // 4. 2x2 农田四阶演替系统
     const farmlandSys = new FarmlandSystem();
 
-    // 5. 12 种族主干生存代谢与饥饿损耗系统
+    // 5. 生存代谢与饥饿系统
     const metabolismSys = new MetabolismSystem(ecs, nutrientField, eventBus);
-
-    // 6. 极端饥荒应急生存网与 10s 通道互斥锁系统
     const emergencySys = new EmergencyMetabolismSystem(ecs, eventBus, prng);
+
+    // 6. M2 四大领域系统原生实例化
+    const casteSys = new SocialCasteSystem(ecs, eventBus);
+    const geneticsSys = new MendelianGeneticsSystem(ecs, eventBus, prng);
+    const raceSkillSys = new RaceSkillSystem(ecs, eventBus, { tileGrid, nutrientField });
 
     // 运行状态与时间倍速
     let timeScale = 1;
@@ -699,6 +929,18 @@
     const statAvgHunger = document.getElementById('statAvgHunger');
     const statDying = document.getElementById('statDying');
 
+    const casteTotalBadge = document.getElementById('casteTotalBadge');
+    const casteBarCivilian = document.getElementById('casteBarCivilian');
+    const casteBarArtisan = document.getElementById('casteBarArtisan');
+    const casteBarSoldier = document.getElementById('casteBarSoldier');
+    const casteBarLeader = document.getElementById('casteBarLeader');
+    const statCivilian = document.getElementById('statCivilian');
+    const statArtisan = document.getElementById('statArtisan');
+    const statSoldier = document.getElementById('statSoldier');
+    const statLeader = document.getElementById('statLeader');
+
+    const mutantTotalBadge = document.getElementById('mutantTotalBadge');
+    const organGrid = document.getElementById('organGrid');
     const inspectorBox = document.getElementById('inspectorBox');
     const logBox = document.getElementById('logBox');
 
@@ -711,7 +953,7 @@
       const timeStr = Math.floor(simElapsedSec) + 's';
       entry.textContent = `[${timeStr}] ${text}`;
       logBox.appendChild(entry);
-      if (logBox.children.length > 60) {
+      if (logBox.children.length > 70) {
         logBox.removeChild(logBox.firstChild);
       }
       logBox.scrollTop = logBox.scrollHeight;
@@ -721,32 +963,76 @@
       logBox.innerHTML = '';
     });
 
-    // 订阅饥饿死亡领域事件
+    // 订阅 M1 领域事件
     eventBus.subscribe(DomainEvents.EVT_DEATH_STARVATION, (evt) => {
-      addLog(`💀 [饥饿衰竭] 小人 #${evt.srcId} 饥荒耗竭，骨肥归流地脉！`, 'danger');
+      addLog(`💀 [饥饿衰竭] 实体 #${evt.srcId} 饥荒耗竭，骨肥归流地脉！`, 'danger');
     });
 
-    // 订阅掠夺口粮互殴事件
     eventBus.subscribe(DomainEvents.EVT_BRAWL_RATION, (evt) => {
-      addLog(`⚔️ [口粮互殴] 掠夺种族 #${evt.srcId} 抢夺同伴口粮饱腹！`, 'warn');
+      addLog(`⚔️ [口粮互殴] 掠夺实体 #${evt.srcId} 抢夺同伴口粮饱腹！`, 'warn');
+      if (evt.targetId > 0 && ecs.isAlive(evt.targetId)) {
+        casteSys.recordCombat(evt.targetId, 15.0, false);
+      }
+    });
+
+    // 订阅 M2 阶级晋升与新王即位事件
+    eventBus.subscribe(DomainEvents.EVT_CASTE_PROMOTED, (evt) => {
+      const casteNames = ['平民', '工匠', '士兵', '领袖'];
+      const cName = casteNames[evt.param2] || '未知';
+      addLog(`🎖️ [社会阶级跃迁] 实体 #${evt.srcId} 晋升为【${cName}】！`, 'green');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_HEIR_CROWNED, (evt) => {
+      addLog(`👑 [王朝加冕] 阵营 #${evt.param1} 新王加冕！新领袖为实体 #${evt.srcId}！`, 'green');
+    });
+
+    // 订阅 M2 技能触发与缴械事件
+    eventBus.subscribe(DomainEvents.EVT_RACE_SKILL_TRIGGERED, (evt) => {
+      addLog(`⚡ [特技激活] 实体 #${evt.srcId} 激发特技 (ID: ${evt.param1})！`, 'purple');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_WEAPON_DISARMED, (evt) => {
+      addLog(`🗡️ [兵刃打落] 实体 #${evt.srcId} 兵器被打落，进入 6s 缴械状态！`, 'warn');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_ACTION_MUTEX_BLOCKED, (evt) => {
+      addLog(`🛑 [通道仲裁阻断] 实体 #${evt.srcId} 动作轨道冲突被阻断打断！`, 'info');
     });
 
     // ==========================================
-    // 初始化 12 始祖种族色彩图例
+    // 初始化 12 始祖种族色彩与技能图例
     // ==========================================
     const raceGrid = document.getElementById('raceGrid');
     RaceList.forEach((race, idx) => {
       const tag = document.createElement('div');
       tag.className = 'race-tag';
+      const skill = RaceSkills[race.id];
+      const skillName = skill ? skill.active.displayName : '基础';
       tag.innerHTML = `
         <div class="race-dot" style="background: ${RACE_COLORS[idx]};"></div>
-        <span>${race.name}</span>
+        <span title="${race.name} - 特技: ${skillName}">${race.name}</span>
       `;
       raceGrid.appendChild(tag);
     });
 
+    // 初始化 9 大突变器官渗透率卡片
+    const organKeys = Object.keys(OrganFlagNames).map(Number);
+    organKeys.forEach((mask) => {
+      const name = OrganFlagNames[mask];
+      const chip = document.createElement('div');
+      chip.className = 'organ-chip';
+      chip.id = `organChip_${mask}`;
+      chip.innerHTML = `
+        <div class="organ-header">
+          <span>${name}</span>
+          <span class="organ-ratio" id="organVal_${mask}">0 (0%)</span>
+        </div>
+      `;
+      organGrid.appendChild(chip);
+    });
+
     // ==========================================
-    // 真实实体生成管理 (写入连续 TypedArray)
+    // 真实实体生成管理 (写入连续 TypedArray 与 M2 构件)
     // ==========================================
     function spawnUnit(raceIndex, targetX, targetY, isLeader = false) {
       const eid = ecs.allocateEntity();
@@ -799,10 +1085,47 @@
       ecs.physiology[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_EMERGENCY_LOCK] = 0.0;
 
       // 5. Identities (factionId: 1-12)
-      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = raceIndex + 1;
+      const factionId = raceIndex + 1;
+      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = factionId;
 
-      // 6. UnitStatusFlags
-      ecs.statusFlags[eid] = IS_ALIVE | (isLeader ? IS_LEADER : 0);
+      // 6. M2: 种族关联绑定
+      raceSkillSys.setEntityRace(eid, race.id);
+      casteSys.setEntityRace(eid, race.id);
+
+      // 7. M2: 阶级系统初始化 (若为领袖则设为 LEADER，否则为 CIVILIAN)
+      const initialCaste = isLeader ? CasteType.LEADER : CasteType.CIVILIAN;
+      initSocialCaste(casteSys.castes, eid, initialCaste);
+      if (isLeader) {
+        casteSys.registerLeader(eid, factionId);
+      }
+
+      // 8. M2: 遗传基因初始化 (始祖带部分突变器官，严格受 TabooFilter 禁忌拦截)
+      let maternalOrgan = 0;
+      let paternalOrgan = 0;
+      if (prng.nextFloat(0, 1) < 0.25) {
+        const rawMask = (1 << prng.nextInt(0, 8));
+        const filtered = filterAndRemapOrgans(race.id, rawMask);
+        maternalOrgan = filtered.remappedMask;
+      }
+      if (prng.nextFloat(0, 1) < 0.15) {
+        const rawMask = (1 << prng.nextInt(0, 8));
+        const filtered = filterAndRemapOrgans(race.id, rawMask);
+        paternalOrgan = filtered.remappedMask;
+      }
+      initGenetics(geneticsSys.genetics, eid, maternalOrgan, paternalOrgan, 1);
+      const phenotype = geneticsSys.genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
+
+      // 9. M2: 技能槽位初始化
+      initRaceSkill(raceSkillSys.skills, eid);
+
+      // 10. UnitStatusFlags
+      let flags = IS_ALIVE;
+      if (isLeader) flags |= IS_LEADER;
+      if (phenotype !== 0) flags |= IS_MUTANT;
+      ecs.statusFlags[eid] = flags;
+
+      // 11. M2: 动态物理聚合 (质量、护甲与移速结合器官位掩码)
+      EntityPhysicalAggregator.aggregate(ecs, eid, race.id, phenotype);
 
       return eid;
     }
@@ -816,12 +1139,11 @@
         const eid = spawnUnit(raceIdx, 0, 0, isLeader);
         if (eid > 0) created++;
       }
-      addLog(`成功向大陆注入 ${created} 只多元种族小人！`, 'green');
+      addLog(`成功向生态箱注入 ${created} 只 M2 多元种族实体！`, 'green');
     }
 
     // 初始化真实 2x2 农田
     function initStarterFarms() {
-      // 激活 8 片位于肥沃平原的农田复合体
       const spots = [
         [14, 10], [18, 12], [22, 14], [26, 11],
         [30, 15], [34, 12], [38, 16], [42, 13]
@@ -843,10 +1165,10 @@
       simTicks++;
       simElapsedSec += dt;
 
-      // 1. 地脉养分连续拉普拉斯扩散步进 (Neumann 绝热反射边界 + 底温保底)
+      // 1. 地脉养分连续拉普拉斯扩散步进
       nutrientField.update(dt, true);
 
-      // 2. 真实 2x2 农田四阶演替迭代 (汲取养分生长 -> 成熟 -> 收割 -> 休耕)
+      // 2. 真实 2x2 农田四阶演替迭代
       farmlandSys.update(dt, nutrientField);
 
       // 3. 实体平滑漫游与地形碰撞阻尼
@@ -863,8 +1185,8 @@
         const phyOff = eid * PHYSICS_STRIDE;
         const tfOff = eid * TRANSFORM_STRIDE;
 
-        // 若处于 10s 应急互斥锁中，禁止位移并锁定速度为 0
-        if (hasStatus(flags, eid, IS_EMERGENCY_LOCK)) {
+        // 若处于 10s 应急互斥锁或定身 (IS_IMMOBILIZED) 中，速度归零
+        if (hasStatus(flags, eid, IS_EMERGENCY_LOCK) || hasStatus(flags, eid, IS_IMMOBILIZED)) {
           phy[phyOff + PHY_OFFSET_VX] = 0.0;
           phy[phyOff + PHY_OFFSET_VY] = 0.0;
           continue;
@@ -880,12 +1202,12 @@
           phy[phyOff + PHY_OFFSET_VX] = -phy[phyOff + PHY_OFFSET_VX];
           phy[phyOff + PHY_OFFSET_VY] = -phy[phyOff + PHY_OFFSET_VY];
         } else if (tileType === 2 || tileType === 4) {
-          // 浅水 (2) 与沼泽 (4) 涉水阻力
+          // 涉水阻力
           phy[phyOff + PHY_OFFSET_VX] *= 0.96;
           phy[phyOff + PHY_OFFSET_VY] *= 0.96;
         }
 
-        // 随机巡航漫游转向
+        // 随机巡航漫游
         if (prng.nextFloat(0, 1) < 0.025) {
           const angle = prng.nextFloat(0, Math.PI * 2);
           const speed = 25.0 + prng.nextFloat(0, 20.0);
@@ -894,21 +1216,30 @@
         }
       }
 
-      // 4. 物理刚体刚性边界 Clamp 守门器 (TC-02, TC-03)
+      // 4. 物理刚体刚性边界 Clamp 守门器
       WorldBoundaryGuard.updateAll(ecs, dt);
 
-      // 5. 12 种族主干生存代谢与饥饿衰竭更新
+      // 5. 生存代谢与饥饿更新
       metabolismSys.update(dt);
 
-      // 6. 极端饥荒应急生存降级网与 10s 通道互斥锁推进
+      // 6. 极端饥荒应急生存网
       emergencySys.update(dt);
 
-      // 7. 领域事件总线 Flush 分发
+      // 7. M2 四大社会阶级动态晋升与领袖即位 FSM 推进
+      casteSys.update(dt);
+
+      // 8. M2 12 始祖种族特异技能与动作轨道仲裁系统推进
+      raceSkillSys.update(dt);
+
+      // 9. M2 实体物理属性动态聚合管线推进 (质量、护甲、移速即时同步)
+      EntityPhysicalAggregator.aggregateAll(ecs, geneticsSys.genetics);
+
+      // 10. 领域事件总线 Flush 分发
       eventBus.flush();
     }
 
     // ==========================================
-    // 仪表盘遥测数据刷新 (0.25s 节流)
+    // 仪表盘遥测数据刷新 (0.2s 节流)
     // ==========================================
     function updateTelemetryUI() {
       const activeCount = ecs.getActiveCount();
@@ -916,12 +1247,25 @@
       const hp = ecs.health;
       const phys = ecs.physiology;
       const flags = ecs.statusFlags;
+      const castes = casteSys.castes;
+      const genetics = geneticsSys.genetics;
 
       let healthy = 0;
       let hungry = 0;
       let mutexLocked = 0;
       let dying = 0;
       let totalHunger = 0;
+
+      // 阶级统计
+      let countCivilian = 0;
+      let countArtisan = 0;
+      let countSoldier = 0;
+      let countLeader = 0;
+
+      // 突变器官渗透率统计 (9 大正交器官)
+      const organTally = {};
+      organKeys.forEach(k => organTally[k] = 0);
+      let mutantCount = 0;
 
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
@@ -939,8 +1283,33 @@
         if (hunger >= 80.0) hungry++;
         if (curHp <= maxHp * 0.2) dying++;
         if (hunger < 50.0 && curHp > maxHp * 0.5) healthy++;
+
+        // 阶级统计
+        const cType = castes[eid * CASTE_STRIDE + CASTE_OFFSET_TYPE] | 0;
+        if (cType === CasteType.LEADER || hasStatus(flags, eid, IS_LEADER)) {
+          countLeader++;
+        } else if (cType === CasteType.SOLDIER) {
+          countSoldier++;
+        } else if (cType === CasteType.ARTISAN) {
+          countArtisan++;
+        } else {
+          countCivilian++;
+        }
+
+        // 突变统计
+        const pheno = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
+        if (pheno !== 0) {
+          mutantCount++;
+          for (let k = 0; k < organKeys.length; k++) {
+            const m = organKeys[k];
+            if ((pheno & m) !== 0) {
+              organTally[m]++;
+            }
+          }
+        }
       }
 
+      // 更新生理指示
       statHealthy.textContent = healthy;
       statHungry.textContent = hungry;
       statMutex.textContent = mutexLocked;
@@ -954,36 +1323,180 @@
       const s = Math.floor(simElapsedSec % 60);
       statTime.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-      // 实体检视器更新
+      // 更新阶级面板
+      casteTotalBadge.textContent = `${activeCount} 人口`;
+      const popSafe = Math.max(1, activeCount);
+      const pctCiv = (countCivilian / popSafe * 100).toFixed(0);
+      const pctArt = (countArtisan / popSafe * 100).toFixed(0);
+      const pctSol = (countSoldier / popSafe * 100).toFixed(0);
+      const pctLea = (countLeader / popSafe * 100).toFixed(0);
+
+      casteBarCivilian.style.width = pctCiv + '%';
+      casteBarArtisan.style.width = pctArt + '%';
+      casteBarSoldier.style.width = pctSol + '%';
+      casteBarLeader.style.width = pctLea + '%';
+
+      statCivilian.textContent = `${countCivilian} (${pctCiv}%)`;
+      statArtisan.textContent = `${countArtisan} (${pctArt}%)`;
+      statSoldier.textContent = `${countSoldier} (${pctSol}%)`;
+      statLeader.textContent = `${countLeader} (${pctLea}%)`;
+
+      // 更新突变器官渗透率
+      mutantTotalBadge.textContent = `变异数: ${mutantCount} (${(mutantCount / popSafe * 100).toFixed(1)}%)`;
+      organKeys.forEach((mask) => {
+        const valElem = document.getElementById(`organVal_${mask}`);
+        if (valElem) {
+          const cnt = organTally[mask] || 0;
+          const ratio = ((cnt / popSafe) * 100).toFixed(1);
+          valElem.textContent = `${cnt} (${ratio}%)`;
+        }
+      });
+
+      // 更新实体全息检视器
       if (selectedEntityId > 0 && ecs.isAlive(selectedEntityId)) {
         const eid = selectedEntityId;
         const curHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_CURRENT] | 0;
         const maxHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_MAX] | 0;
         const hg = phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] | 0;
-        const lk = phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_EMERGENCY_LOCK].toFixed(1);
         const facId = ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION];
         const race = RaceList[(facId - 1) % 12] || RaceList[0];
         const isL = hasStatus(flags, eid, IS_LEADER);
 
+        // 阶级
+        const cType = castes[eid * CASTE_STRIDE + CASTE_OFFSET_TYPE] | 0;
+        const casteNames = ['平民 (Civilian)', '工匠 (Artisan)', '士兵 (Soldier)', '领袖 (Leader)'];
+        const expL = castes[eid * CASTE_STRIDE + CASTE_OFFSET_EXP_LABOR].toFixed(1);
+        const expC = castes[eid * CASTE_STRIDE + CASTE_OFFSET_EXP_COMBAT].toFixed(1);
+        const cCd = castes[eid * CASTE_STRIDE + CASTE_OFFSET_COOLDOWN].toFixed(1);
+
+        // 技能
+        const skCd = raceSkillSys.skills[eid * SKILL_STRIDE + SKILL_OFFSET_COOLDOWN].toFixed(1);
+        const skDur = raceSkillSys.skills[eid * SKILL_STRIDE + SKILL_OFFSET_DURATION].toFixed(1);
+        const skConfig = RaceSkills[race.id];
+        const isCasting = hasStatus(flags, eid, IS_CASTING);
+        const isDisarmed = hasStatus(flags, eid, IS_DISARMED);
+
+        // 遗传
+        const mat = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_MATERNAL];
+        const pat = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PATERNAL];
+        const pheno = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
+        const gen = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_GENERATION];
+        const matNames = getOrganFlagNames(mat).join(',') || '野生型';
+        const patNames = getOrganFlagNames(pat).join(',') || '野生型';
+        const phenoNames = getOrganFlagNames(pheno).join(' + ') || '标准表型';
+
+        // 物理
+        const mass = ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_MASS].toFixed(1);
+        const armor = ecs.combatStats[eid * COMBAT_STRIDE + CS_OFFSET_ARMOR].toFixed(1);
+
         inspectorBox.innerHTML = `
-          <strong>[实体 #${eid}]</strong> ${isL ? '👑 ' : ''}${race.name}<br>
-          生命值: ${curHp} / ${maxHp}<br>
-          饥饿度: ${hg} / 100<br>
-          10s 互斥锁倒计时: <span style="color: #facc15; font-weight: bold;">${lk}s</span><br>
-          坐标: (${ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X]|0}, ${ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y]|0})
+          <strong>[实体 #${eid}]</strong> ${isL ? '👑 ' : ''}${race.name} (阵营 #${facId})<br>
+          <div style="margin-top: 4px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
+            <strong>阶级身份:</strong> <span style="color: #ffd700;">${casteNames[cType]}</span> | 劳作: ${expL} | 战功: ${expC} | 防抖锁: ${cCd}s<br>
+            <strong>种族特技:</strong> 【${skConfig ? skConfig.active.displayName : '无'}】 | ICD: ${skCd}s | 持续: ${skDur}s ${isCasting ? '⏳施法中' : ''} ${isDisarmed ? '🗡️缴械中' : ''}<br>
+            <strong>孟德尔基因 (F${gen}):</strong> 母系[${matNames}] / 父系[${patNames}]<br>
+            <strong>表达表型:</strong> <span style="color: #38bdf8;">${phenoNames}</span><br>
+            <strong>聚合物理:</strong> 质量: ${mass}kg | 护甲: ${armor} | 生命: ${curHp}/${maxHp} | 饥饿: ${hg}/100
+          </div>
         `;
       }
     }
 
     // ==========================================
-    // 交互操作逻辑 (直接驱动真实 M1 系统)
+    // 交互操作逻辑 (直接驱动真实 M2 系统)
     // ==========================================
-    // 1. 一键生成 100 只小人
+    // 1. 生成 100 只小人
     document.getElementById('btnSpawn100').addEventListener('click', () => {
       spawnBatch(100);
     });
 
-    // 2. 一键引发饥荒 (全员饥饿直接设为 95，并践踏销毁全部农田)
+    // 2. 全员释放种族特技
+    document.getElementById('btnCastAllSkills').addEventListener('click', () => {
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      let triggered = 0;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if (!ecs.isAlive(eid)) continue;
+        const raceKey = raceSkillSys.getEntityRaceKey(eid);
+        // 尝试释放技能
+        if (raceSkillSys.triggerSkill(eid, raceKey)) {
+          triggered++;
+        }
+      }
+      addLog(`⚡ 全军号令激活！共激发 ${triggered} 名战士的种族特技！`, 'purple');
+    });
+
+    // 3. 诱发环境辐射突变 (通过 TabooFilter 禁忌过滤与重映射)
+    document.getElementById('btnRadiateMutation').addEventListener('click', () => {
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      let mutated = 0;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if (!ecs.isAlive(eid)) continue;
+        if (prng.nextFloat(0, 1) < 0.35) {
+          const raceKey = raceSkillSys.getEntityRaceKey(eid);
+          const rawMask = (1 << prng.nextInt(0, 8));
+          const filtered = filterAndRemapOrgans(raceKey, rawMask);
+          // 注入母系或父系
+          const genOff = eid * GENETICS_STRIDE;
+          geneticsSys.genetics[genOff + GEN_OFFSET_MATERNAL] |= filtered.remappedMask;
+          updatePhenotype(geneticsSys.genetics, eid);
+          setStatus(ecs.statusFlags, eid, IS_MUTANT);
+          mutated++;
+        }
+      }
+      addLog(`🧬 沃土神辐射洗礼！共促发 ${mutated} 名单位产生合法表型突变！`, 'green');
+    });
+
+    // 4. 战备动员与劳作晋升 (向平民注入劳作经验/战备经验)
+    document.getElementById('btnPromoteCastes').addEventListener('click', () => {
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      let expInjected = 0;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if (!ecs.isAlive(eid)) continue;
+        const cType = casteSys.getCaste(eid);
+        if (cType === CasteType.CIVILIAN) {
+          if (prng.nextFloat(0, 1) < 0.5) {
+            casteSys.recordLabor(eid, 6.0); // 达到工匠门槛
+          } else {
+            casteSys.recordCombat(eid, 60.0, true); // 达到士兵门槛
+          }
+          expInjected++;
+        }
+      }
+      addLog(`🎖️ 战备号召与工匠大竞赛！注入履历促进 ${expInjected} 名平民跃迁！`, 'amber');
+    });
+
+    // 5. 斩首领袖仲裁继承
+    document.getElementById('btnRegicide').addEventListener('click', () => {
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      let killed = 0;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if (ecs.isAlive(eid) && hasStatus(ecs.statusFlags, eid, IS_LEADER)) {
+          casteSys.onLeaderDied(eid);
+          // 处死实体
+          ecs.destroyEntity(eid);
+          killed++;
+        }
+      }
+      if (killed > 0) {
+        addLog(`👑 王座动荡！处决了 ${killed} 名旧领袖，各阵营进入 3s 空位继承期！`, 'danger');
+      } else {
+        addLog(`当前无在位领袖，尝试由功勋氏族加冕新王！`, 'info');
+      }
+    });
+
+    // 6. 一键引发饥荒
     document.getElementById('btnTriggerFamine').addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
@@ -992,40 +1505,40 @@
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if (ecs.isAlive(eid)) {
-          // 饥饿度直接拉满至 95.0，诱发全图进入应急生存！
           phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] = 95.0;
         }
       }
 
-      // 损毁全图农田储备
       for (let i = 0; i < farmlandSys.maxCapacity; i++) {
         if (farmlandSys.farmActive[i] === 1) {
           farmlandSys.pillageFarmland(i, nutrientField);
         }
       }
-
-      addLog(`🚨 全图神罚大饥荒爆发！全员饥饿升至 95，农田全毁！全员触发 10s 互斥锁！`, 'danger');
+      addLog(`🚨 全图神罚大饥荒爆发！饥饿升至 95，农田全毁，触发 10s 互斥锁！`, 'danger');
     });
 
-    // 3. 种植 8 片农田
+    // 7. 种植 8 片农田
     document.getElementById('btnSpawnFarms').addEventListener('click', () => {
       initStarterFarms();
     });
 
-    // 4. 重置生态
+    // 8. 重置生态
     document.getElementById('btnResetAll').addEventListener('click', () => {
       ecs.reset();
       nutrientField.reset(20.0);
       nutrientField.syncBaseHeatFromGrid();
       farmlandSys.farmActive.fill(0);
       farmlandSys.activeCount = 0;
+      casteSys.castes.fill(0);
+      geneticsSys.genetics.fill(0);
+      raceSkillSys.skills.fill(0);
       initStarterFarms();
       spawnBatch(120);
       renderer.invalidateTerrain();
       addLog(`生态系统彻底重置，重新孕育 120 只始祖部族！`, 'info');
     });
 
-    // 5. 图层快捷切换
+    // 9. 图层快捷切换
     const bindToggle = (id, prop) => {
       const btn = document.getElementById(id);
       btn.addEventListener('click', () => {
@@ -1037,9 +1550,12 @@
     bindToggle('toggleFarmlands', 'showFarmlands');
     bindToggle('toggleHealthBars', 'showHealthBars');
     bindToggle('toggleStatusPips', 'showStatusPips');
+    bindToggle('toggleCastes', 'showCastes');
+    bindToggle('toggleMutations', 'showMutations');
+    bindToggle('toggleSkills', 'showSkills');
     bindToggle('toggleGrid', 'showGrid');
 
-    // 6. 倍速切换
+    // 10. 倍速切换
     const speedBtns = [
       { id: 'btnPause', val: 0 },
       { id: 'btn1x', val: 1 },
@@ -1057,7 +1573,7 @@
       });
     });
 
-    // 7. 画布点击选定实体检视
+    // 11. 画布点击选定实体全息检视
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -1065,7 +1581,6 @@
       const clickX = (e.clientX - rect.left) * scaleX;
       const clickY = (e.clientY - rect.top) * scaleY;
 
-      // 查找 24px 半径内最近实体
       let closestId = 0;
       let minDisSq = 32 * 32;
       const activeCount = ecs.getActiveCount();
@@ -1088,7 +1603,6 @@
         selectedEntityId = closestId;
         updateTelemetryUI();
       } else {
-        // 点击空白处生成小人
         const raceIdx = prng.nextInt(0, 11);
         const eid = spawnUnit(raceIdx, clickX, clickY, false);
         selectedEntityId = eid;
@@ -1103,24 +1617,21 @@
     spawnBatch(120);
 
     const gameLoop = new GameLoop(
-      // Update 回调 (1/60s 物理步长)
       (fixedDt) => {
         if (timeScale > 0) {
-          // 根据倍速决定单帧演化次数，确保定步长物理数值稳定性
           for (let step = 0; step < timeScale; step++) {
             updateSimulation(fixedDt);
           }
         }
       },
-      // Render 回调 (全量热路径零 GC 渲染)
       (interpolation) => {
         const t0 = performance.now();
-        // 传入真实 M1 系统: tileGrid, ecs, farmlandSys, nutrientField
-        renderer.render(tileGrid, ecs, farmlandSys, nutrientField);
+        // 传入真实 M2 领域系统: tileGrid, ecs, farmlandSys, nutrientField, casteSys, geneticsSys, raceSkillSys
+        renderer.render(tileGrid, ecs, farmlandSys, nutrientField, casteSys, geneticsSys, raceSkillSys);
         lastFrameDurationMs = performance.now() - t0;
 
         frameCount++;
-        if (t0 - lastFpsUpdate >= 250) {
+        if (t0 - lastFpsUpdate >= 200) {
           const fps = ((frameCount * 1000) / (t0 - lastFpsUpdate)).toFixed(1);
           statFps.textContent = fps;
           statFps.className = fps >= 55 ? 'fps-good' : (fps >= 30 ? 'fps-mid' : 'fps-low');
@@ -1133,7 +1644,7 @@
     );
 
     gameLoop.start();
-    addLog(`60 FPS 定步长 M1 端到端系统已启动，渲染器零 GC 稳定运行！`, 'green');
+    addLog(`60 FPS M2 端到端领域视窗已就绪，全量构件原生运转中！`, 'green');
   </script>
 </body>
 </html>

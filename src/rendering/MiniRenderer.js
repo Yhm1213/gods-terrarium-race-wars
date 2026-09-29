@@ -32,8 +32,33 @@ import {
   IS_ALIVE,
   IS_LEADER,
   IS_EMERGENCY_LOCK,
-  IN_COMBAT
+  IN_COMBAT,
+  IS_CASTING,
+  IS_DISARMED,
+  IS_SKILL_ACTIVE,
+  IS_IMMOBILIZED
 } from '../components/UnitStatusFlags.js';
+
+import {
+  CASTE_STRIDE,
+  CASTE_OFFSET_TYPE,
+  CasteType
+} from '../components/SocialCasteComponent.js';
+
+import {
+  GENETICS_STRIDE,
+  GEN_OFFSET_PHENOTYPE
+} from '../components/GeneticsComponent.js';
+
+import {
+  OrganFlags
+} from '../data/MutationFlags.js';
+
+import {
+  SKILL_STRIDE,
+  SKILL_OFFSET_COOLDOWN,
+  SKILL_OFFSET_DURATION
+} from '../components/RaceSkillComponent.js';
 
 // ==========================================
 // 世界规格与常量
@@ -143,6 +168,23 @@ const COLOR_EYE         = '#0f172a';
 const COLOR_GRID_LINE   = 'rgba(255, 255, 255, 0.05)';
 const COLOR_FARM_BORDER = 'rgba(0, 0, 0, 0.45)';
 
+// M2 阶级标牌调色板 (契约 5.2 节)
+export const COLOR_CASTE_CIVILIAN = '#a88d75'; // 平民浅褐色微点
+export const COLOR_CASTE_ARTISAN  = '#8a8a8a'; // 工匠铁灰色方块
+export const COLOR_CASTE_SOLDIER  = '#b22222'; // 士兵暗红色三角
+export const COLOR_CASTE_LEADER   = '#ffd700'; // 领袖亮金外圈王冠
+
+// M2 突变器官点缀色 (契约 5.2 节)
+export const COLOR_ORGAN_HOLY     = '#fef08a'; // 圣灵淡金圣环
+export const COLOR_ORGAN_FLAME    = '#ff4500'; // 烈焰橙红微光
+export const COLOR_ORGAN_WING     = '#93c5fd'; // 薄翼轻盈浅蓝
+export const COLOR_ORGAN_GRANITE  = '#78716c'; // 花岗岩灰色斑块
+
+// M2 技能与施法反馈颜色
+export const COLOR_CASTING        = '#38bdf8'; // 施法读条青蓝光晕
+export const COLOR_DISARMED       = '#94a3b8'; // 缴械断刃灰钢
+export const COLOR_SKILL_ACTIVE   = '#a855f7'; // 特技激活炫紫微光
+
 /**
  * MiniRenderer 类
  * 纯原生 Canvas 2D 渲染引擎，热路径零 GC
@@ -173,6 +215,9 @@ export class MiniRenderer {
     this.showHealthBars = true;  // 是否悬浮小人血条
     this.showStatusPips = true;  // 是否悬浮饥饿/互斥锁状态小点
     this.showGrid = false;       // 是否显示 24x24 瓦片网格线
+    this.showCastes = true;      // 是否绘制四大阶级标牌
+    this.showMutations = true;   // 是否绘制突变器官视觉点缀
+    this.showSkills = true;      // 是否绘制技能与施法反馈
   }
 
   /**
@@ -252,8 +297,11 @@ export class MiniRenderer {
    * @param {ECS} ecs ECS 实体管理器实例
    * @param {Array<object>|import('../ecosystem/FarmlandSystem.js').FarmlandSystem|null} [farmlands=null] 2x2 农田列表或系统
    * @param {import('../ecosystem/NutrientField.js').NutrientField|Float32Array|null} [nutrientField=null] 养分扩散场实例
+   * @param {Float32Array|object|null} [casteBuffer=null] 阶级数据缓冲或 SocialCasteSystem 实例
+   * @param {Uint32Array|object|null} [geneticsBuffer=null] 遗传基因缓冲或 MendelianGeneticsSystem 实例
+   * @param {Float32Array|object|null} [skillBuffer=null] 技能数据缓冲或 RaceSkillSystem 实例
    */
-  render(world, ecs, farmlands = null, nutrientField = null) {
+  render(world, ecs, farmlands = null, nutrientField = null, casteBuffer = null, geneticsBuffer = null, skillBuffer = null) {
     const ctx = this.ctx;
 
     // 1. 绘制静态地形瓦片底图 (若脏则重新烘焙，否则单次 blit 极速贴图)
@@ -291,9 +339,22 @@ export class MiniRenderer {
       this._renderGridLines(ctx);
     }
 
-    // 5. 绘制 4096 连续内存小人实体群
+    // 5. 绘制 4096 连续内存小人实体群 (解析 M2 Buffer 或系统对象)
     if (ecs && ecs.activeCount > 0) {
-      this._renderEntities(ctx, ecs);
+      let castes = null;
+      if (casteBuffer) {
+        castes = casteBuffer.castes || (casteBuffer instanceof Float32Array ? casteBuffer : null);
+      }
+      let genetics = null;
+      if (geneticsBuffer) {
+        genetics = geneticsBuffer.genetics || (geneticsBuffer instanceof Uint32Array ? geneticsBuffer : null);
+      }
+      let skills = null;
+      if (skillBuffer) {
+        skills = skillBuffer.skills || (skillBuffer instanceof Float32Array ? skillBuffer : null);
+      }
+
+      this._renderEntities(ctx, ecs, castes, genetics, skills);
     }
   }
 
@@ -472,8 +533,11 @@ export class MiniRenderer {
    * @private
    * @param {CanvasRenderingContext2D} ctx 
    * @param {ECS} ecs 
+   * @param {Float32Array|null} [castes=null]
+   * @param {Uint32Array|null} [genetics=null]
+   * @param {Float32Array|null} [skills=null]
    */
-  _renderEntities(ctx, ecs) {
+  _renderEntities(ctx, ecs, castes = null, genetics = null, skills = null) {
     const activeCount = ecs.activeCount;
     const dense = ecs.denseEntities;
     const transforms = ecs.transforms;
@@ -484,6 +548,9 @@ export class MiniRenderer {
 
     const showHp = this.showHealthBars;
     const showPips = this.showStatusPips;
+    const showCastes = this.showCastes;
+    const showMutations = this.showMutations;
+    const showSkills = this.showSkills;
 
     for (let i = 0; i < activeCount; i++) {
       const eid = dense[i];
@@ -506,22 +573,114 @@ export class MiniRenderer {
       const factionId = identities[idOffset + ID_OFFSET_FACTION];
       const raceIdx = (factionId > 0 ? (factionId - 1) : 0) % 12;
 
-      // 1. 绘制小人主体 (6x6 像素方块)
+      // 读取突变表型掩码并绘制突变器官底层或外轮廓点缀
+      let phenotype = 0;
+      if (genetics && showMutations) {
+        phenotype = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE];
+
+        // 1. OrganFlags.WING: 背部两侧 2 像素薄翼 (各 2x1 像素)
+        if ((phenotype & OrganFlags.WING) !== 0) {
+          ctx.fillStyle = COLOR_ORGAN_WING;
+          ctx.fillRect(rx - 2, ry + 2, 2, 1);
+          ctx.fillRect(rx + 6, ry + 2, 2, 1);
+        }
+
+        // 2. OrganFlags.FLAME: 身体边缘带橙红微光 (左右外侧 1x4 像素)
+        if ((phenotype & OrganFlags.FLAME) !== 0) {
+          ctx.fillStyle = COLOR_ORGAN_FLAME;
+          ctx.fillRect(rx - 1, ry + 1, 1, 4);
+          ctx.fillRect(rx + 6, ry + 1, 1, 4);
+        }
+      }
+
+      // 3. 绘制小人主体 (6x6 像素方块)
       ctx.fillStyle = RACE_COLORS[raceIdx];
       ctx.fillRect(rx, ry, 6, 6);
 
-      // 2. 绘制 1px 眼睛面部像素点 (增添复古像素灵动感)
+      // 4. 突变器官本体表面斑块与头顶圣环
+      if (phenotype !== 0 && showMutations) {
+        // OrganFlags.GRANITE: 灰色岩石斑块 (身体中心 2x2 斑块)
+        if ((phenotype & OrganFlags.GRANITE) !== 0) {
+          ctx.fillStyle = COLOR_ORGAN_GRANITE;
+          ctx.fillRect(rx + 2, ry + 2, 2, 2);
+        }
+        // OrganFlags.HOLY: 头顶淡金圣环 (4x1 像素)
+        if ((phenotype & OrganFlags.HOLY) !== 0) {
+          ctx.fillStyle = COLOR_ORGAN_HOLY;
+          ctx.fillRect(rx + 1, ry - 5, 4, 1);
+        }
+      }
+
+      // 5. 绘制 1px 眼睛面部像素点 (增添复古像素灵动感)
       ctx.fillStyle = COLOR_EYE;
       ctx.fillRect(rx + 1, ry + 1, 1, 1);
       ctx.fillRect(rx + 4, ry + 1, 1, 1);
 
-      // 3. 酋长王冠标志 (若为部族领袖)
-      if ((flag & IS_LEADER) !== 0) {
+      // 6. 领袖外圈与王冠标志 (严格由 statusFlags[id] & IS_LEADER 驱动)
+      const isLeader = (flag & IS_LEADER) !== 0;
+      if (isLeader) {
+        // 亮金色 24px 外发光圈描边与四角发光晶格 (rx - 9, ry - 9, 24x24)
+        ctx.strokeStyle = COLOR_LEADER;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(rx - 9 + 0.5, ry - 9 + 0.5, 23, 23);
+
         ctx.fillStyle = COLOR_LEADER;
+        ctx.fillRect(rx - 9, ry - 9, 2, 2);
+        ctx.fillRect(rx + 13, ry - 9, 2, 2);
+        ctx.fillRect(rx - 9, ry + 13, 2, 2);
+        ctx.fillRect(rx + 13, ry + 13, 2, 2);
+
+        // 金色王冠 (4x2 像素)
         ctx.fillRect(rx + 1, ry - 3, 4, 2);
       }
 
-      // 4. 血条浮标 (8x2 像素条)
+      // 7. 四大阶级标牌 (Caste Badge, 3x3 像素)
+      if (showCastes) {
+        let caste = CasteType.CIVILIAN;
+        if (castes) {
+          caste = castes[eid * CASTE_STRIDE + CASTE_OFFSET_TYPE] | 0;
+        } else if (isLeader) {
+          caste = CasteType.LEADER;
+        }
+
+        if (caste === CasteType.ARTISAN) {
+          // ARTISAN: 铁灰色方块 (3x3 像素, #8a8a8a)
+          ctx.fillStyle = COLOR_CASTE_ARTISAN;
+          ctx.fillRect(rx - 4, ry, 3, 3);
+        } else if (caste === CasteType.SOLDIER) {
+          // SOLDIER: 暗红色三角 (3x3 像素, #b22222)
+          ctx.fillStyle = COLOR_CASTE_SOLDIER;
+          ctx.fillRect(rx - 3, ry - 1, 1, 1);
+          ctx.fillRect(rx - 4, ry, 3, 2);
+        } else if (caste === CasteType.CIVILIAN) {
+          // CIVILIAN: 浅褐色微点 (1x1 像素, #a88d75)
+          ctx.fillStyle = COLOR_CASTE_CIVILIAN;
+          ctx.fillRect(rx - 3, ry + 1, 1, 1);
+        }
+      }
+
+      // 8. 技能与施法反馈 (IS_CASTING 施法光晕, IS_DISARMED 缴械匕首状态)
+      if (showSkills) {
+        // IS_CASTING: 施法光晕 (青蓝 10x2 像素脚底光圈)
+        if ((flag & IS_CASTING) !== 0) {
+          ctx.fillStyle = COLOR_CASTING;
+          ctx.fillRect(rx - 2, ry + 7, 10, 2);
+        }
+        // IS_DISARMED: 处于缴械状态 (拔出备用短刀, 灰红色掉落匕首标记)
+        if ((flag & IS_DISARMED) !== 0) {
+          ctx.fillStyle = COLOR_DISARMED;
+          ctx.fillRect(rx + 7, ry + 2, 2, 3);
+          ctx.fillStyle = COLOR_COMBAT;
+          ctx.fillRect(rx + 8, ry + 1, 1, 1);
+        }
+        // IS_SKILL_ACTIVE: 主动技能生效中紫光小点
+        if ((flag & IS_SKILL_ACTIVE) !== 0) {
+          ctx.fillStyle = COLOR_SKILL_ACTIVE;
+          ctx.fillRect(rx + 2, ry - 2, 2, 1);
+        }
+      }
+
+      // 9. 血条浮标 (8x2 像素条)
       if (showHp) {
         const hpOffset = eid * HEALTH_STRIDE;
         const curHp = health[hpOffset + HP_OFFSET_CURRENT];
@@ -543,7 +702,7 @@ export class MiniRenderer {
         }
       }
 
-      // 5. 饥饿状态与 10s 通道互斥锁浮标小点
+      // 10. 饥饿状态与 10s 通道互斥锁浮标小点
       if (showPips) {
         const physOffset = eid * PHYSIOLOGY_STRIDE;
         const hunger = physiology[physOffset + PHY_OFFSET_HUNGER];

@@ -43,7 +43,7 @@ export const Races = Object.freeze({
     baseHp: 85,
     metabolicRate: 0.8,
     metabolicType: MetabolicTypes.AGRARIAN,
-    tabooMask: OrganFlags.FLAME | OrganFlags.GAS, // 禁忌火焰与瓦斯器官 (自动重映射为剧毒孢子)
+    tabooMask: OrganFlags.FLAME, // 禁忌火焰 (抽中火焰自动重映射为草木相容的剧毒孢子 GAS)
     resistances: Object.freeze({ blunt: -0.10, pierce: 0.10, fire: -0.40, acid: 0.30 })
   }),
 
@@ -91,7 +91,7 @@ export const Races = Object.freeze({
     baseHp: 60,
     metabolicRate: 1.3,
     metabolicType: MetabolicTypes.MARAUDER,
-    tabooMask: OrganFlags.HOLY,
+    tabooMask: OrganFlags.HOLY | OrganFlags.GRANITE,
     resistances: Object.freeze({ blunt: -0.20, pierce: -0.10, fire: 0.30, acid: 0.10 })
   }),
 
