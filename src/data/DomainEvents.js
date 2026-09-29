@@ -25,6 +25,7 @@ export const DomainEvents = Object.freeze({
   EVT_OVERDRIVE_STARTED:    0x800C, // 15秒神恩满溢狂欢开启 (Param1: 触发Tick, Param2: 0) [新增]
   EVT_OVERDRIVE_ENDED:      0x800D, // 神恩狂欢结束结算 (Param1: 结束Tick, Param2: 击杀统计) [新增]
   EVT_SUPER_WEAPON_MISFIRE: 0x800E, // 超级奇迹兵器毁灭性反噬 (Param1: 武器ID, Param2: 反噬类型) [升格]
+  EVT_DEATH_STARVATION:     0x800F, // 实体饥饿衰竭死亡 (Param1: 实体ID, Param2: 瓦片Index) [新增]
 
   // ================= 瞬态表现通道 (0x0001 起始，可降频抽帧) =================
   EVT_DAMAGE_APPLIED:       0x0001, // 实体受创 (Param1: 实际扣血量, Param2: 伤害类型掩码)
@@ -36,7 +37,8 @@ export const DomainEvents = Object.freeze({
   EVT_MIRACLE_ACTIVATED:    0x0007, // 上帝神力释放 (Param1: 神力ID, Param2: 瓦片Index)
   EVT_AIRBORNE_LANDED:      0x0008, // 神之手抛掷实体平稳落地 (Param1: 实体ID, Param2: 落地瓦片)
   EVT_GRUDGE_RECORDED:      0x0009, // 宿怨账本记上一笔 (Param1: 受害国ID, Param2: SlabHandle)
-  EVT_CORPSE_DEGRADED:      0x000A  // 尸体降解回流地脉 (Param1: 尸体ID, Param2: 养分量) [降级]
+  EVT_CORPSE_DEGRADED:      0x000A, // 尸体降解回流地脉 (Param1: 尸体ID, Param2: 养分量) [降级]
+  EVT_BRAWL_RATION:         0x000B  // 掠夺种族同伴互殴抢粮 (Param1: 抢夺者ID, Param2: 受害者ID) [新增]
 });
 
 /**

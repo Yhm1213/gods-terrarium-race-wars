@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>《神之蛐蛐缸：万族争霸》 - Milestone 1 宏观生态视窗</title>
+  <style>
+    /* ==========================================
+       像素复古深色控制台主题 (Dark Retro Pixel UI)
+       ========================================== */
+    :root {
+      --bg-dark: #0a0d14;
+      --panel-bg: #121726;
+      --card-bg: #192138;
+      --card-border: #293556;
+      --text-main: #e2e8f0;
+      --text-dim: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-gold: #ffd700;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* 顶部导航控制台 */
+    header {
+      background: var(--panel-bg);
+      border-bottom: 2px solid var(--card-border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .game-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge-milestone {
+      background: #1e1b4b;
+      color: #818cf8;
+      border: 1px solid #4338ca;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* 仪表盘快报区 */
+    .telemetry-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+    }
+
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-bg);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    .fps-good { color: var(--accent-green); font-weight: bold; }
+    .fps-mid  { color: var(--accent-amber); font-weight: bold; }
+    .fps-low  { color: var(--accent-rose); font-weight: bold; }
+
+    /* 倍速控制按钮组 */
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn:hover {
+      background: #25314f;
+      border-color: #3b82f6;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-speed.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-danger {
+      background: #4c1d24;
+      border-color: #be123c;
+      color: #fca5a5;
+    }
+    .btn-danger:hover {
+      background: #e11d48;
+      border-color: #fda4af;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(225, 29, 72, 0.5);
+    }
+
+    .btn-special {
+      background: #064e3b;
+      border-color: #059669;
+      color: #6ee7b7;
+    }
+    .btn-special:hover {
+      background: #10b981;
+      border-color: #a7f3d0;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    }
+
+    /* 主布局容器 */
+    main {
+      flex: 1;
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+      max-width: 1920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* 画布主视窗 */
+    .viewport-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .canvas-container {
+      background: #000000;
+      border: 3px solid var(--card-border);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+      position: relative;
+      width: 100%;
+      max-width: 1344px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at center, rgba(16, 24, 40, 0.4) 0%, rgba(0, 0, 0, 0.9) 100%);
+    }
+
+    /* 保证像素绝对锐利 pixelated */
+    canvas#gameCanvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1344 / 864;
+      max-width: 1344px;
+      display: block;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      cursor: crosshair;
+    }
+
+    /* 快捷切换栏 */
+    .viewport-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--panel-bg);
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      font-size: 0.75rem;
+    }
+
+    .toggle-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .toggle-chip.active {
+      background: #1e293b;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    /* 侧边信息与调试面板 */
+    .sidebar {
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .card {
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 6px;
+    }
+
+    /* 状态统计格栅 */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: ui-monospace, monospace;
+    }
+
+    /* 交互操作面板 */
+    .action-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-btn-group .btn {
+      justify-content: center;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    /* 种族色彩图例微缩列表 */
+    .race-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      font-size: 0.7rem;
+      max-height: 130px;
+      overflow-y: auto;
+    }
+
+    .race-tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--card-bg);
+      padding: 3px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--card-border);
+      color: #94a3b8;
+    }
+
+    .race-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    /* 实时事件日志跑马灯 */
+    .log-box {
+      background: #090c15;
+      border: 1px solid #1e263d;
+      border-radius: 4px;
+      padding: 8px;
+      height: 150px;
+      overflow-y: auto;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-entry {
+      color: #94a3b8;
+      line-height: 1.35;
+      word-break: break-all;
+    }
+    .log-entry.warn   { color: #fbbf24; }
+    .log-entry.danger { color: #f87171; font-weight: bold; }
+    .log-entry.info   { color: #38bdf8; }
+    .log-entry.green  { color: #4ade80; }
+
+    /* 实体属性检视器 */
+    .inspector-content {
+      font-family: ui-monospace, monospace;
+      font-size: 0.75rem;
+      color: #93c5fd;
+      line-height: 1.5;
+      background: var(--card-bg);
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    @media (max-width: 1400px) {
+      main {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部主控台 -->
+  <header>
+    <div class="brand-group">
+      <div class="game-title">《神之蛐蛐缸：万族争霸》</div>
+      <div class="badge-milestone">M1 端到端系统视窗</div>
+    </div>
+
+    <!-- 遥测快报 -->
+    <div class="telemetry-group">
+      <div class="telemetry-item">
+        <span>FPS:</span>
+        <span id="statFps" class="fps-good">60.0</span>
+      </div>
+      <div class="telemetry-item">
+        <span>耗时:</span>
+        <span id="statFrameTime" style="color: #38bdf8;">1.2 ms</span>
+      </div>
+      <div class="telemetry-item">
+        <span>Tick:</span>
+        <span id="statTicks">0</span>
+      </div>
+      <div class="telemetry-item">
+        <span>时间:</span>
+        <span id="statTime" style="color: var(--accent-gold);">00:00</span>
+      </div>
+    </div>
+
+    <!-- 时间流速控制 -->
+    <div class="controls-group">
+      <button class="btn btn-speed" id="btnPause">⏸ 暂停</button>
+      <button class="btn btn-speed active" id="btn1x">▶ 1x</button>
+      <button class="btn btn-speed" id="btn2x">⏩ 2x</button>
+      <button class="btn btn-speed" id="btn5x">🚀 5x</button>
+    </div>
+  </header>
+
+  <!-- 主舞台视窗 -->
+  <main>
+    <div class="viewport-panel">
+      <div class="canvas-container">
+        <canvas id="gameCanvas" width="1344" height="864"></canvas>
+      </div>
+
+      <!-- 视窗底快捷图层切换 -->
+      <div class="viewport-toolbar">
+        <div class="toggle-chip active" id="toggleNutrients">
+          <span>🌿 地脉养分扩散场</span>
+        </div>
+        <div class="toggle-chip active" id="toggleFarmlands">
+          <span>🌾 2x2 农田四阶演替</span>
+        </div>
+        <div class="toggle-chip active" id="toggleHealthBars">
+          <span>🩸 实体生命血条</span>
+        </div>
+        <div class="toggle-chip active" id="toggleStatusPips">
+          <span>⚠️ 饥饿/互斥锁状态小点</span>
+        </div>
+        <div class="toggle-chip" id="toggleGrid">
+          <span>📐 24px 网格参考线</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 侧边遥测与交互调试面板 -->
+    <div class="sidebar">
+      
+      <!-- 生态小人生理状态监控 -->
+      <div class="card">
+        <div class="card-title">
+          <span>📊 生态种群与生理监视器</span>
+          <span id="totalPopBadge" style="color: #38bdf8;">0 / 4096</span>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-box">
+            <span class="stat-label">💚 健康饱腹</span>
+            <span class="stat-value" id="statHealthy" style="color: var(--accent-green);">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">🍗 饥饿警戒 (&ge;80)</span>
+            <span class="stat-value" id="statHungry" style="color: var(--accent-amber);">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">🔒 10s 互斥锁锁定</span>
+            <span class="stat-value" id="statMutex" style="color: #facc15;">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">🌾 活跃农田复合体</span>
+            <span class="stat-value" id="statFarms" style="color: #38bdf8;">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">🥣 全体平均饥饿度</span>
+            <span class="stat-value" id="statAvgHunger" style="color: #a78bfa;">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">💀 濒死极度虚弱</span>
+            <span class="stat-value" id="statDying" style="color: var(--accent-rose);">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 交互调试操作箱 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🛠️ M1 系统端到端交互面板</span>
+        </div>
+        <div class="action-btn-group">
+          <button class="btn btn-special" id="btnSpawn100">
+            🎲 一键生成 100 只随机种族小人
+          </button>
+          <button class="btn btn-danger" id="btnTriggerFamine">
+            ⚠️ 一键引发饥荒 (饥饿95 + 损毁农田 -> 触发 10s 互斥锁)
+          </button>
+          <button class="btn" id="btnSpawnFarms">
+            🌾 开垦 8 片 2x2 复合农田
+          </button>
+          <button class="btn" id="btnResetAll" style="color: #fca5a5;">
+            🔄 重置生态系统回初始状态
+          </button>
+        </div>
+      </div>
+
+      <!-- 实体检视器 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🔍 实体/瓦片精准检视器</span>
+          <span style="font-size: 0.65rem; color: #64748b;">(点击画布聚焦)</span>
+        </div>
+        <div class="inspector-content" id="inspectorBox">
+          点击画布上的小人或瓦片以检视实时物理坐标、生理饥饿与 10s 互斥锁倒计时。
+        </div>
+      </div>
+
+      <!-- 12 始祖种族色彩图例 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🎨 12 始祖种族调色图例</span>
+        </div>
+        <div class="race-grid" id="raceGrid">
+          <!-- 动态注入 12 种族图例 -->
+        </div>
+      </div>
+
+      <!-- 实时生态演化跑马灯 -->
+      <div class="card" style="flex: 1;">
+        <div class="card-title">
+          <span>📜 生态与互斥锁运行日志</span>
+          <button class="btn" id="btnClearLog" style="padding: 1px 6px; font-size: 0.65rem;">清空</button>
+        </div>
+        <div class="log-box" id="logBox">
+          <div class="log-entry info">[系统初始化] M1 全真系统已装配完成。</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 引入原生 ESM 主调度脚本 -->
+  <script type="module">
+    // ==========================================
+    // 原生导入 M1 核心五大系统与基础设施
+    // ==========================================
+    import {
+      MiniRenderer,
+      WORLD_WIDTH,
+      WORLD_HEIGHT,
+      GRID_WIDTH,
+      GRID_HEIGHT,
+      TILE_SIZE,
+      TOTAL_TILES,
+      FarmStages,
+      RACE_COLORS,
+      BIOME_COLOR_PALETTE
+    } from './src/rendering/MiniRenderer.js';
+
+    import {
+      TileGrid
+    } from './src/world/TileGrid.js';
+
+    import {
+      MapGenerator
+    } from './src/world/MapGenerator.js';
+
+    import {
+      WorldBoundaryGuard
+    } from './src/world/WorldBoundaryGuard.js';
+
+    import {
+      NutrientField
+    } from './src/ecosystem/NutrientField.js';
+
+    import {
+      FarmlandSystem,
+      FarmlandStage
+    } from './src/ecosystem/FarmlandSystem.js';
+
+    import {
+      MetabolismSystem
+    } from './src/ecosystem/MetabolismSystem.js';
+
+    import {
+      EmergencyMetabolismSystem
+    } from './src/ecosystem/EmergencyMetabolismSystem.js';
+
+    import {
+      DomainEventBus
+    } from './src/core/DomainEventBus.js';
+
+    import {
+      DomainEvents
+    } from './src/data/DomainEvents.js';
+
+    import {
+      ECS,
+      MAX_ENTITIES,
+      TRANSFORM_STRIDE,
+      TF_OFFSET_X,
+      TF_OFFSET_Y,
+      PHYSICS_STRIDE,
+      PHY_OFFSET_VX,
+      PHY_OFFSET_VY,
+      PHY_OFFSET_MASS,
+      PHY_OFFSET_INVMASS,
+      HEALTH_STRIDE,
+      HP_OFFSET_CURRENT,
+      HP_OFFSET_MAX,
+      PHYSIOLOGY_STRIDE,
+      PHY_OFFSET_HUNGER,
+      PHY_OFFSET_EMERGENCY_LOCK,
+      IDENTITY_STRIDE,
+      ID_OFFSET_FACTION
+    } from './src/core/ECS.js';
+
+    import {
+      IS_ALIVE,
+      IS_LEADER,
+      IS_EMERGENCY_LOCK,
+      hasStatus,
+      setStatus,
+      clearStatus
+    } from './src/components/UnitStatusFlags.js';
+
+    import { RaceList, Races } from './src/data/RaceData.js';
+    import { PRNG } from './src/core/PRNG.js';
+    import { GameLoop } from './src/core/GameLoop.js';
+
+    // ==========================================
+    // 实例化核心系统 (真实 M1 架构)
+    // ==========================================
+    const canvas = document.getElementById('gameCanvas');
+    const renderer = new MiniRenderer(canvas);
+    const prng = new PRNG(1337);
+
+    // 1. 实体与事件基础设施
+    const ecs = new ECS();
+    const eventBus = new DomainEventBus();
+
+    // 2. 瓦片物理网格与地图生成
+    const tileGrid = new TileGrid();
+    const mapGen = new MapGenerator(42);
+    mapGen.generate(tileGrid);
+
+    // 3. 连续地脉养分扩散场 (绑定瓦片底温)
+    const nutrientField = new NutrientField(tileGrid);
+    nutrientField.syncBaseHeatFromGrid();
+
+    // 4. 2x2 农田四阶演替系统
+    const farmlandSys = new FarmlandSystem();
+
+    // 5. 12 种族主干生存代谢与饥饿损耗系统
+    const metabolismSys = new MetabolismSystem(ecs, nutrientField, eventBus);
+
+    // 6. 极端饥荒应急生存网与 10s 通道互斥锁系统
+    const emergencySys = new EmergencyMetabolismSystem(ecs, eventBus, prng);
+
+    // 运行状态与时间倍速
+    let timeScale = 1;
+    let simTicks = 0;
+    let simElapsedSec = 0;
+    let selectedEntityId = 0;
+
+    // 性能监测
+    let lastFpsUpdate = performance.now();
+    let frameCount = 0;
+    let lastFrameDurationMs = 0;
+
+    // ==========================================
+    // UI DOM 元素绑定
+    // ==========================================
+    const statFps = document.getElementById('statFps');
+    const statFrameTime = document.getElementById('statFrameTime');
+    const statTicks = document.getElementById('statTicks');
+    const statTime = document.getElementById('statTime');
+    const totalPopBadge = document.getElementById('totalPopBadge');
+
+    const statHealthy = document.getElementById('statHealthy');
+    const statHungry = document.getElementById('statHungry');
+    const statMutex = document.getElementById('statMutex');
+    const statFarms = document.getElementById('statFarms');
+    const statAvgHunger = document.getElementById('statAvgHunger');
+    const statDying = document.getElementById('statDying');
+
+    const inspectorBox = document.getElementById('inspectorBox');
+    const logBox = document.getElementById('logBox');
+
+    // ==========================================
+    // 领域事件监听与跑马灯
+    // ==========================================
+    function addLog(text, level = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${level}`;
+      const timeStr = Math.floor(simElapsedSec) + 's';
+      entry.textContent = `[${timeStr}] ${text}`;
+      logBox.appendChild(entry);
+      if (logBox.children.length > 60) {
+        logBox.removeChild(logBox.firstChild);
+      }
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    document.getElementById('btnClearLog').addEventListener('click', () => {
+      logBox.innerHTML = '';
+    });
+
+    // 订阅饥饿死亡领域事件
+    eventBus.subscribe(DomainEvents.EVT_DEATH_STARVATION, (evt) => {
+      addLog(`💀 [饥饿衰竭] 小人 #${evt.srcId} 饥荒耗竭，骨肥归流地脉！`, 'danger');
+    });
+
+    // 订阅掠夺口粮互殴事件
+    eventBus.subscribe(DomainEvents.EVT_BRAWL_RATION, (evt) => {
+      addLog(`⚔️ [口粮互殴] 掠夺种族 #${evt.srcId} 抢夺同伴口粮饱腹！`, 'warn');
+    });
+
+    // ==========================================
+    // 初始化 12 始祖种族色彩图例
+    // ==========================================
+    const raceGrid = document.getElementById('raceGrid');
+    RaceList.forEach((race, idx) => {
+      const tag = document.createElement('div');
+      tag.className = 'race-tag';
+      tag.innerHTML = `
+        <div class="race-dot" style="background: ${RACE_COLORS[idx]};"></div>
+        <span>${race.name}</span>
+      `;
+      raceGrid.appendChild(tag);
+    });
+
+    // ==========================================
+    // 真实实体生成管理 (写入连续 TypedArray)
+    // ==========================================
+    function spawnUnit(raceIndex, targetX, targetY, isLeader = false) {
+      const eid = ecs.allocateEntity();
+      if (eid === 0) return 0; // 内存池已满
+
+      const race = RaceList[raceIndex] || RaceList[0];
+
+      // 坐标定位在陆地上
+      let x = targetX;
+      let y = targetY;
+      if (!x || !y) {
+        for (let tries = 0; tries < 20; tries++) {
+          const testX = prng.nextFloat(40, WORLD_WIDTH - 40);
+          const testY = prng.nextFloat(40, WORLD_HEIGHT - 40);
+          const tIdx = tileGrid.worldToTileIndex(testX, testY);
+          const tType = tileGrid.tileTypes[tIdx];
+          // 避开深水绝壁 (3)
+          if (tType !== 3) {
+            x = testX;
+            y = testY;
+            break;
+          }
+        }
+        if (!x) {
+          x = WORLD_WIDTH * 0.5;
+          y = WORLD_HEIGHT * 0.5;
+        }
+      }
+
+      // 1. TransformComponent
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = x;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = y;
+
+      // 2. PhysicsComponent
+      const angle = prng.nextFloat(0, Math.PI * 2);
+      const speed = (race.baseSpeed || 50.0) * 0.45;
+      ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_VX] = Math.cos(angle) * speed;
+      ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_VY] = Math.sin(angle) * speed;
+      ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_MASS] = race.mass || 60.0;
+      ecs.physics[eid * PHYSICS_STRIDE + PHY_OFFSET_INVMASS] = 1.0 / (race.mass || 60.0);
+
+      // 3. HealthComponent
+      const hp = race.baseHp || 100.0;
+      ecs.health[eid * HEALTH_STRIDE + HP_OFFSET_CURRENT] = hp;
+      ecs.health[eid * HEALTH_STRIDE + HP_OFFSET_MAX] = hp;
+
+      // 4. PhysiologyComponent (初始饥饿度 20~55)
+      const initHunger = prng.nextFloat(20, 55);
+      ecs.physiology[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] = initHunger;
+      ecs.physiology[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_EMERGENCY_LOCK] = 0.0;
+
+      // 5. Identities (factionId: 1-12)
+      ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION] = raceIndex + 1;
+
+      // 6. UnitStatusFlags
+      ecs.statusFlags[eid] = IS_ALIVE | (isLeader ? IS_LEADER : 0);
+
+      return eid;
+    }
+
+    // 批量生成小人
+    function spawnBatch(count = 100) {
+      let created = 0;
+      for (let i = 0; i < count; i++) {
+        const raceIdx = prng.nextInt(0, 11);
+        const isLeader = prng.nextFloat(0, 1) < 0.08;
+        const eid = spawnUnit(raceIdx, 0, 0, isLeader);
+        if (eid > 0) created++;
+      }
+      addLog(`成功向大陆注入 ${created} 只多元种族小人！`, 'green');
+    }
+
+    // 初始化真实 2x2 农田
+    function initStarterFarms() {
+      // 激活 8 片位于肥沃平原的农田复合体
+      const spots = [
+        [14, 10], [18, 12], [22, 14], [26, 11],
+        [30, 15], [34, 12], [38, 16], [42, 13]
+      ];
+      spots.forEach((pt, i) => {
+        const farmId = farmlandSys.createFarmland(pt[0], pt[1], (i % 3) + 1);
+        if (farmId >= 0) {
+          farmlandSys.farmStage[farmId] = i % 4; // 错峰演替
+          farmlandSys.farmTimer[farmId] = prng.nextFloat(0, 6);
+        }
+      });
+      addLog(`成功开垦 8 片 2x2 复合农田！`, 'info');
+    }
+
+    // ==========================================
+    // 真实系统驱动单步更新 (Update Tick)
+    // ==========================================
+    function updateSimulation(dt) {
+      simTicks++;
+      simElapsedSec += dt;
+
+      // 1. 地脉养分连续拉普拉斯扩散步进 (Neumann 绝热反射边界 + 底温保底)
+      nutrientField.update(dt, true);
+
+      // 2. 真实 2x2 农田四阶演替迭代 (汲取养分生长 -> 成熟 -> 收割 -> 休耕)
+      farmlandSys.update(dt, nutrientField);
+
+      // 3. 实体平滑漫游与地形碰撞阻尼
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      const flags = ecs.statusFlags;
+      const tf = ecs.transforms;
+      const phy = ecs.physics;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if ((flags[eid] & IS_ALIVE) === 0) continue;
+
+        const phyOff = eid * PHYSICS_STRIDE;
+        const tfOff = eid * TRANSFORM_STRIDE;
+
+        // 若处于 10s 应急互斥锁中，禁止位移并锁定速度为 0
+        if (hasStatus(flags, eid, IS_EMERGENCY_LOCK)) {
+          phy[phyOff + PHY_OFFSET_VX] = 0.0;
+          phy[phyOff + PHY_OFFSET_VY] = 0.0;
+          continue;
+        }
+
+        const curX = tf[tfOff + TF_OFFSET_X];
+        const curY = tf[tfOff + TF_OFFSET_Y];
+        const tileIdx = tileGrid.worldToTileIndex(curX, curY);
+        const tileType = tileGrid.tileTypes[tileIdx];
+
+        // 地形避障：深水绝壁 (3) 与高山 (1) 弹性转向
+        if (tileType === 3 || tileType === 1) {
+          phy[phyOff + PHY_OFFSET_VX] = -phy[phyOff + PHY_OFFSET_VX];
+          phy[phyOff + PHY_OFFSET_VY] = -phy[phyOff + PHY_OFFSET_VY];
+        } else if (tileType === 2 || tileType === 4) {
+          // 浅水 (2) 与沼泽 (4) 涉水阻力
+          phy[phyOff + PHY_OFFSET_VX] *= 0.96;
+          phy[phyOff + PHY_OFFSET_VY] *= 0.96;
+        }
+
+        // 随机巡航漫游转向
+        if (prng.nextFloat(0, 1) < 0.025) {
+          const angle = prng.nextFloat(0, Math.PI * 2);
+          const speed = 25.0 + prng.nextFloat(0, 20.0);
+          phy[phyOff + PHY_OFFSET_VX] = Math.cos(angle) * speed;
+          phy[phyOff + PHY_OFFSET_VY] = Math.sin(angle) * speed;
+        }
+      }
+
+      // 4. 物理刚体刚性边界 Clamp 守门器 (TC-02, TC-03)
+      WorldBoundaryGuard.updateAll(ecs, dt);
+
+      // 5. 12 种族主干生存代谢与饥饿衰竭更新
+      metabolismSys.update(dt);
+
+      // 6. 极端饥荒应急生存降级网与 10s 通道互斥锁推进
+      emergencySys.update(dt);
+
+      // 7. 领域事件总线 Flush 分发
+      eventBus.flush();
+    }
+
+    // ==========================================
+    // 仪表盘遥测数据刷新 (0.25s 节流)
+    // ==========================================
+    function updateTelemetryUI() {
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      const hp = ecs.health;
+      const phys = ecs.physiology;
+      const flags = ecs.statusFlags;
+
+      let healthy = 0;
+      let hungry = 0;
+      let mutexLocked = 0;
+      let dying = 0;
+      let totalHunger = 0;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if ((flags[eid] & IS_ALIVE) === 0) continue;
+
+        const curHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_CURRENT];
+        const maxHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_MAX];
+        const hunger = phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER];
+        totalHunger += hunger;
+
+        const isLocked = hasStatus(flags, eid, IS_EMERGENCY_LOCK) ||
+                         phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_EMERGENCY_LOCK] > 0;
+
+        if (isLocked) mutexLocked++;
+        if (hunger >= 80.0) hungry++;
+        if (curHp <= maxHp * 0.2) dying++;
+        if (hunger < 50.0 && curHp > maxHp * 0.5) healthy++;
+      }
+
+      statHealthy.textContent = healthy;
+      statHungry.textContent = hungry;
+      statMutex.textContent = mutexLocked;
+      statDying.textContent = dying;
+      statFarms.textContent = farmlandSys.activeCount;
+      statAvgHunger.textContent = activeCount > 0 ? (totalHunger / activeCount).toFixed(1) : '0';
+      totalPopBadge.textContent = `${activeCount} / ${MAX_ENTITIES}`;
+      statTicks.textContent = simTicks;
+
+      const m = Math.floor(simElapsedSec / 60);
+      const s = Math.floor(simElapsedSec % 60);
+      statTime.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+      // 实体检视器更新
+      if (selectedEntityId > 0 && ecs.isAlive(selectedEntityId)) {
+        const eid = selectedEntityId;
+        const curHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_CURRENT] | 0;
+        const maxHp = hp[eid * HEALTH_STRIDE + HP_OFFSET_MAX] | 0;
+        const hg = phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] | 0;
+        const lk = phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_EMERGENCY_LOCK].toFixed(1);
+        const facId = ecs.identities[eid * IDENTITY_STRIDE + ID_OFFSET_FACTION];
+        const race = RaceList[(facId - 1) % 12] || RaceList[0];
+        const isL = hasStatus(flags, eid, IS_LEADER);
+
+        inspectorBox.innerHTML = `
+          <strong>[实体 #${eid}]</strong> ${isL ? '👑 ' : ''}${race.name}<br>
+          生命值: ${curHp} / ${maxHp}<br>
+          饥饿度: ${hg} / 100<br>
+          10s 互斥锁倒计时: <span style="color: #facc15; font-weight: bold;">${lk}s</span><br>
+          坐标: (${ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X]|0}, ${ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y]|0})
+        `;
+      }
+    }
+
+    // ==========================================
+    // 交互操作逻辑 (直接驱动真实 M1 系统)
+    // ==========================================
+    // 1. 一键生成 100 只小人
+    document.getElementById('btnSpawn100').addEventListener('click', () => {
+      spawnBatch(100);
+    });
+
+    // 2. 一键引发饥荒 (全员饥饿直接设为 95，并践踏销毁全部农田)
+    document.getElementById('btnTriggerFamine').addEventListener('click', () => {
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      const phys = ecs.physiology;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if (ecs.isAlive(eid)) {
+          // 饥饿度直接拉满至 95.0，诱发全图进入应急生存！
+          phys[eid * PHYSIOLOGY_STRIDE + PHY_OFFSET_HUNGER] = 95.0;
+        }
+      }
+
+      // 损毁全图农田储备
+      for (let i = 0; i < farmlandSys.maxCapacity; i++) {
+        if (farmlandSys.farmActive[i] === 1) {
+          farmlandSys.pillageFarmland(i, nutrientField);
+        }
+      }
+
+      addLog(`🚨 全图神罚大饥荒爆发！全员饥饿升至 95，农田全毁！全员触发 10s 互斥锁！`, 'danger');
+    });
+
+    // 3. 种植 8 片农田
+    document.getElementById('btnSpawnFarms').addEventListener('click', () => {
+      initStarterFarms();
+    });
+
+    // 4. 重置生态
+    document.getElementById('btnResetAll').addEventListener('click', () => {
+      ecs.reset();
+      nutrientField.reset(20.0);
+      nutrientField.syncBaseHeatFromGrid();
+      farmlandSys.farmActive.fill(0);
+      farmlandSys.activeCount = 0;
+      initStarterFarms();
+      spawnBatch(120);
+      renderer.invalidateTerrain();
+      addLog(`生态系统彻底重置，重新孕育 120 只始祖部族！`, 'info');
+    });
+
+    // 5. 图层快捷切换
+    const bindToggle = (id, prop) => {
+      const btn = document.getElementById(id);
+      btn.addEventListener('click', () => {
+        renderer[prop] = !renderer[prop];
+        btn.classList.toggle('active', renderer[prop]);
+      });
+    };
+    bindToggle('toggleNutrients', 'showNutrients');
+    bindToggle('toggleFarmlands', 'showFarmlands');
+    bindToggle('toggleHealthBars', 'showHealthBars');
+    bindToggle('toggleStatusPips', 'showStatusPips');
+    bindToggle('toggleGrid', 'showGrid');
+
+    // 6. 倍速切换
+    const speedBtns = [
+      { id: 'btnPause', val: 0 },
+      { id: 'btn1x', val: 1 },
+      { id: 'btn2x', val: 2 },
+      { id: 'btn5x', val: 5 }
+    ];
+
+    speedBtns.forEach(item => {
+      const btn = document.getElementById(item.id);
+      btn.addEventListener('click', () => {
+        timeScale = item.val;
+        speedBtns.forEach(b => document.getElementById(b.id).classList.remove('active'));
+        btn.classList.add('active');
+        addLog(`时间流速调谐至: ${timeScale === 0 ? '暂停 ⏸' : timeScale + 'x'}`, 'info');
+      });
+    });
+
+    // 7. 画布点击选定实体检视
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const clickX = (e.clientX - rect.left) * scaleX;
+      const clickY = (e.clientY - rect.top) * scaleY;
+
+      // 查找 24px 半径内最近实体
+      let closestId = 0;
+      let minDisSq = 32 * 32;
+      const activeCount = ecs.getActiveCount();
+      const dense = ecs.getActiveEntities();
+      const tf = ecs.transforms;
+
+      for (let i = 0; i < activeCount; i++) {
+        const eid = dense[i];
+        if (!ecs.isAlive(eid)) continue;
+        const x = tf[eid * TRANSFORM_STRIDE + TF_OFFSET_X];
+        const y = tf[eid * TRANSFORM_STRIDE + TF_OFFSET_Y];
+        const disSq = (x - clickX) * (x - clickX) + (y - clickY) * (y - clickY);
+        if (disSq < minDisSq) {
+          minDisSq = disSq;
+          closestId = eid;
+        }
+      }
+
+      if (closestId > 0) {
+        selectedEntityId = closestId;
+        updateTelemetryUI();
+      } else {
+        // 点击空白处生成小人
+        const raceIdx = prng.nextInt(0, 11);
+        const eid = spawnUnit(raceIdx, clickX, clickY, false);
+        selectedEntityId = eid;
+        addLog(`在坐标 (${clickX|0}, ${clickY|0}) 点召了一只 ${RaceList[raceIdx].name}！`, 'info');
+      }
+    });
+
+    // ==========================================
+    // 启动 60 FPS 定步长 GameLoop
+    // ==========================================
+    initStarterFarms();
+    spawnBatch(120);
+
+    const gameLoop = new GameLoop(
+      // Update 回调 (1/60s 物理步长)
+      (fixedDt) => {
+        if (timeScale > 0) {
+          // 根据倍速决定单帧演化次数，确保定步长物理数值稳定性
+          for (let step = 0; step < timeScale; step++) {
+            updateSimulation(fixedDt);
+          }
+        }
+      },
+      // Render 回调 (全量热路径零 GC 渲染)
+      (interpolation) => {
+        const t0 = performance.now();
+        // 传入真实 M1 系统: tileGrid, ecs, farmlandSys, nutrientField
+        renderer.render(tileGrid, ecs, farmlandSys, nutrientField);
+        lastFrameDurationMs = performance.now() - t0;
+
+        frameCount++;
+        if (t0 - lastFpsUpdate >= 250) {
+          const fps = ((frameCount * 1000) / (t0 - lastFpsUpdate)).toFixed(1);
+          statFps.textContent = fps;
+          statFps.className = fps >= 55 ? 'fps-good' : (fps >= 30 ? 'fps-mid' : 'fps-low');
+          statFrameTime.textContent = lastFrameDurationMs.toFixed(2) + ' ms';
+          frameCount = 0;
+          lastFpsUpdate = t0;
+          updateTelemetryUI();
+        }
+      }
+    );
+
+    gameLoop.start();
+    addLog(`60 FPS 定步长 M1 端到端系统已启动，渲染器零 GC 稳定运行！`, 'green');
+  </script>
+</body>
+</html>

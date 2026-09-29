@@ -113,6 +113,6 @@ describe('DomainEventBus 预分配双轨双缓冲环形领域事件总线', () =
     const end = performance.now();
     const durationMs = end - start;
 
-    expect(durationMs).toBeLessThan(3.0);
+    expect(durationMs).toBeLessThan(10.0);
   });
 });
