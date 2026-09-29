@@ -1,15 +1,15 @@
-# 《神之蛐蛐缸：万族争霸》全量系统工作分解结构说明书 (WBS v1.1 闭环终验版)
+# 《神之蛐蛐缸：万族争霸》全量系统工作分解结构说明书 (WBS v2.0 活体文明涌现版)
 > **工程代名**：Project God-Cricket (万族争霸)  
-> **设计依据**：Master GDD v2.2 (总策划案及 01~09 专册) & SRS v1.1 (系统需求规格说明书 专家评审闭环版)  
+> **设计依据**：Master GDD v3.0 (总策划案及 01~09 专册) & SRS v2.0 (系统需求规格说明书) & ECR-2026-001  
 > **编制标准**：PMBOK 软件工程工作分解标准 (Work Breakdown Structure, 100% 穷尽覆盖规则)  
 > **工程层级**：Level 1 (总体工程) $\rightarrow$ Level 2 (交付域) $\rightarrow$ Level 3 (功能子流) $\rightarrow$ Level 4 (高内聚特性包 Feature Package / 工作任务包 WP, 1.5~4.5 pd)  
-> **评审闭环**：全量合入 5 位跨学科专家（首席架构师、研发项目总监 TPM、引擎性能架构师、沙盒涌现总监、QA 测试架构师）第一轮评审意见  
+> **评审闭环**：全量合入 ECR-2026-001 活体文明涌现、动态领地与全系统有机串联大重构要求  
 > **文档密级**：内部技术交付基线 (封版基线)  
 
 ---
 
 ## 目录
-1. [WBS 编制原则与特性包规范八要素 (v1.1 修订)](#一-wbs-编制原则与特性包规范八要素)
+1. [WBS 编制原则与特性包规范八要素 (v2.0 修订)](#一-wbs-编制原则与特性包规范八要素)
 2. [WBS 架构拓扑与三泳道工程总览](#二-wbs-架构拓扑与三泳道工程总览)
 3. [WBS 详细特性任务包清单 (Level 4 展开)](#三-wbs-详细特性任务包清单)
    - [WBS 1.0 核心运行时与基础设施域 (Runtime & Core Infra)](#wbs-10-核心运行时与基础设施域)
@@ -21,8 +21,10 @@
    - [WBS 7.0 上帝交互与智能导播域 (God Interaction & Director)](#wbs-70-上帝交互与智能导播域)
    - [WBS 8.0 视听叙事与前端渲染管线域 (Narrative, Audio & Mega-Atlas)](#wbs-80-视听叙事与前端渲染管线域)
    - [WBS 9.0 守门断言测试左移与四阶质量门禁域 (Shift-Left QA Guardrails)](#wbs-90-守门断言测试左移与四阶质量门禁域)
-4. [三泳道并行甘特图与里程碑交付门禁 (Milestones M0 ~ M4)](#四-三泳道并行甘特图与里程碑交付门禁)
+   - [WBS 11.0 活体文明涌现与全系统有机串联域 (Emergence & Living Civilization - M5)](#wbs-110-活体文明涌现与全系统有机串联域)
+4. [三泳道并行甘特图与里程碑交付门禁 (Milestones M0 ~ M5)](#四-三泳道并行甘特图与里程碑交付门禁)
 5. [需求双向追踪矩阵 (RTM: 100% 穷尽覆盖验证)](#五-需求双向追踪矩阵)
+
 
 ---
 
@@ -815,7 +817,77 @@ Level 1: 《神之蛐蛐缸：万族争霸》全栈系统研发工程
 
 ---
 
+### WBS 11.0 活体文明涌现与全系统有机串联域 (Emergence & Living Civilization - M5)
+
+#### WP-5.1: 部落粮仓、四大阶级自驱行为机与闭环巡逻 (`CasteBehaviorSystem`)
+* **需求映射**：`REQ-CIV-003`
+* **前置依赖**：`WP-1.1.4`, `WP-2.4.1`, `WP-4.1.1`
+* **工程范围与核心逻辑**：
+  - 构建连续平铺粮仓内存池 (`GranaryBuffer`)；
+  - 平民自动寻农田与果林采收运粮回仓（一次+10.0）并积累劳作经验；
+  - 工匠依物资开辟新农田、立界碑扩充领地；
+  - 士兵领地外沿环形巡逻警戒与入侵驱逐；
+  - 领袖坐镇图腾辐射 96px 战意移速光环。
+* **交付构件**：`src/profession/CasteBehaviorSystem.js`, `tests/profession/CasteBehaviorSystem.test.js`
+* **预估工时**：2.5 pd
+
+#### WP-5.2: 领地动态潮汐推移、战线吞并与弹簧退耕还林 (`DynamicTerritorySystem`)
+* **需求映射**：`REQ-CIV-002`, `TC-EDGE-10`
+* **前置依赖**：`WP-2.1.1`, `WP-5.1`
+* **工程范围与核心逻辑**：
+  - 维护全图 2,016 瓦片的归属权矩阵与活力矩阵；
+  - 国土随人口与工匠立碑动态向外平滑侵染扩张；
+  - 战争期间士兵前沿推进实时翻转瓦片所属权；
+  - 饥荒与战败时外围地块自动退耕还林变回野生荒地，恒久确保全大陆 $\ge 35\%$ 中立野区。
+* **交付构件**：`src/territory/DynamicTerritorySystem.js`, `tests/territory/DynamicTerritorySystem.test.js`
+* **预估工时**：2.5 pd
+
+#### WP-5.3: 活体繁衍引擎与世代孟德尔突变演进 (`LiveReproductionSystem`)
+* **需求映射**：`REQ-CIV-004`, `TC-EDGE-10`
+* **前置依赖**：`WP-4.2.1`, `WP-4.3.1`, `WP-5.1`
+* **工程范围与核心逻辑**：
+  - 粮仓储备 $\ge 40.0$ 时触发成年市民交配繁衍；
+  - 原生消费 `MendelianGeneticsSystem` 与 `TabooFilter` 重组双亲显隐性突变基因；
+  - 幼童诞生在生态箱肉眼可见突变器官扩散。
+* **交付构件**：`src/mutation/LiveReproductionSystem.js`, `tests/mutation/LiveReproductionSystem.test.js`
+* **预估工时**：2.0 pd
+
+#### WP-5.4: 空间实时索敌交火系统与边境摩擦级联 (`SpatialCombatSystem`)
+* **需求映射**：`REQ-CIV-005`, `TC-EDGE-11`
+* **前置依赖**：`WP-1.1.2`, `WP-5.2.1`, `WP-3.2.1`
+* **工程范围与核心逻辑**：
+  - 基于 `SpatialHash` 32px 实时索敌分帧调度；
+  - 士兵遇敌主动拔刀，调用 `DamageCalculator.applyDamage`；
+  - 检查冷却触发 `RaceSkillSystem` 12 始祖特技轰击；
+  - 越界冲突与伤亡推升 `BorderFrictionSystem`，摩擦满 70 触发全面宣战。
+* **交付构件**：`src/warfare/SpatialCombatSystem.js`, `tests/warfare/SpatialCombatSystem.test.js`
+* **预估工时**：2.5 pd
+
+#### WP-5.5: 多模态程序化沙盒重玩器与群系定居 (`SandboxScenarioManager`)
+* **需求映射**：`REQ-CIV-001`, `REQ-CIV-006`
+* **前置依赖**：`WP-2.1.1`, `WP-3.1.1`
+* **工程范围与核心逻辑**：
+  - 12 种族生态亲和度选址算法，建立原始先祖营火；
+  - 随机地图种子洗牌；
+  - 首领 4 大随机性格标签抽取；
+  - 支持万族大争霸、四国鼎立、单族起源三大剧本。
+* **交付构件**：`src/world/SandboxScenarioManager.js`, `src/world/BiomeAffinitySettlementSystem.js`, `tests/world/SandboxScenarioManager.test.js`
+* **预估工时**：2.0 pd
+
+#### WP-5.6: 展现层全真视窗重装、HUD 排行榜与生草动效 (`index.html` & `MiniRenderer`)
+* **需求映射**：`REQ-CIV-006`, `REQ-ENG-001`
+* **前置依赖**：`WP-5.1` ~ `WP-5.5`
+* **工程范围与核心逻辑**：
+  - 视窗原生 ESM 驱动全部 M5 新系统；
+  - 绘制呼吸动态国界线、平民运粮背包、受击闪红与近战劈砍刀光；
+  - 界面新增剧本切换栏、随机种子洗牌按钮与 12 族实时战力领地排行榜。
+* **交付构件**：`index.html`, `src/rendering/MiniRenderer.js`, `tests/rendering/MiniRenderer.test.js`
+* **预估工时**：2.5 pd
+
+---
+
 ## 四、 三泳道并行甘特图与里程碑交付门禁
+
 
 ### 4.1 三泳道并行研发排期甘特图 (CPM 关键路径优化)
 

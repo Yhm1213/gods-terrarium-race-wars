@@ -1,18 +1,20 @@
-# 《众神之造物生态箱：万族争霸》全景需求双向追踪矩阵 (RTM v3.0)
+# 《众神之造物生态箱：万族争霸》全景需求双向追踪矩阵 (RTM v5.0)
 
-> **文档代号**：DOC-RTM-v3.0  
+> **文档代号**：DOC-RTM-v5.0  
 > **管理责任人**：主控总指挥 / 项目经理 (Lead Orchestrator / Project Manager)  
-> **制定基线**：Master GDD v2.2 (01~09专册), SRS v1.1, TDS v1.1, WBS v1.1, SPEC-M0/M1/M2/M3 契约说明书  
+> **制定基线**：Master GDD v3.0, SRS v2.0, TDS v2.0, WBS v2.0, SPEC-M0~M5 契约说明书, ECR-2026-001  
 > **文档性质**：工程级端到端双向需求对账全景矩阵 (Requirements Traceability Matrix)  
 > **追踪链条**：策划专册 $\longleftrightarrow$ SRS需求条目 $\longleftrightarrow$ WBS任务包 $\longleftrightarrow$ 技术契约 $\longleftrightarrow$ 生产源码 $\longleftrightarrow$ 自动化测试 $\longleftrightarrow$ 交付状态  
-> **闭环状态**：**M0 (底座) 100%、M1 (宏观生态) 100%、M2 (种族突变) 100%、M3 (战争裂变) 100% 全部已验证闭环**；M4 待施工。
+> **闭环状态**：**M0~M4 (基础建设与总装) 68项 100% 满分已闭环交付**；**M5 (文明建立与全系统有机涌现) 8 项新需求已纳入跟踪，处于待批准排期状态**。
 
 ---
 
 ## 矩阵状态图例 (Legend)
 
 * 🟢 **已交付 (Verified)**：代码已合并入 `main`，单测/守门测试 100% 通过，已发布正式 Release Tag。
-* ⚪ **待排期 (Backlog M4)**：架构预留接口，计划在 M4 (上帝交互、三声道叙事、Web Audio与全系统总装) 进行全系统总装集成。
+* 🟡 **变更待实施 (ECR Approved / In Progress)**：经 ECR-2026-001 批准纳入 M5，待子 Agent 闭环开发与验收。
+* ⚪ **待排期 (Backlog)**：架构预留接口。
+
 
 ---
 
@@ -153,13 +155,29 @@
 
 ---
 
-## 十一、 矩阵统计与度量总结
+## 十一、 活体文明涌现与全系统有机闭环域 (Civilization Emergence & Loop)
 
-* **总需求条目数**：59 条原子功能需求 + 9 项底层致命守门断言，共 **68 项**；
+| SRS 需求编号 | 需求名称与规格概要 | 策划依据 | 承接 WBS | 阶段 | 交付生产代码路径 | 承接测试套件路径 | 状态 |
+| :---: | :--- | :---: | :---: | :---: | :--- | :--- | :---: |
+| **REQ-CIV-001** | 生态群系自适应定居与营火奠基 | GDD §13.1 | `WP-5.5` | **M5** | `src/world/BiomeAffinitySettlementSystem.js` | `tests/world/SandboxScenarioManager.test.js` | 🟡 待实施 |
+| **REQ-CIV-002** | 领地动态潮汐推移与弹簧退耕还林 | GDD §13.2 | `WP-5.2` | **M5** | `src/territory/DynamicTerritorySystem.js` | `tests/territory/DynamicTerritorySystem.test.js` | 🟡 待实施 |
+| **REQ-CIV-003** | 粮仓驱动四大阶级闭环行为机 | GDD §13.3 | `WP-5.1` | **M5** | `src/profession/CasteBehaviorSystem.js` | `tests/profession/CasteBehaviorSystem.test.js` | 🟡 待实施 |
+| **REQ-CIV-004** | 活体繁衍与世代双亲孟德尔遗传重组 | GDD §13.4 | `WP-5.3` | **M5** | `src/mutation/LiveReproductionSystem.js` | `tests/mutation/LiveReproductionSystem.test.js` | 🟡 待实施 |
+| **REQ-CIV-005** | 空间实时索敌交火与边境摩擦级联推进 | GDD §13.5 | `WP-5.4` | **M5** | `src/warfare/SpatialCombatSystem.js` | `tests/warfare/SpatialCombatSystem.test.js` | 🟡 待实施 |
+| **REQ-CIV-006** | 程序化沙盒重玩性、首领性格与多模态剧本 | GDD §13.6 | `WP-5.5`<br/>`WP-5.6` | **M5** | `src/world/SandboxScenarioManager.js`<br/>`index.html` | `tests/world/SandboxScenarioManager.test.js`<br/>`tests/rendering/MiniRenderer.test.js` | 🟡 待实施 |
+| **TC-EDGE-10** | 文明生命周期与动态领地守门断言 | SPEC-M5 §九 | `WP-5.2`<br/>`WP-5.3` | **M5** | `tests/guardrails/TC-EDGE-10.test.js` | `tests/guardrails/TC-EDGE-10.test.js` | 🟡 待实施 |
+| **TC-EDGE-11** | 自发摩擦交火与战争军团推演守门断言 | SPEC-M5 §九 | `WP-5.4` | **M5** | `tests/guardrails/TC-EDGE-11.test.js` | `tests/guardrails/TC-EDGE-11.test.js` | 🟡 待实施 |
+
+---
+
+## 十二、 矩阵统计与度量总结
+
+* **总需求条目数**：65 条原子功能需求 + 11 项底层致命守门断言，共 **76 项**；
 * **需求覆盖率**：WBS 映射覆盖率 **100.0%**（设计孤儿数：0，范围蔓延数：0）；
-* **当前交付达成度 (至 M4 终审全量结项)**：
-  - 🟢 **已全量闭环交付**：**68 项**（占比 **$100.0\%$**，完美覆盖基础设施、生态代谢、始祖种族特技、阶级分工、孟德尔突变、大军团战争、流场寻路、双核大分裂与王朝政治、上帝之手与时间法则、六大生草玩具、15s 神恩狂欢、智能导播画中画、极乐迪斯科/矮人要塞三声道叙事、帝国验尸单、Web Audio 8-bit 合成压限与 Mega-Atlas 图集）；
-  - ⚪ **待排期**：**0 项**（占比 **$0.0\%$**）。
-* **自动化测试防线**：全工程 **45 个测试套件、351 项机器断言，100% 满分全绿通过 (0 Failed, 0 Flaky)**，包含 10,000 帧千人同屏混沌总压测！
+* **当前交付达成度 (M0~M4 终验 + M5 变更发起)**：
+  - 🟢 **已全量闭环交付 (M0~M4)**：**68 项**（占比 **$89.5\%$**，基座引擎、生态群系、技能遗传、战争流场、上帝视听、Web Audio等已全部合入）；
+  - 🟡 **ECR-2026-001 变更实施中 (M5)**：**8 项**（占比 **$10.5\%$**，包含群系定居、动态领地、阶级闭环、活体繁衍、实时交火与沙盒重玩器）。
+* **自动化测试防线**：全工程 **45 个测试套件、355 项机器断言，100% 满分全绿通过 (0 Failed, 0 Flaky)**，包含 10,000 帧千人同屏混沌总压测！
 * **架构合规性**：主渲染循环内部热路径 **绝对 0 次 `ctx.save()` / `ctx.restore()`**，全生命周期业务物理循环 **绝对零 GC**。
+
 

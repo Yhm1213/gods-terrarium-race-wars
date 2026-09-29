@@ -1,10 +1,10 @@
-# 《神之蛐蛐缸：万族争霸》系统技术详细设计与数据契约说明书 (TDS v1.1 闭环终验版)
+# 《神之蛐蛐缸：万族争霸》系统技术详细设计与数据契约说明书 (TDS v2.0 活体文明涌现版)
 
 > **工程代名**：Project God-Cricket (万族争霸)  
-> **设计依据**：Master GDD v2.2 (总策划案) & SRS v1.1 (系统需求规格说明书) & WBS v1.1 (工作分解结构说明书)  
-> **评审基线**：已通过 5 位跨学科专家联合评审（吸收 6 大致命缺陷修复与 20 项加固方案，详见 `tds_expert_review_report.md`）  
+> **设计依据**：Master GDD v3.0 (总策划案) & SRS v2.0 (系统需求规格说明书) & WBS v2.0 & ECR-2026-001  
+> **评审基线**：已全量纳入 ECR-2026-001 活体文明涌现与全系统有机闭环技术架构规程  
 > **文档性质**：工程实施与编码装配强制施工蓝图 (Technical Design Specification, TDS)  
-> **核心目标**：统一全系统分层目录脚手架、正交静态配表数据字典、ECS 连续平铺内存池（零越界、纯 SoA 缓存行优化）、核心系统无分配 API 签名、双轨领域事件字典、以及 StorageWorker 异步零拷贝存储容灾，确保千人同屏稳定 60 FPS、连续挂机内存绝对零 GC。  
+> **核心目标**：统一全系统分层目录脚手架、ECS 连续平铺内存池（零越界、纯 SoA 缓存行优化）、部族粮仓连续池、领地动态侵染矩阵、活体繁衍遗传引擎、核心系统无分配 API 签名、以及前端 60 FPS 零 GC 渲染，构建生机勃勃的活体文明生态箱。  
 > **文档密级**：内部技术交付基线 (开发阶段不可违背之施工宪法)  
 
 ---
@@ -17,6 +17,8 @@
 5. [全局领域事件枚举与载荷字典 (Domain Events Catalog)](#五-全局领域事件枚举与载荷字典)
 6. [客户端三层数据存储与持久化规范 (Persistence & IndexedDB)](#六-客户端三层数据存储与持久化规范)
 7. [施工准则与红线门禁 (Construction Mandates)](#七-施工准则与红线门禁)
+8. [活体文明涌现与全系统闭环技术扩展 (TDS v2.0 M5 Expansion)](#八-活体文明涌现与全系统闭环技术扩展-tds-v20-m5-expansion)
+
 
 ---
 
@@ -980,14 +982,43 @@ postMessage({ type: 'SAVE_RECEIPT', canvas, meta }, [canvas])
 
 ---
 
-## 七、 施工准则与红线门禁 (Construction Mandates)
+## 八、 活体文明涌现与全系统闭环技术扩展 (TDS v2.0 M5 Expansion)
 
-本《系统技术详细设计与数据契约说明书 (TDS v1.1 闭环终验版)》是工程实施阶段不可违背的**“施工宪法”**：
-1. **目录纯粹性铁律**：所有业务模块严格归入第一章规划领域，严禁跨层随意网状引用；
-2. **0 号墓碑与边界铁律**：全量 TypedArray 必须分配 `TOTAL_SLOTS = MAX_ENTITIES + 1`，0 索引锁死为 `NULL_ENTITY`；
-3. **物理零 GC 铁律**：主物理循环与战斗计算中严禁任何 `new Object()`、`new Array()` 或动态闭包，核心计算必须使用复用出参缓冲区；
-4. **正交掩码铁律**：变异器官与种族禁忌必须使用 `OrganFlags` 组合位运算，严禁硬编码数字字面量；
-5. **异步存储铁律**：所有图片编码与持久化写入统一走 `StorageWorker`，严禁阻塞主线程 16.6ms 帧预算。
+### 8.1 部落连续粮仓内存池 (`GranaryBuffer`)
+```javascript
+// 16 阵营 * 4 步长连续平铺内存: Float32Array(64)
+export const MAX_FACTIONS = 16;
+export const GRANARY_STRIDE = 4;
+export const GRANARY_OFFSET_FOOD = 0;      // 粮食物理库存 (0.0 ~ 500.0)
+export const GRANARY_OFFSET_TIMBER = 1;    // 木料库存 (用于扩地立碑)
+export const GRANARY_OFFSET_STONE = 2;     // 石料库存 (用于修缮图腾)
+export const GRANARY_OFFSET_CAPACITY = 3;  // 仓储上限 (默认 200.0，升级可扩充)
+```
+
+### 8.2 动态领地侵染与活力矩阵 (`DynamicTerritorySystem`)
+* **瓦片所属权矩阵**：`Uint8Array(2016)` (56 列 x 36 行)，值为 0 (中立荒原) 或 1~12 (阵营 ID)；
+* **瓦片活力矩阵**：`Float32Array(2016)`，每个瓦片维护活力值 (0.0 ~ 100.0)。
+* **伸缩与阻尼**：
+  - 人口充足、工匠活跃时向外侵染扩张 ($R_{\max} = 10$)；
+  - 战乱饥荒断粮时，活力每秒衰减 2.0 点，跌至 0 剥离所属权（退耕还林）；
+  - 全图常驻看门狗确保全大陆至少保留 **35% 无主野区**。
+
+### 8.3 四大阶级行为机决策管线 (`CasteBehaviorSystem`)
+* **平民**：求生(吃粮) $\rightarrow$ 采收(赴农田) $\rightarrow$ 运粮(回图腾粮仓+10) $\rightarrow$ 逃跑(遇敌后撤)；
+* **工匠**：农田开垦(寻适耕地) $\rightarrow$ 边界立碑(扩充领地) $\rightarrow$ 图腾修缮(战损维护)；
+* **士兵**：领地巡防(界碑环巡) $\rightarrow$ 敌军驱逐(拔刀拦截) $\rightarrow$ 战时攻城(沿流场总攻)；
+* **首领**：坐镇中枢 $\rightarrow$ 战意光环(96px +15%移速/+20%攻击) $\rightarrow$ 死战不退。
+
+### 8.4 活体繁衍与世代突变演进管线 (`LiveReproductionSystem`)
+* 粮仓粮食 $\ge 40.0$ 时触发成年市民繁衍，消耗 20.0 粮食在图腾旁诞生新生小人；
+* 实时调用 `MendelianGeneticsSystem.breedOffspring` 与 `TabooFilter`，双亲突变显隐性等位基因依孟德尔定律重组，突变表型在子代实时呈现。
+
+### 8.5 空间实时交火管线 (`SpatialCombatSystem`)
+* 结合 `SpatialHash` 32px 索敌，士兵遇敌自动靠近进入挥刀距离；
+* 调用 `DamageCalculator.applyDamage` 执行边际减伤、真实反伤与种族特技轰击；
+* 越界砍杀推升 `BorderFrictionSystem`，摩擦满 70 触发全面宣战。
 
 ---
+**全套技术蓝图正式升级至 TDS v2.0 活体文明涌现版！**
+
 **全套技术蓝图自即日起正式封版，研发团队遵照本说明书推进 Milestone 0 代码实装！**
