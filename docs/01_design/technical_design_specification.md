@@ -1018,7 +1018,49 @@ export const GRANARY_OFFSET_CAPACITY = 3;  // 仓储上限 (默认 200.0，升�
 * 调用 `DamageCalculator.applyDamage` 执行边际减伤、真实反伤与种族特技轰击；
 * 越界砍杀推升 `BorderFrictionSystem`，摩擦满 70 触发全面宣战。
 
+### 8.6 种族与政权正交解耦与同族多王国架构 (`FactionRegistry`)
+* **正交解耦模型**：
+  - `RaceId` (0~11)：决定生物外貌、体质质量、代谢范式、种族特技与变异禁忌掩码；
+  - `FactionId` (1~16)：决定政治主权、国号国旗、图腾营火坐标、领地流场、粮仓物理库存与外交好恶；
+* **同族多王国数据存储**：
+  ```javascript
+  // FactionRegistry: 16 阵营槽位元数据
+  export class FactionRegistry {
+    // 数组索引 1~16 对应 FactionId
+    static factions = new Array(17).fill(null).map((_, id) => ({
+      id,
+      raceId: 0,          // 关联的生物种族 (0~11)
+      name: '',           // 国号 (如 "神圣索兰帝国", "北境凛冬公国")
+      color: '#ffffff',   // 旗帜与领地主色
+      totemX: 0, totemY: 0,
+      isAlive: false,
+      isRebel: false      // 是否为同族内战叛军
+    }));
+  }
+  ```
+* **动态大分裂与槽位分配**：
+  - 当某国政治张力满 100 爆发大分裂时，从 1~16 检索首个 `isAlive === false` 的空闲槽位；
+  - 叛军新政权继承原文明的 `raceId`，生成独立的新国号与暗色战旗，两军仇恨值锁定 200。
+
+### 8.7 双职业实体物理闭环与行为机管线 (`DualClassStateMachine`)
+* **双职业内存池布局**：
+  ```javascript
+  // Float32Array(TOTAL_SLOTS * 6)
+  export const DUAL_CLASS_STRIDE = 6;
+  export const DC_OFFSET_PRIMARY_JOB     = 0; // 0=NONE, 1=FARMER, 2=STONECUTTER, 3=LUMBERJACK, 4=HERBALIST
+  export const DC_OFFSET_SECONDARY_JOB   = 1; // 0=NONE, 1=SHIELDBEARER, 2=BERSERKER, 3=ASSASSIN, 4=SHARPSHOOTER
+  export const DC_OFFSET_CURRENT_MODE    = 2; // 0=PEACETIME_LABOR, 1=MOBILIZED_COMBAT
+  export const DC_OFFSET_LABOR_PROGRESS  = 3; // 生产进度计时器 (0.0 ~ 5.0s)
+  export const DC_OFFSET_CARRIED_RES_QTY = 4; // 背负资源数量 (0 ~ 10)
+  export const DC_OFFSET_CARRIED_RES_TYP = 5; // 背负类型 (1=FOOD, 2=STONE, 3=WOOD, 4=MEDICINE)
+  ```
+* **微观行为与动员切换管线**：
+  - **和平态**：根据主职寻路至对应瓦片（农田/岩石/树木/草药）采集，头顶背负资源，移速乘以 0.85 步行回仓，入库增加所属图腾粮仓储备；
+  - **战时动员态**：当本国领地内出现敌军或边境摩擦满 70 时，小人瞬间由生产态切换为战斗态，拔出副职军械（重盾抗线/狂暴冲锋/潜行背刺/后排抛射）；
+  - **复合身份与特技**：【暴怒民兵】平时割麦战时暴走；【重石壁垒】平时采石战时立盾筑墙卡位。
+
 ---
 **全套技术蓝图正式升级至 TDS v2.0 活体文明涌现版！**
 
-**全套技术蓝图自即日起正式封版，研发团队遵照本说明书推进 Milestone 0 代码实装！**
+**全套技术蓝图自即日起正式封版，研发团队遵照本说明书推进 Milestone 5 代码实装！**
+

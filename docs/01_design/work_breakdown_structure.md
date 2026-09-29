@@ -819,17 +819,19 @@ Level 1: 《神之蛐蛐缸：万族争霸》全栈系统研发工程
 
 ### WBS 11.0 活体文明涌现与全系统有机串联域 (Emergence & Living Civilization - M5)
 
-#### WP-5.1: 部落粮仓、四大阶级自驱行为机与闭环巡逻 (`CasteBehaviorSystem`)
-* **需求映射**：`REQ-CIV-003`
+#### WP-5.1: 部落粮仓、双职业实体物理闭环与平战动态动员 (`CasteBehaviorSystem` & `DualClassStateMachine`)
+* **需求映射**：`REQ-CIV-003`, `REQ-CIV-008`
 * **前置依赖**：`WP-1.1.4`, `WP-2.4.1`, `WP-4.1.1`
 * **工程范围与核心逻辑**：
-  - 构建连续平铺粮仓内存池 (`GranaryBuffer`)；
-  - 平民自动寻农田与果林采收运粮回仓（一次+10.0）并积累劳作经验；
-  - 工匠依物资开辟新农田、立界碑扩充领地；
+  - 构建连续平铺粮仓内存池 (`GranaryBuffer`)，维护食物/木料/石料/药剂实体储量；
+  - 双职业实体物理闭环：
+    - 生产主职驱动和平时期：农夫割麦并背负运粮入仓（+10 粮食）、石工采石并在边界立碑（领地扩展+1）、伐木工砍柴修营、药剂师炼药并在友军 HP<40% 时主动喂药治疗；
+    - 战斗副职驱动战术动作：重盾卫士抗线举盾（减免 50% 投射物）、狂战士濒死狂暴突脸、暗影刺客隐身潜行刺杀敌酋/烧粮、神射长弓手 48px 抛射；
+  - 平战动态动员：遭遇外敌入侵或边境摩擦满 70 时，小人瞬间由生产态切换为战斗态，复合称号如【暴怒民兵】、【重岩壁垒】具象化涌现；
   - 士兵领地外沿环形巡逻警戒与入侵驱逐；
   - 领袖坐镇图腾辐射 96px 战意移速光环。
-* **交付构件**：`src/profession/CasteBehaviorSystem.js`, `tests/profession/CasteBehaviorSystem.test.js`
-* **预估工时**：2.5 pd
+* **交付构件**：`src/profession/CasteBehaviorSystem.js`, `src/profession/DualClassStateMachine.js`, `tests/profession/CasteBehaviorSystem.test.js`
+* **预估工时**：3.0 pd
 
 #### WP-5.2: 领地动态潮汐推移、战线吞并与弹簧退耕还林 (`DynamicTerritorySystem`)
 * **需求映射**：`REQ-CIV-002`, `TC-EDGE-10`
@@ -863,16 +865,19 @@ Level 1: 《神之蛐蛐缸：万族争霸》全栈系统研发工程
 * **交付构件**：`src/warfare/SpatialCombatSystem.js`, `tests/warfare/SpatialCombatSystem.test.js`
 * **预估工时**：2.5 pd
 
-#### WP-5.5: 多模态程序化沙盒重玩器与群系定居 (`SandboxScenarioManager`)
-* **需求映射**：`REQ-CIV-001`, `REQ-CIV-006`
+#### WP-5.5: 种族政权正交解耦、一族多王国支持与多模态沙盒重玩器 (`FactionRegistry` & `SandboxScenarioManager`)
+* **需求映射**：`REQ-CIV-001`, `REQ-CIV-006`, `REQ-CIV-007`
 * **前置依赖**：`WP-2.1.1`, `WP-3.1.1`
 * **工程范围与核心逻辑**：
+  - 构建 `FactionRegistry`：生物种族 `RaceId` (0~11) 与法理政权 `FactionId` (1~16) 正交解耦；
+  - 支持同一生物种族在大陆上建立多个独立的敌对/同盟王国（如神圣索兰帝国 vs 北境公国）；
+  - 运行期大分裂与皇子内战时，叛军继承母国生物 `RaceId` 但分配新 `FactionId`，生成新图腾与独立粮仓；
   - 12 种族生态亲和度选址算法，建立原始先祖营火；
-  - 随机地图种子洗牌；
-  - 首领 4 大随机性格标签抽取；
-  - 支持万族大争霸、四国鼎立、单族起源三大剧本。
-* **交付构件**：`src/world/SandboxScenarioManager.js`, `src/world/BiomeAffinitySettlementSystem.js`, `tests/world/SandboxScenarioManager.test.js`
-* **预估工时**：2.0 pd
+  - 随机地图种子洗牌，首领 4 大随机性格标签抽取；
+  - 支持万族大争霸、同族争霸/四国鼎立、单族起源三大剧本。
+* **交付构件**：`src/world/FactionRegistry.js`, `src/world/SandboxScenarioManager.js`, `src/world/BiomeAffinitySettlementSystem.js`, `tests/world/SandboxScenarioManager.test.js`
+* **预估工时**：2.5 pd
+
 
 #### WP-5.6: 展现层全真视窗重装、HUD 排行榜与生草动效 (`index.html` & `MiniRenderer`)
 * **需求映射**：`REQ-CIV-006`, `REQ-ENG-001`

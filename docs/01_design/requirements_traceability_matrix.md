@@ -165,6 +165,8 @@
 | **REQ-CIV-004** | 活体繁衍与世代双亲孟德尔遗传重组 | GDD §13.4 | `WP-5.3` | **M5** | `src/mutation/LiveReproductionSystem.js` | `tests/mutation/LiveReproductionSystem.test.js` | 🟡 待实施 |
 | **REQ-CIV-005** | 空间实时索敌交火与边境摩擦级联推进 | GDD §13.5 | `WP-5.4` | **M5** | `src/warfare/SpatialCombatSystem.js` | `tests/warfare/SpatialCombatSystem.test.js` | 🟡 待实施 |
 | **REQ-CIV-006** | 程序化沙盒重玩性、首领性格与多模态剧本 | GDD §13.6 | `WP-5.5`<br/>`WP-5.6` | **M5** | `src/world/SandboxScenarioManager.js`<br/>`index.html` | `tests/world/SandboxScenarioManager.test.js`<br/>`tests/rendering/MiniRenderer.test.js` | 🟡 待实施 |
+| **REQ-CIV-007** | 种族与政权正交解耦与一族多王国支持 | GDD §13.7 | `WP-5.5` | **M5** | `src/world/FactionRegistry.js` | `tests/world/SandboxScenarioManager.test.js` | 🟡 待实施 |
+| **REQ-CIV-008** | 双职业全物理闭环与军民平战动态动员 | GDD §13.3 | `WP-5.1` | **M5** | `src/profession/DualClassStateMachine.js` | `tests/profession/CasteBehaviorSystem.test.js` | 🟡 待实施 |
 | **TC-EDGE-10** | 文明生命周期与动态领地守门断言 | SPEC-M5 §九 | `WP-5.2`<br/>`WP-5.3` | **M5** | `tests/guardrails/TC-EDGE-10.test.js` | `tests/guardrails/TC-EDGE-10.test.js` | 🟡 待实施 |
 | **TC-EDGE-11** | 自发摩擦交火与战争军团推演守门断言 | SPEC-M5 §九 | `WP-5.4` | **M5** | `tests/guardrails/TC-EDGE-11.test.js` | `tests/guardrails/TC-EDGE-11.test.js` | 🟡 待实施 |
 
@@ -172,12 +174,13 @@
 
 ## 十二、 矩阵统计与度量总结
 
-* **总需求条目数**：65 条原子功能需求 + 11 项底层致命守门断言，共 **76 项**；
+* **总需求条目数**：67 条原子功能需求 + 11 项底层致命守门断言，共 **78 项**；
 * **需求覆盖率**：WBS 映射覆盖率 **100.0%**（设计孤儿数：0，范围蔓延数：0）；
 * **当前交付达成度 (M0~M4 终验 + M5 变更发起)**：
-  - 🟢 **已全量闭环交付 (M0~M4)**：**68 项**（占比 **$89.5\%$**，基座引擎、生态群系、技能遗传、战争流场、上帝视听、Web Audio等已全部合入）；
-  - 🟡 **ECR-2026-001 变更实施中 (M5)**：**8 项**（占比 **$10.5\%$**，包含群系定居、动态领地、阶级闭环、活体繁衍、实时交火与沙盒重玩器）。
+  - 🟢 **已全量闭环交付 (M0~M4)**：**68 项**（占比 **$87.2\%$**，基座引擎、生态群系、技能遗传、战争流场、上帝视听、Web Audio等已全部合入）；
+  - 🟡 **ECR-2026-001 变更实施中 (M5)**：**10 项**（占比 **$12.8\%$**，包含群系定居、动态领地、阶级闭环、活体繁衍、实时交火、沙盒重玩器、一族多国解耦与双职业实体闭环）。
 * **自动化测试防线**：全工程 **45 个测试套件、355 项机器断言，100% 满分全绿通过 (0 Failed, 0 Flaky)**，包含 10,000 帧千人同屏混沌总压测！
 * **架构合规性**：主渲染循环内部热路径 **绝对 0 次 `ctx.save()` / `ctx.restore()`**，全生命周期业务物理循环 **绝对零 GC**。
+
 
 

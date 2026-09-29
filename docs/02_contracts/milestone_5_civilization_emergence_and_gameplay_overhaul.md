@@ -58,7 +58,17 @@
 * 初始仅生成 1 名酋长 (Leader)、1 名工匠 (Artisan)、4 名开拓平民 (Civilian)；
 * 初始法理领地仅以营火为中心半径 $R=2$ 圈。
 
+### 2.3 种族与政权正交解耦与同族多王国契约 (`src/world/FactionRegistry.js`)
+* **正交解耦核心设计**：
+  - `RaceId` (0~11)：决定生物外貌、体质质量、代谢范式、种族特技与变异禁忌掩码；
+  - `FactionId` (1~16)：决定政治主权、国号国旗、图腾营火坐标、领地流场、粮仓物理库存与外交好恶；
+* **一族多国史诗支持**：
+  - 允许同一种族在沙盒中初始设立多个王国（例如人类同时拥有“神圣索兰帝国”与“北境凛冬公国”，绿皮同时拥有“血颅战盟”与“断牙氏族”）；
+  - 发生政治大分裂（Schism）时，从 1~16 槽位动态分配空闲 `FactionId`，叛乱军完全继承母国 `RaceId`（同族血脉），但插下新图腾、换装反叛旗帜，同族仇恨锁定 200 爆发内战；
+  - 异族战俘可打上 `IS_SLAVE` 掩码并入胜利国政权从事农林采石劳作。
+
 ---
+
 
 ## 三、 领地动态潮汐扩张与退耕还林契约 (`src/territory/DynamicTerritorySystem.js`)
 
@@ -107,7 +117,33 @@ export const GRANARY_OFFSET_CAPACITY = 3;
    - **统御光环**：为周围 96px 内同族士兵赋予移速+15%、伤害+20% 战意光环；
    - **坐镇图腾**：图腾安全时驻留中枢，图腾被围攻时死战不退！
 
+### 4.3 双职业实体物理闭环与平战动态动员契约 (`src/profession/DualClassStateMachine.js`)
+* **内存池连续布局 (Float32Array(TOTAL_SLOTS * 6))**：
+  ```javascript
+  export const DUAL_CLASS_STRIDE = 6;
+  export const DC_OFFSET_PRIMARY_JOB     = 0; // 0=NONE, 1=FARMER, 2=STONECUTTER, 3=LUMBERJACK, 4=HERBALIST
+  export const DC_OFFSET_SECONDARY_JOB   = 1; // 0=NONE, 1=SHIELDBEARER, 2=BERSERKER, 3=ASSASSIN, 4=SHARPSHOOTER
+  export const DC_OFFSET_CURRENT_MODE    = 2; // 0=PEACETIME_LABOR, 1=MOBILIZED_COMBAT
+  export const DC_OFFSET_LABOR_PROGRESS  = 3; // 生产进度计时器 (0.0 ~ 5.0s)
+  export const DC_OFFSET_CARRIED_RES_QTY = 4; // 背负资源数量 (0 ~ 10)
+  export const DC_OFFSET_CARRIED_RES_TYP = 5; // 背负类型 (1=FOOD, 2=STONE, 3=WOOD, 4=MEDICINE)
+  ```
+* **生产主职物理流通规则**：
+  - **农夫 (Farmer)**：前往 2x2 农田割麦，头顶背负麦捆，以 0.85 倍移速步行送回图腾粮仓，入库增加粮食库存 +10.0；
+  - **石工 (Stonecutter)**：前往岩石瓦片采石，背负石料步行至边境立下【图腾界碑 (Boundary Obelisk)】，使领地半径 +1；
+  - **伐木工 (Lumberjack)**：采伐森林原木送回营火，用于营寨维修与箭矢防具制造；
+  - **药剂师 (Herbalist)**：采摘草药炼制金创药，主动寻路救治领地内生命值 $<40\%$ 的重伤士兵。
+* **战斗副职战术动作规则**：
+  - **重盾卫士 (Shieldbearer)**：战线最前沿抗线，激活 `IS_SHIELDING`，格挡正面 $50\%$ 投射物；
+  - **狂战士 (Berserker)**：生命值跌破 $50\%$ 触发狂暴，移速攻速翻倍突脸；
+  - **暗影刺客 (Shadow Assassin)**：隐身潜行绕开正面，直插敌国后排首领或突入粮仓纵火；
+  - **神射长弓手 (Sharpshooter)**：后排保持 48px 抛物线吊射压制。
+* **平战动态动员与复合身份**：
+  - 当本国领地内出现敌军或边境摩擦满 70 触发全面宣战时，小人瞬间由生产态切换为战斗态；
+  - 复合身份如【暴怒民兵】（平时割麦战时暴走反击）、【重岩壁垒】（平时采石战时立盾筑墙卡位）在沙盒中具象化展现。
+
 ---
+
 
 ## 五、 活体繁衍与世代孟德尔突变演化契约 (`src/mutation/LiveReproductionSystem.js`)
 
