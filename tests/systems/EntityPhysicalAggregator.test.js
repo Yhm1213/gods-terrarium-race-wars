@@ -132,4 +132,29 @@ describe('EntityPhysicalAggregator Pipeline Specification Suite', () => {
       }
     });
   });
+
+  describe('4. 方法签名鲁棒性与别名兼容 (LL-006 & P0整改)', () => {
+    it('调用 EntityPhysicalAggregator.aggregate 别名方法正常执行', () => {
+      const id = ecs.allocateEntity();
+      initGenetics(genetics, id, OrganFlags.FLESH, 0, 1);
+
+      const profile = {};
+      const mass = EntityPhysicalAggregator.aggregate(ecs, id, 'ORC', genetics, profile);
+
+      expect(mass).toBeGreaterThan(Races.ORC.mass);
+      expect(profile.mass).toBe(mass);
+    });
+
+    it('直接传入 phenotype 纯数字掩码和数字 raceId 正常自适应解析', () => {
+      const id = ecs.allocateEntity();
+      const rawPhenotype = OrganFlags.GRANITE; // +0.25 质量, +12 护甲
+
+      const profile = {};
+      // 传入数字 raceId (0: ORC) 与 纯数字 phenotype
+      const mass = EntityPhysicalAggregator.aggregate(ecs, id, 0, rawPhenotype, profile);
+
+      expect(mass).toBeCloseTo(Races.ORC.mass * 1.25, 2);
+      expect(profile.armor).toBe(12.0);
+    });
+  });
 });

@@ -138,6 +138,9 @@ describe('DivineOverdrive Specification Suite (WP-4.1 §2.2)', () => {
       expect(report.miraclesCast).toBe(1);
       expect(report.killsCount).toBe(1);
       expect(report.headline).toContain('【狂欢纪元快报');
+
+      // 验证别名兼容 (LL-006)
+      expect(overdrive.getSummaryReport()).toBe(report);
     });
   });
 });

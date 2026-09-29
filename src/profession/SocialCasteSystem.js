@@ -184,6 +184,17 @@ export class SocialCasteSystem {
   }
 
   /**
+   * 注册或指定阵营领袖
+   * @param {number} entityId 
+   * @param {number} factionId 
+   */
+  registerLeader(entityId, factionId) {
+    if (factionId < 0 || factionId >= FACTION_CAPACITY) return;
+    this.factionLeaderCount[factionId] = 1;
+    this.factionLeaderEntityId[factionId] = entityId;
+  }
+
+  /**
    * 重置指定实体的社会阶级数据
    * @param {number} entityId 
    */

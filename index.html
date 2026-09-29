@@ -1652,9 +1652,35 @@
     const mindCabinet = new MindCabinet();
     const deathAuditReceipt = new DeathAuditReceipt();
 
-    // 12. M4 Web Audio 8-bit 音效总线
+    // 12. M4 Web Audio 8-bit 音效总线 (带有 Proxy 异常防御与别名回退保护，绝不击穿事件总线)
     const audioBus = new WebAudioBusManager();
-    const synth = new Synth8Bit(audioBus);
+    const rawSynth = new Synth8Bit(audioBus);
+    const synth = new Proxy(rawSynth, {
+      get(target, prop) {
+        if (typeof target[prop] === 'function') {
+          return (...args) => {
+            try {
+              return target[prop](...args);
+            } catch (err) {
+              console.warn(`[Synth] Error invoking ${String(prop)}:`, err);
+            }
+          };
+        }
+        if (prop === 'playMiracleChime' && typeof target.playMiracle === 'function') {
+          return (...args) => target.playMiracle(...args);
+        }
+        if (prop === 'playWarHorn' && typeof target.playHorn === 'function') {
+          return (...args) => target.playHorn(...args);
+        }
+        if (prop === 'playWhisper' && typeof target.playChant === 'function') {
+          return (...args) => target.playChant(...args);
+        }
+        if (prop === 'playRainDrop' && typeof target.playWaterDrop === 'function') {
+          return (...args) => target.playWaterDrop(...args);
+        }
+        return (...args) => {};
+      }
+    });
 
     // 用户交互解锁音频标志
     let audioUnlocked = false;
@@ -1944,7 +1970,9 @@
     eventBus.subscribe(DomainEvents.EVT_OVERDRIVE_ENDED, () => {
       renderer.isOverdriveActive = false;
       overdriveScreenFx.style.display = 'none';
-      const rep = divineOverdriveSys.getSummaryReport();
+      const rep = (typeof divineOverdriveSys.getSummaryReport === 'function')
+        ? divineOverdriveSys.getSummaryReport()
+        : divineOverdriveSys.getLastReport();
       addLog(`🎉 【狂欢纪元快报】狂欢落幕！施展神迹 ${rep.miraclesCast} 次，击杀 ${rep.killsCount} 单位！`, 'green');
       synth.playMiracleChime();
     });
@@ -2152,7 +2180,7 @@
       if (phenotype !== 0) flags |= IS_MUTANT;
       ecs.statusFlags[eid] = flags;
 
-      EntityPhysicalAggregator.aggregate(ecs, eid, race.id, phenotype);
+      EntityPhysicalAggregator.aggregateEntity(ecs, eid, race.id, geneticsSys.genetics);
 
       return eid;
     }
@@ -2310,7 +2338,7 @@
 
       casteSys.update(dt);
       raceSkillSys.update(dt);
-      EntityPhysicalAggregator.aggregateAll(ecs, geneticsSys.genetics);
+      EntityPhysicalAggregator.aggregateAll(ecs, geneticsSys.genetics, (eid) => raceSkillSys.getEntityRaceKey(eid));
 
       borderFrictionSys.update(dt);
       clanCensusSys.update(dt);

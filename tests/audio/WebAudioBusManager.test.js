@@ -184,6 +184,15 @@ describe('Web Audio 压限拓扑与 8-Bit 合成音效规范套件', () => {
       expect(busManager.getActiveVoiceCount()).toBeGreaterThan(0);
     });
 
+    it('视窗别名方法 (playMiracleChime, playWarHorn, playWhisper, playRainDrop) 顺利发声 (LL-006)', () => {
+      expect(() => {
+        synth.playMiracleChime();
+        synth.playWarHorn();
+        synth.playWhisper();
+        synth.playRainDrop();
+      }).not.toThrow();
+    });
+
     it('静音或无 AudioContext 时优雅静默，永不抛出异常', () => {
       const emptyBus = new WebAudioBusManager(null);
       const safeSynth = new Synth8Bit(emptyBus);

@@ -106,12 +106,35 @@ export const OrganPhysicalModifiers = Object.freeze({
 
 export class EntityPhysicalAggregator {
   /**
+   * 聚合单个实体的物理与战斗属性 (别名方法与多态自适应，遵循 LL-006)
+   * 既支持传入完整的 geneticsBuffer，也支持直接传入表型数字掩码 phenotypeMask
+   * 
+   * @param {import('../core/ECS.js').ECS} ecs 
+   * @param {number} entityId 
+   * @param {string|number} raceKeyOrId 
+   * @param {Uint32Array|number} geneticsBufferOrPhenotype 
+   * @param {object|null} [outProfile=null] 
+   * @param {object|null} [options=null] 
+   * @returns {number} EffectiveMass
+   */
+  static aggregate(ecs, entityId, raceKeyOrId, geneticsBufferOrPhenotype, outProfile = null, options = null) {
+    return EntityPhysicalAggregator.aggregateEntity(
+      ecs,
+      entityId,
+      raceKeyOrId,
+      geneticsBufferOrPhenotype,
+      outProfile,
+      options
+    );
+  }
+
+  /**
    * 聚合单个实体的物理与战斗属性 (零 GC 纯运算)
    * 
    * @param {import('../core/ECS.js').ECS} ecs 
    * @param {number} entityId 
-   * @param {string} raceKey 
-   * @param {Uint32Array} geneticsBuffer 
+   * @param {string|number} raceKey 
+   * @param {Uint32Array|number} geneticsBuffer 
    * @param {object|null} [outProfile=null] 可选复用结果对象
    * @param {object|null} [options=null] 可选基础属性重写 (baseArmor, baseMass 等)
    * @returns {number} EffectiveMass
@@ -119,15 +142,31 @@ export class EntityPhysicalAggregator {
   static aggregateEntity(ecs, entityId, raceKey, geneticsBuffer, outProfile = null, options = null) {
     if (entityId <= NULL_ENTITY || !ecs.isAlive(entityId)) return 0.0;
 
-    const race = Races[raceKey] || Races.HUMAN;
+    let race = Races[raceKey];
+    if (!race && typeof raceKey === 'number') {
+      const raceValues = Object.values(Races);
+      if (raceKey >= 0 && raceKey < raceValues.length) {
+        race = raceValues[raceKey];
+      }
+    }
+    if (!race && typeof raceKey === 'string') {
+      race = Races[raceKey.toUpperCase()];
+    }
+    if (!race) race = Races.HUMAN;
+
     const baseMass = options?.baseMass ?? race.mass;
     const baseArmor = options?.baseArmor ?? 0.0; // 契约公式中的 BaseArmor (装备或Debuff)
     const baseBlunt = race.resistances?.blunt || 0.0;
     const basePierce = race.resistances?.pierce || 0.0;
 
-    // 读取表型表达位掩码
-    const phenoOff = entityId * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE;
-    const phenotype = geneticsBuffer[phenoOff];
+    // 读取表型表达位掩码 (自适应 Uint32Array 或直接传入的 number)
+    let phenotype = 0;
+    if (typeof geneticsBuffer === 'number') {
+      phenotype = geneticsBuffer >>> 0;
+    } else if (geneticsBuffer && (geneticsBuffer instanceof Uint32Array || geneticsBuffer.length !== undefined)) {
+      const phenoOff = entityId * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE;
+      phenotype = geneticsBuffer[phenoOff] || 0;
+    }
 
     let totalMassMod = 0.0;
     let totalSpeedMod = 0.0;

@@ -115,4 +115,22 @@ describe('DomainEventBus 预分配双轨双缓冲环形领域事件总线', () =
 
     expect(durationMs).toBeLessThan(10.0);
   });
+
+  it('监听器异常防御隔离断言：单个外围监听器抛异常绝不击穿事件派发 (LL-006)', () => {
+    let secondListenerCalled = false;
+    bus.subscribe(DomainEvents.EVT_FACTION_SCHISM, () => {
+      throw new Error('Broken listener exception!');
+    });
+    bus.subscribe(DomainEvents.EVT_FACTION_SCHISM, () => {
+      secondListenerCalled = true;
+    });
+
+    bus.emit(DomainEvents.EVT_FACTION_SCHISM, 1, 2, 0, 0);
+
+    expect(() => {
+      bus.flush();
+    }).not.toThrow();
+
+    expect(secondListenerCalled).toBe(true);
+  });
 });

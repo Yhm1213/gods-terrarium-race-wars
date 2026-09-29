@@ -259,12 +259,20 @@ export class DomainEventBus {
     const specificListeners = this.listeners.get(type);
     if (specificListeners && specificListeners.size > 0) {
       for (const cb of specificListeners) {
-        cb(type, src, dst, p1, p2);
+        try {
+          cb(type, src, dst, p1, p2);
+        } catch (err) {
+          console.error('[DomainEventBus] Dispatch error in listener:', err);
+        }
       }
     }
     if (this.globalListeners.size > 0) {
       for (const cb of this.globalListeners) {
-        cb(type, src, dst, p1, p2);
+        try {
+          cb(type, src, dst, p1, p2);
+        } catch (err) {
+          console.error('[DomainEventBus] Dispatch error in listener:', err);
+        }
       }
     }
   }

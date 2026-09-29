@@ -204,4 +204,12 @@ export class DivineOverdrive {
   getLastReport() {
     return this.lastReport;
   }
+
+  /**
+   * 获取最近一份狂欢快报 (别名兼容)
+   * @returns {Object}
+   */
+  getSummaryReport() {
+    return this.getLastReport();
+  }
 }

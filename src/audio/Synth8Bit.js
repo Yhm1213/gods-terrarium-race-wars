@@ -344,4 +344,10 @@ export class Synth8Bit {
       osc.stop(now + duration + 0.01);
     } catch (e) {}
   }
+
+  // ================= 契约与视窗别名兼容 (LL-006) =================
+  playMiracleChime(options = {}) { return this.playMiracle(options); }
+  playWarHorn(options = {}) { return this.playHorn(options); }
+  playWhisper(options = {}) { return this.playChant(options); }
+  playRainDrop(options = {}) { return this.playWaterDrop(options); }
 }
