@@ -36,7 +36,11 @@ import {
   IS_CASTING,
   IS_DISARMED,
   IS_SKILL_ACTIVE,
-  IS_IMMOBILIZED
+  IS_IMMOBILIZED,
+  IS_LAST_STAND,
+  IS_PANICKED,
+  IS_SACRED_BODY,
+  IS_STATIC_ANCHOR
 } from '../components/UnitStatusFlags.js';
 
 import {
@@ -185,6 +189,65 @@ export const COLOR_CASTING        = '#38bdf8'; // 施法读条青蓝光晕
 export const COLOR_DISARMED       = '#94a3b8'; // 缴械断刃灰钢
 export const COLOR_SKILL_ACTIVE   = '#a855f7'; // 特技激活炫紫微光
 
+// ==========================================
+// M3 战争、政体与流场预量化调色板 (热路径零 GC)
+// ==========================================
+// 16 阵营领地半透明底色 LUT (0 号为中立透明)
+export const FACTION_TERRITORY_COLORS = Object.freeze([
+  'rgba(0, 0, 0, 0)',               // 0: 中立荒漠
+  'rgba(56, 118, 29, 0.22)',        // 1: ORC
+  'rgba(46, 125, 50, 0.22)',        // 2: ELF
+  'rgba(25, 118, 210, 0.22)',       // 3: HUMAN
+  'rgba(216, 67, 21, 0.22)',        // 4: DWARF
+  'rgba(106, 27, 154, 0.22)',       // 5: UNDEAD
+  'rgba(104, 159, 56, 0.22)',       // 6: GOBLIN
+  'rgba(194, 24, 91, 0.22)',        // 7: DEMON
+  'rgba(0, 137, 123, 0.22)',        // 8: LIZARD
+  'rgba(245, 124, 0, 0.22)',        // 9: BEAST
+  'rgba(0, 172, 193, 0.22)',        // 10: SPORE
+  'rgba(92, 107, 192, 0.22)',       // 11: GOLEM
+  'rgba(142, 36, 170, 0.22)',       // 12: ABERR
+  'rgba(225, 29, 72, 0.22)',        // 13: 裂变叛乱军
+  'rgba(249, 115, 22, 0.22)',       // 14: 自由战阵
+  'rgba(139, 92, 246, 0.22)',       // 15: 宗族分裂军
+  'rgba(6, 182, 212, 0.22)'         // 16: 边境流寇
+]);
+
+// 16 阵营国界明亮边框高光色 (用于 2px 国界描边)
+export const FACTION_BORDER_COLORS = Object.freeze([
+  '#000000',
+  '#4ade80', // 1: ORC
+  '#86efac', // 2: ELF
+  '#60a5fa', // 3: HUMAN
+  '#fb923c', // 4: DWARF
+  '#c084fc', // 5: UNDEAD
+  '#bef264', // 6: GOBLIN
+  '#f43f5e', // 7: DEMON
+  '#2dd4bf', // 8: LIZARD
+  '#fde047', // 9: BEAST
+  '#38bdf8', // 10: SPORE
+  '#a5b4fc', // 11: GOLEM
+  '#f472b6', // 12: ABERR
+  '#fb7185', // 13
+  '#fdba74', // 14
+  '#c4b5fd', // 15
+  '#67e8f9'  // 16
+]);
+
+// 流场向量与目标点颜色
+export const COLOR_FLOW_VECTOR = 'rgba(56, 189, 248, 0.75)';
+export const COLOR_FLOW_TARGET = '#ffd700';
+
+// M3 士气微表情与死战光环颜色
+export const COLOR_MORALE_SWEAT = '#38bdf8';     // 动摇冒汗浅蓝小水滴
+export const COLOR_MORALE_PANIC = '#67e8f9';     // 溃逃慌张急汗浅青蓝
+export const COLOR_LAST_STAND_AURA = '#b91c1c';  // 破釜沉舟暗红死战气焰
+export const COLOR_LAST_STAND_CORE = '#ef4444';  // 气焰亮红焰芯
+
+// M3 图腾 25% 圣盾与冲击波
+export const COLOR_TOTEM_SHIELD    = '#ffd700';  // 金身圣盾亮金
+export const COLOR_TOTEM_SHOCKWAVE = 'rgba(255, 215, 0, 0.85)'; // 金色环形冲击波
+
 /**
  * MiniRenderer 类
  * 纯原生 Canvas 2D 渲染引擎，热路径零 GC
@@ -218,6 +281,21 @@ export class MiniRenderer {
     this.showCastes = true;      // 是否绘制四大阶级标牌
     this.showMutations = true;   // 是否绘制突变器官视觉点缀
     this.showSkills = true;      // 是否绘制技能与施法反馈
+
+    // M3 战争、政体与寻路可视化开关
+    this.showTerritories = true; // 是否绘制领地国界半透明光晕与边框
+    this.showFlowField = false;   // 是否绘制大军团向量流场与集结靶心 (按 F 键切换)
+    this.showMorale = true;      // 是否绘制士气微表情与破釜沉舟死战气焰
+    this.showTotemShield = true; // 是否绘制图腾 25% 金身圣盾与环形冲击波
+
+    // 预分配图腾圣火涅槃冲击波定长环形缓冲池 (容量 16，绝对零 GC)
+    this.maxShockwaves = 16;
+    this.shockwaveX = new Float32Array(16);
+    this.shockwaveY = new Float32Array(16);
+    this.shockwaveRadius = new Float32Array(16);
+    this.shockwaveMaxRadius = new Float32Array(16);
+    this.shockwaveSpeed = new Float32Array(16);
+    this.shockwaveActive = new Uint8Array(16);
   }
 
   /**
@@ -293,15 +371,29 @@ export class MiniRenderer {
   /**
    * 完整主渲染管线 (主循环热路径，严格零 GC)
    * 
-   * @param {object} world 世界地图实例 (包含 tiles/tileTypes, nutrients/nutrientFloor)
+   * @param {object} world 世界地图实例 (包含 tiles/tileTypes, nutrients/nutrientFloor, territoryFaction)
    * @param {ECS} ecs ECS 实体管理器实例
    * @param {Array<object>|import('../ecosystem/FarmlandSystem.js').FarmlandSystem|null} [farmlands=null] 2x2 农田列表或系统
    * @param {import('../ecosystem/NutrientField.js').NutrientField|Float32Array|null} [nutrientField=null] 养分扩散场实例
    * @param {Float32Array|object|null} [casteBuffer=null] 阶级数据缓冲或 SocialCasteSystem 实例
    * @param {Uint32Array|object|null} [geneticsBuffer=null] 遗传基因缓冲或 MendelianGeneticsSystem 实例
    * @param {Float32Array|object|null} [skillBuffer=null] 技能数据缓冲或 RaceSkillSystem 实例
+   * @param {import('../pathfinding/VectorFlowFieldSystem.js').VectorFlowFieldSystem|null} [flowField=null] 大军团反向 BFS 流场
+   * @param {import('../warfare/MoraleSystem.js').MoraleSystem|null} [moraleSystem=null] 四级士气状态机系统
+   * @param {import('../warfare/TotemDefenseSystem.js').TotemDefenseSystem|null} [totemDefense=null] 图腾防卫与圣盾系统
    */
-  render(world, ecs, farmlands = null, nutrientField = null, casteBuffer = null, geneticsBuffer = null, skillBuffer = null) {
+  render(
+    world,
+    ecs,
+    farmlands = null,
+    nutrientField = null,
+    casteBuffer = null,
+    geneticsBuffer = null,
+    skillBuffer = null,
+    flowField = null,
+    moraleSystem = null,
+    totemDefense = null
+  ) {
     const ctx = this.ctx;
 
     // 1. 绘制静态地形瓦片底图 (若脏则重新烘焙，否则单次 blit 极速贴图)
@@ -316,7 +408,15 @@ export class MiniRenderer {
       this._drawTerrainDirect(ctx, world);
     }
 
-    // 2. 瓦片养分地脉热力图微弱光晕叠合 (LUT 查表，零分配，安全 fallback)
+    // 2. 绘制领地国界半透明光晕与边界高光线
+    if (this.showTerritories && world) {
+      const territoryFaction = world.territoryFaction || null;
+      if (territoryFaction) {
+        this._renderTerritoryBorders(ctx, territoryFaction);
+      }
+    }
+
+    // 3. 瓦片养分地脉热力图微弱光晕叠合 (LUT 查表，零分配，安全 fallback)
     let nutrients = null;
     if (nutrientField) {
       nutrients = nutrientField.current || (nutrientField instanceof Float32Array ? nutrientField : null);
@@ -329,17 +429,27 @@ export class MiniRenderer {
       this._renderNutrientHeatmap(ctx, nutrients);
     }
 
-    // 3. 绘制 2x2 农田四阶演替
+    // 4. 绘制 2x2 农田四阶演替
     if (this.showFarmlands && farmlands) {
       this._renderFarmlands(ctx, farmlands);
     }
 
-    // 4. 绘制网格线 (若开启调试)
+    // 5. 绘制网格线 (若开启调试)
     if (this.showGrid) {
       this._renderGridLines(ctx);
     }
 
-    // 5. 绘制 4096 连续内存小人实体群 (解析 M2 Buffer 或系统对象)
+    // 6. 绘制战线向量流场与集结靶心 (若开启调试)
+    if (this.showFlowField && flowField) {
+      this._renderFlowField(ctx, flowField);
+    }
+
+    // 7. 绘制图腾金身圣盾护罩
+    if (this.showTotemShield && totemDefense && ecs) {
+      this._renderTotemDefenseEffects(ctx, ecs, totemDefense);
+    }
+
+    // 8. 绘制 4096 连续内存小人实体群 (解析 M2/M3 状态)
     if (ecs && ecs.activeCount > 0) {
       let castes = null;
       if (casteBuffer) {
@@ -354,7 +464,12 @@ export class MiniRenderer {
         skills = skillBuffer.skills || (skillBuffer instanceof Float32Array ? skillBuffer : null);
       }
 
-      this._renderEntities(ctx, ecs, castes, genetics, skills);
+      this._renderEntities(ctx, ecs, castes, genetics, skills, moraleSystem);
+    }
+
+    // 9. 绘制图腾圣火涅槃环形冲击波
+    if (this.showTotemShield) {
+      this._renderShockwaves(ctx);
     }
   }
 
@@ -529,6 +644,212 @@ export class MiniRenderer {
   }
 
   /**
+   * 绘制领地国界半透明光晕与边界明亮高光线 (绝对零 GC)
+   * @private
+   * @param {CanvasRenderingContext2D} ctx 
+   * @param {Uint8Array} territoryFaction 
+   */
+  _renderTerritoryBorders(ctx, territoryFaction) {
+    const tSize = TILE_SIZE;
+    const w = GRID_WIDTH;
+    const h = GRID_HEIGHT;
+
+    for (let ty = 0; ty < h; ty++) {
+      const rowOff = ty * w;
+      const py = ty * tSize;
+
+      for (let tx = 0; tx < w; tx++) {
+        const idx = rowOff + tx;
+        const fac = territoryFaction[idx];
+        if (fac === 0) continue;
+
+        const px = tx * tSize;
+
+        // 1. 领地半透明底色
+        ctx.fillStyle = FACTION_TERRITORY_COLORS[fac] || FACTION_TERRITORY_COLORS[1];
+        ctx.fillRect(px, py, tSize, tSize);
+
+        // 2. 边缘光晕边线检测
+        const leftFac   = tx > 0     ? territoryFaction[idx - 1] : 0;
+        const rightFac  = tx < w - 1 ? territoryFaction[idx + 1] : 0;
+        const topFac    = ty > 0     ? territoryFaction[idx - w] : 0;
+        const bottomFac = ty < h - 1 ? territoryFaction[idx + w] : 0;
+
+        const borderCol = FACTION_BORDER_COLORS[fac] || FACTION_BORDER_COLORS[1];
+        ctx.fillStyle = borderCol;
+
+        if (topFac !== fac) {
+          ctx.fillRect(px, py, tSize, 2);
+        }
+        if (bottomFac !== fac) {
+          ctx.fillRect(px, py + tSize - 2, tSize, 2);
+        }
+        if (leftFac !== fac) {
+          ctx.fillRect(px, py, 2, tSize);
+        }
+        if (rightFac !== fac) {
+          ctx.fillRect(px + tSize - 2, py, 2, tSize);
+        }
+      }
+    }
+  }
+
+  /**
+   * 绘制战线大军团向量流场指引线与目标点靶心 (绝对零 GC)
+   * @private
+   * @param {CanvasRenderingContext2D} ctx 
+   * @param {import('../pathfinding/VectorFlowFieldSystem.js').VectorFlowFieldSystem} flowField 
+   */
+  _renderFlowField(ctx, flowField) {
+    if (!flowField) return;
+
+    const targetX = flowField.targetTileX;
+    const targetY = flowField.targetTileY;
+    const vxArr = flowField.vectorFieldX;
+    const vyArr = flowField.vectorFieldY;
+    if (!vxArr || !vyArr) return;
+
+    const tSize = TILE_SIZE;
+    const half = tSize * 0.5;
+    const w = GRID_WIDTH;
+    const h = GRID_HEIGHT;
+    const arrowLen = 7.0;
+
+    // 1. 绘制向量引导小线段 (单次 beginPath 与单次 stroke)
+    ctx.strokeStyle = COLOR_FLOW_VECTOR;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+
+    for (let ty = 0; ty < h; ty++) {
+      const rowOff = ty * w;
+      const cy = ty * tSize + half;
+      for (let tx = 0; tx < w; tx++) {
+        const idx = rowOff + tx;
+        const vx = vxArr[idx];
+        const vy = vyArr[idx];
+        if (vx === 0.0 && vy === 0.0) continue;
+
+        const cx = tx * tSize + half;
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + vx * arrowLen, cy + vy * arrowLen);
+      }
+    }
+    ctx.stroke();
+
+    // 2. 绘制集结目标瓦片靶心
+    if (targetX >= 0 && targetY >= 0 && targetX < w && targetY < h) {
+      const gx = targetX * tSize;
+      const gy = targetY * tSize;
+
+      ctx.strokeStyle = COLOR_FLOW_TARGET;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(gx + 1.5, gy + 1.5, tSize - 3, tSize - 3);
+
+      ctx.fillStyle = COLOR_FLOW_TARGET;
+      ctx.fillRect(gx + 10, gy + 10, 4, 4);
+    }
+  }
+
+  /**
+   * 绘制图腾防卫 12s 金身圣盾光环
+   * @private
+   * @param {CanvasRenderingContext2D} ctx 
+   * @param {ECS} ecs 
+   * @param {import('../warfare/TotemDefenseSystem.js').TotemDefenseSystem} totemDefense 
+   */
+  _renderTotemDefenseEffects(ctx, ecs, totemDefense) {
+    if (!totemDefense || !ecs) return;
+
+    const durationArr = totemDefense.aegisDuration;
+    const totemIds = totemDefense.totemEntityIds;
+    if (!durationArr || !totemIds) return;
+
+    const tf = ecs.transforms;
+    if (!tf) return;
+
+    for (let f = 1; f <= 16; f++) {
+      if (durationArr[f] > 0.0) {
+        const tid = totemIds[f];
+        if (tid > 0 && ecs.isAlive(tid)) {
+          const off = tid * TRANSFORM_STRIDE;
+          const tx = tf[off + TF_OFFSET_X];
+          const ty = tf[off + TF_OFFSET_Y];
+          const rx = (tx - 12.0) | 0;
+          const ry = (ty - 12.0) | 0;
+
+          ctx.strokeStyle = COLOR_TOTEM_SHIELD;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(rx + 0.5, ry + 0.5, 23, 23);
+
+          ctx.fillStyle = COLOR_TOTEM_SHIELD;
+          ctx.fillRect(rx - 2, ry - 2, 4, 4);
+          ctx.fillRect(rx + 22, ry - 2, 4, 4);
+          ctx.fillRect(rx - 2, ry + 22, 4, 4);
+          ctx.fillRect(rx + 22, ry + 22, 4, 4);
+        }
+      }
+    }
+  }
+
+  /**
+   * 触发图腾圣火涅槃环形冲击波
+   * @param {number} x 世界像素坐标 X
+   * @param {number} y 世界像素坐标 Y
+   * @param {number} [maxRadius=144.0] 最大扩散半径 (px)
+   * @param {number} [speed=180.0] 扩散速度 (px/s)
+   */
+  addShockwave(x, y, maxRadius = 144.0, speed = 180.0) {
+    let idx = -1;
+    for (let i = 0; i < this.maxShockwaves; i++) {
+      if (this.shockwaveActive[i] === 0) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx === -1) {
+      idx = 0; // 环形缓冲覆盖
+    }
+
+    this.shockwaveActive[idx] = 1;
+    this.shockwaveX[idx] = x;
+    this.shockwaveY[idx] = y;
+    this.shockwaveRadius[idx] = 4.0;
+    this.shockwaveMaxRadius[idx] = maxRadius;
+    this.shockwaveSpeed[idx] = speed;
+  }
+
+  /**
+   * 绘制定长缓冲池中的图腾冲击波动画 (绝对零 GC)
+   * @private
+   * @param {CanvasRenderingContext2D} ctx 
+   */
+  _renderShockwaves(ctx) {
+    const active = this.shockwaveActive;
+    const xs = this.shockwaveX;
+    const ys = this.shockwaveY;
+    const rads = this.shockwaveRadius;
+    const maxRads = this.shockwaveMaxRadius;
+    const speeds = this.shockwaveSpeed;
+
+    for (let i = 0; i < this.maxShockwaves; i++) {
+      if (active[i] === 0) continue;
+
+      ctx.strokeStyle = COLOR_TOTEM_SHOCKWAVE;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      if (typeof ctx.arc === 'function') {
+        ctx.arc(xs[i], ys[i], rads[i], 0, 6.2831853);
+      }
+      ctx.stroke();
+
+      rads[i] += speeds[i] * 0.016;
+      if (rads[i] >= maxRads[i]) {
+        active[i] = 0;
+      }
+    }
+  }
+
+  /**
    * 绘制 4096 连续内存中的实体小人 (热路径绝对零 GC)
    * @private
    * @param {CanvasRenderingContext2D} ctx 
@@ -536,8 +857,9 @@ export class MiniRenderer {
    * @param {Float32Array|null} [castes=null]
    * @param {Uint32Array|null} [genetics=null]
    * @param {Float32Array|null} [skills=null]
+   * @param {import('../warfare/MoraleSystem.js').MoraleSystem|null} [moraleSystem=null]
    */
-  _renderEntities(ctx, ecs, castes = null, genetics = null, skills = null) {
+  _renderEntities(ctx, ecs, castes = null, genetics = null, skills = null, moraleSystem = null) {
     const activeCount = ecs.activeCount;
     const dense = ecs.denseEntities;
     const transforms = ecs.transforms;
@@ -726,6 +1048,50 @@ export class MiniRenderer {
           ctx.fillStyle = COLOR_COMBAT;
           ctx.fillRect(rx + 2, ry + 7, 2, 2);
         }
+      }
+
+      // 11. M3 士气微表情与破釜沉舟死战气焰 (热路径零 GC)
+      if (this.showMorale) {
+        let moraleState = 0; // 默认 SOLID
+        if (moraleSystem && typeof moraleSystem.getMoraleState === 'function') {
+          moraleState = moraleSystem.getMoraleState(eid);
+        } else if ((flag & IS_PANICKED) !== 0) {
+          moraleState = 2; // DISORGANIZED
+        }
+
+        // 动摇 (Morale 59~30): 头部右上侧 1 滴微汗小水滴 (1x2 像素)
+        if (moraleState === 1) {
+          ctx.fillStyle = COLOR_MORALE_SWEAT;
+          ctx.fillRect(rx + 5, ry - 3, 1, 2);
+        } else if (moraleState >= 2 || (flag & IS_PANICKED) !== 0) {
+          // 溃逃 (Morale < 30 或 IS_PANICKED): 头部两侧 2 滴慌张急汗 (各 1x2 像素)
+          ctx.fillStyle = COLOR_MORALE_PANIC;
+          ctx.fillRect(rx - 2, ry - 3, 1, 2);
+          ctx.fillRect(rx + 6, ry - 3, 1, 2);
+        }
+
+        // 破釜沉舟死战光环: (flag & IS_LAST_STAND) 燃起暗红死战气焰
+        if ((flag & IS_LAST_STAND) !== 0) {
+          ctx.fillStyle = COLOR_LAST_STAND_AURA;
+          ctx.fillRect(rx - 2, ry + 1, 1, 4);
+          ctx.fillRect(rx + 7, ry + 1, 1, 4);
+          ctx.fillRect(rx + 1, ry - 2, 4, 1);
+          ctx.fillRect(rx + 1, ry + 7, 4, 1);
+          ctx.fillStyle = COLOR_LAST_STAND_CORE;
+          ctx.fillRect(rx + 2, ry - 1, 2, 1);
+        }
+      }
+
+      // 12. M3 金身圣盾霸体状态 (IS_SACRED_BODY)
+      if (this.showTotemShield && (flag & IS_SACRED_BODY) !== 0) {
+        ctx.strokeStyle = COLOR_TOTEM_SHIELD;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(rx - 3 + 0.5, ry - 3 + 0.5, 11, 11);
+        ctx.fillStyle = COLOR_TOTEM_SHIELD;
+        ctx.fillRect(rx - 3, ry - 3, 2, 2);
+        ctx.fillRect(rx + 7, ry - 3, 2, 2);
+        ctx.fillRect(rx - 3, ry + 7, 2, 2);
+        ctx.fillRect(rx + 7, ry + 7, 2, 2);
       }
     }
   }

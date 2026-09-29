@@ -36,6 +36,7 @@ export class TileGrid {
     this.hazardType = new Uint8Array(TOTAL_TILES);
     this.hazardDamage = new Float32Array(TOTAL_TILES);
     this.nutrientFloor = new Float32Array(TOTAL_TILES);
+    this.territoryFaction = new Uint8Array(TOTAL_TILES); // 瓦片领地归属阵营 ID [0 ~ 16], 0=中立荒漠 (2,016 B)
 
     this.reset();
   }
@@ -318,7 +319,47 @@ export class TileGrid {
   }
 
   /**
-   * 重置全部瓦片为默认温带平原 (PLAINS)
+   * 获取指定瓦片的领地归属阵营 ID [0 ~ 16] (0=中立)
+   * @param {number} idx
+   * @returns {number}
+   */
+  getTerritory(idx) {
+    if (idx < 0 || idx >= TOTAL_TILES) return 0;
+    return this.territoryFaction[idx];
+  }
+
+  /**
+   * 通过坐标获取瓦片领地归属阵营 ID (越界自动 Clamp)
+   * @param {number} x
+   * @param {number} y
+   * @returns {number}
+   */
+  getTerritoryByCoord(x, y) {
+    return this.territoryFaction[this.getIndex(x, y)];
+  }
+
+  /**
+   * 设置指定瓦片的领地归属阵营 ID
+   * @param {number} idx
+   * @param {number} factionId
+   */
+  setTerritory(idx, factionId) {
+    if (idx < 0 || idx >= TOTAL_TILES) return;
+    this.territoryFaction[idx] = factionId & 0xFF;
+  }
+
+  /**
+   * 通过坐标设置瓦片领地归属阵营 ID
+   * @param {number} x
+   * @param {number} y
+   * @param {number} factionId
+   */
+  setTerritoryByCoord(x, y, factionId) {
+    this.territoryFaction[this.getIndex(x, y)] = factionId & 0xFF;
+  }
+
+  /**
+   * 重置全部瓦片为默认温带平原 (PLAINS) 并清除领地权属为中立
    */
   reset() {
     const defaultBiome = Biomes.PLAINS;
@@ -329,6 +370,7 @@ export class TileGrid {
       this.hazardType[i] = defaultBiome.hazardType;
       this.hazardDamage[i] = defaultBiome.hazardDps;
       this.nutrientFloor[i] = defaultBiome.nutrientFloor;
+      this.territoryFaction[i] = 0;
     }
   }
 
@@ -343,7 +385,8 @@ export class TileGrid {
       this.elevation.byteLength +
       this.hazardType.byteLength +
       this.hazardDamage.byteLength +
-      this.nutrientFloor.byteLength
+      this.nutrientFloor.byteLength +
+      this.territoryFaction.byteLength
     );
   }
 }

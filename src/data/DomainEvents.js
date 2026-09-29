@@ -28,6 +28,8 @@ export const DomainEvents = Object.freeze({
   EVT_DEATH_STARVATION:     0x800F, // 实体饥饿衰竭死亡 (Param1: 实体ID, Param2: 瓦片Index) [新增]
   EVT_CASTE_PROMOTED:       0x8010, // 实体社会阶级晋升 (Param1: entityId, Param2: newCaste) [M2新增]
   EVT_GENE_ASSIMILATED:     0x8011, // 模式 A 基因驱动全族同化完成 (Param1: factionId, Param2: organMask) [M2新增]
+  EVT_TOTEM_AEGIS_TRIGGERED:0x8012, // 图腾 25% 圣盾击退波爆发 (Param1: 阵营ID, Param2: 图腾ID) [M3新增]
+  EVT_SCHISM_ENCLAVE_PURGED:0x8013, // 裂变非连通孤岛飞地注销 (Param1: 阵营ID, Param2: 瓦片Index) [M3新增]
 
   // ================= 瞬态表现通道 (0x0001 起始，可降频抽帧) =================
   EVT_DAMAGE_APPLIED:       0x0001, // 实体受创 (Param1: 实际扣血量, Param2: 伤害类型掩码)
@@ -43,7 +45,10 @@ export const DomainEvents = Object.freeze({
   EVT_BRAWL_RATION:         0x000B, // 掠夺种族同伴互殴抢粮 (Param1: 抢夺者ID, Param2: 受害者ID) [新增]
   EVT_RACE_SKILL_TRIGGERED: 0x0010, // 种族主动/被动特技激活 (Param1: entityId, Param2: skillId) [M2新增]
   EVT_WEAPON_DISARMED:      0x0011, // 实体兵器被打落缴械 (Param1: victimId, Param2: attackerId) [M2新增]
-  EVT_ACTION_MUTEX_BLOCKED: 0x0012  // 动作轨道互斥阻断打断 (Param1: entityId, Param2: blockedChannel) [M2新增]
+  EVT_ACTION_MUTEX_BLOCKED: 0x0012, // 动作轨道互斥阻断打断 (Param1: entityId, Param2: blockedChannel) [M2新增]
+  EVT_MORALE_STATE_CHANGED: 0x0013, // 士兵士气四阶状态改变 (Param1: 实体ID, Param2: 新士气等级) [M3新增]
+  EVT_FRICTION_ESCALATED:   0x0014, // 边境摩擦阶梯升级 (Param1: 阵营A, Param2: 阵营B) [M3新增]
+  EVT_LAST_STAND_ACTIVATED: 0x0015  // 图腾 5 格破釜沉舟绝地死战激活 (Param1: 实体ID, Param2: 0) [M3新增]
 });
 
 /**

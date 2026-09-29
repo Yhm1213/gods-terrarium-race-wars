@@ -27,7 +27,17 @@ import {
   COLOR_ORGAN_GRANITE,
   COLOR_CASTING,
   COLOR_DISARMED,
-  COLOR_SKILL_ACTIVE
+  COLOR_SKILL_ACTIVE,
+  FACTION_TERRITORY_COLORS,
+  FACTION_BORDER_COLORS,
+  COLOR_FLOW_VECTOR,
+  COLOR_FLOW_TARGET,
+  COLOR_MORALE_SWEAT,
+  COLOR_MORALE_PANIC,
+  COLOR_LAST_STAND_AURA,
+  COLOR_LAST_STAND_CORE,
+  COLOR_TOTEM_SHIELD,
+  COLOR_TOTEM_SHOCKWAVE
 } from '../../src/rendering/MiniRenderer.js';
 
 import {
@@ -52,8 +62,16 @@ import {
   IN_COMBAT,
   IS_CASTING,
   IS_DISARMED,
-  IS_SKILL_ACTIVE
+  IS_SKILL_ACTIVE,
+  IS_LAST_STAND,
+  IS_PANICKED,
+  IS_SACRED_BODY,
+  IS_STATIC_ANCHOR
 } from '../../src/components/UnitStatusFlags.js';
+
+import {
+  MoraleState
+} from '../../src/warfare/MoraleSystem.js';
 
 import {
   CasteType,
@@ -89,7 +107,8 @@ function createMockCanvas() {
     save: 0,
     restore: 0,
     beginPath: 0,
-    stroke: 0
+    stroke: 0,
+    arc: 0
   };
 
   const ctx = {
@@ -97,10 +116,10 @@ function createMockCanvas() {
     strokeStyle: '#000000',
     lineWidth: 1,
     fillRect: vi.fn((x, y, w, h) => {
-      contextCalls.fillRect.push({ x, y, w, h });
+      contextCalls.fillRect.push({ x, y, w, h, fillStyle: ctx.fillStyle });
     }),
     strokeRect: vi.fn((x, y, w, h) => {
-      contextCalls.strokeRect.push({ x, y, w, h });
+      contextCalls.strokeRect.push({ x, y, w, h, strokeStyle: ctx.strokeStyle });
     }),
     drawImage: vi.fn(() => {
       contextCalls.drawImage.push(true);
@@ -116,6 +135,9 @@ function createMockCanvas() {
     }),
     moveTo: vi.fn(),
     lineTo: vi.fn(),
+    arc: vi.fn(() => {
+      contextCalls.arc++;
+    }),
     stroke: vi.fn(() => {
       contextCalls.stroke++;
     })
@@ -576,5 +598,262 @@ describe('MiniRenderer Pipeline & Zero-GC Specification Suite', () => {
       expect(mock.contextCalls.restore).toBe(restoresBefore);
     });
   });
+
+  describe('8. M3 领地国界半透明光晕与边界高光线渲染断言 (WP-3.5)', () => {
+    it('依据 world.territoryFaction 瓦片权属绘制半透明阵营色与国界高光描边', () => {
+      mockWorld.territoryFaction = new Uint8Array(TOTAL_TILES);
+      // 阵营 1 (ORC) 占据瓦片 (0, 0)，阵营 2 (ELF) 占据瓦片 (1, 0)
+      mockWorld.territoryFaction[0] = 1;
+      mockWorld.territoryFaction[1] = 2;
+
+      renderer.showNutrients = false;
+      renderer.showTerritories = true;
+      renderer.render(mockWorld, ecs);
+
+      // (0, 0) 填充 24x24 领地色
+      const fillTile0 = mock.contextCalls.fillRect.find(c => c.x === 0 && c.y === 0 && c.w === 24 && c.h === 24);
+      // (1, 0) 对应 x=24, y=0 填充 24x24 领地色
+      const fillTile1 = mock.contextCalls.fillRect.find(c => c.x === 24 && c.y === 0 && c.w === 24 && c.h === 24);
+
+      expect(fillTile0).toBeDefined();
+      expect(fillTile1).toBeDefined();
+
+      // 瓦片 0 的右边界与瓦片 1 不同，应生成 2px 描边 (x = 24 - 2 = 22, y = 0, w = 2, h = 24)
+      const borderRight = mock.contextCalls.fillRect.find(c => c.x === 22 && c.y === 0 && c.w === 2 && c.h === 24);
+      expect(borderRight).toBeDefined();
+    });
+
+    it('中立瓦片 (territoryFaction=0) 绝不绘制领地底色', () => {
+      mockWorld.territoryFaction = new Uint8Array(TOTAL_TILES);
+      mockWorld.territoryFaction.fill(0);
+
+      renderer.showNutrients = false;
+      renderer.showTerritories = true;
+      mock.contextCalls.fillRect = [];
+
+      renderer.render(mockWorld, ecs);
+
+      // 仅包含底图全屏填充，无阵营领地半透明色块
+      const territoryFills = mock.contextCalls.fillRect.filter(c => c.w === 24 && c.h === 24 && FACTION_TERRITORY_COLORS.includes(c.fillStyle) && c.fillStyle !== 'rgba(0, 0, 0, 0)');
+      expect(territoryFills.length).toBe(0);
+    });
+
+    it('通过 showTerritories 开关可禁用国界渲染', () => {
+      mockWorld.territoryFaction = new Uint8Array(TOTAL_TILES);
+      mockWorld.territoryFaction[0] = 1;
+
+      renderer.showTerritories = false;
+      renderer.showNutrients = false;
+      mock.contextCalls.fillRect = [];
+
+      renderer.render(mockWorld, ecs);
+
+      const territoryFills = mock.contextCalls.fillRect.filter(c => c.w === 24 && c.h === 24 && FACTION_TERRITORY_COLORS.includes(c.fillStyle) && c.fillStyle !== 'rgba(0, 0, 0, 0)');
+      expect(territoryFills.length).toBe(0);
+    });
+  });
+
+  describe('9. M3 战线大军团反向 BFS 向量流场可视化断言 (WP-3.5)', () => {
+    it('开启 showFlowField 时，正确绘制向量线段与集结目标点靶心', () => {
+      const mockFlowField = {
+        width: GRID_WIDTH,
+        height: GRID_HEIGHT,
+        targetTileX: 10,
+        targetTileY: 8,
+        vectorFieldX: new Float32Array(TOTAL_TILES),
+        vectorFieldY: new Float32Array(TOTAL_TILES)
+      };
+
+      // 在瓦片 (2, 2) 注入向右导向向量
+      const idx = 2 * GRID_WIDTH + 2;
+      mockFlowField.vectorFieldX[idx] = 1.0;
+      mockFlowField.vectorFieldY[idx] = 0.0;
+
+      renderer.showFlowField = true;
+      renderer.render(mockWorld, ecs, null, null, null, null, null, mockFlowField);
+
+      // 验证目标靶心描边 (10 * 24 + 1.5 = 241.5, 8 * 24 + 1.5 = 193.5, 21x21)
+      const targetStroke = mock.contextCalls.strokeRect.find(c => c.x === 241.5 && c.y === 193.5 && c.w === 21 && c.h === 21);
+      expect(targetStroke).toBeDefined();
+
+      // 验证目标中心 4x4 像素点 (240 + 10 = 250, 192 + 10 = 202)
+      const targetCenter = mock.contextCalls.fillRect.find(c => c.x === 250 && c.y === 202 && c.w === 4 && c.h === 4);
+      expect(targetCenter).toBeDefined();
+
+      // 验证调用了 stroke 绘制流场小线段
+      expect(mock.contextCalls.stroke).toBeGreaterThan(0);
+    });
+  });
+
+  describe('10. M3 士气微表情、破釜沉舟死战光环与图腾金身冲击波断言 (WP-3.5)', () => {
+    it('动摇 (WAVERING) 状态在实体头上绘制浅蓝微汗水滴', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 100.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 100.0;
+
+      const mockMoraleSys = {
+        getMoraleState: vi.fn(() => MoraleState.WAVERING)
+      };
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs, null, null, null, null, null, null, mockMoraleSys);
+
+      // rx = 97, ry = 97. 微汗水滴: (rx + 5, ry - 3, 1, 2) = (102, 94, 1, 2)
+      const sweat = mock.contextCalls.fillRect.find(c => c.x === 102 && c.y === 94 && c.w === 1 && c.h === 2);
+      expect(sweat).toBeDefined();
+    });
+
+    it('溃逃 (DISORGANIZED / IS_PANICKED) 状态在实体两侧绘制慌张急汗双水滴', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 150.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 150.0;
+      ecs.statusFlags[eid] = IS_ALIVE | IS_PANICKED;
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs);
+
+      // rx = 147, ry = 147. 左汗滴: (145, 144, 1, 2), 右汗滴: (153, 144, 1, 2)
+      const leftSweat = mock.contextCalls.fillRect.find(c => c.x === 145 && c.y === 144 && c.w === 1 && c.h === 2);
+      const rightSweat = mock.contextCalls.fillRect.find(c => c.x === 153 && c.y === 144 && c.w === 1 && c.h === 2);
+      expect(leftSweat).toBeDefined();
+      expect(rightSweat).toBeDefined();
+    });
+
+    it('破釜沉舟 (IS_LAST_STAND) 状态在周身绘制暗红死战气焰', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 200.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 200.0;
+      ecs.statusFlags[eid] = IS_ALIVE | IS_LAST_STAND;
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs);
+
+      // rx = 197, ry = 197. 气焰左翼 (195, 198, 1, 4), 右翼 (204, 198, 1, 4)
+      const leftFlames = mock.contextCalls.fillRect.find(c => c.x === 195 && c.y === 198 && c.w === 1 && c.h === 4);
+      const rightFlames = mock.contextCalls.fillRect.find(c => c.x === 204 && c.y === 198 && c.w === 1 && c.h === 4);
+      expect(leftFlames).toBeDefined();
+      expect(rightFlames).toBeDefined();
+    });
+
+    it('金身圣盾 (IS_SACRED_BODY) 状态绘制金色发光圣盾框', () => {
+      const eid = ecs.allocateEntity();
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_X] = 250.0;
+      ecs.transforms[eid * TRANSFORM_STRIDE + TF_OFFSET_Y] = 250.0;
+      ecs.statusFlags[eid] = IS_ALIVE | IS_SACRED_BODY;
+
+      renderer.showNutrients = false;
+      renderer.render(mockWorld, ecs);
+
+      // rx = 247, ry = 247. 圣盾框 (244.5, 244.5, 11, 11)
+      const shieldBox = mock.contextCalls.strokeRect.find(c => c.x === 244.5 && c.y === 244.5 && c.w === 11 && c.h === 11);
+      expect(shieldBox).toBeDefined();
+    });
+
+    it('调用 addShockwave 触发金色环形冲击波扩散动画', () => {
+      renderer.addShockwave(300.0, 300.0, 144.0, 200.0);
+      expect(renderer.shockwaveActive[0]).toBe(1);
+      expect(renderer.shockwaveX[0]).toBe(300.0);
+      expect(renderer.shockwaveY[0]).toBe(300.0);
+
+      renderer.render(mockWorld, ecs);
+
+      // 验证冲击波触发了 arc 与 stroke
+      expect(mock.contextCalls.arc).toBeGreaterThan(0);
+      expect(mock.contextCalls.stroke).toBeGreaterThan(0);
+    });
+  });
+
+  describe('11. M3 全真全要素接入与连续 100 帧 0 次 save/restore 守门断言 (LL-003, LL-006 & DoD)', () => {
+    it('向后兼容安全判空 Fallback 保护链：即使传入全新 M3 构件或全为 null 也永不抛异常 (LL-006)', () => {
+      expect(() => {
+        renderer.render(mockWorld, ecs, null, null, null, null, null, null, null, null);
+      }).not.toThrow();
+    });
+
+    it('在 M1 + M2 + M3 全真全要素全负载下连续执行 100 帧渲染循环，绝对 0 次 save/restore 且零 GC 逃逸', async () => {
+      const { TileGrid } = await import('../../src/world/TileGrid.js');
+      const { FarmlandSystem } = await import('../../src/ecosystem/FarmlandSystem.js');
+      const { NutrientField } = await import('../../src/ecosystem/NutrientField.js');
+      const { SocialCasteSystem } = await import('../../src/profession/SocialCasteSystem.js');
+      const { MendelianGeneticsSystem } = await import('../../src/mutation/MendelianGeneticsSystem.js');
+      const { RaceSkillSystem } = await import('../../src/race/RaceSkillSystem.js');
+      const { VectorFlowFieldSystem } = await import('../../src/pathfinding/VectorFlowFieldSystem.js');
+      const { MoraleSystem } = await import('../../src/warfare/MoraleSystem.js');
+      const { TotemDefenseSystem } = await import('../../src/warfare/TotemDefenseSystem.js');
+
+      const fullTileGrid = new TileGrid();
+      // 填充 16 阵营领地
+      for (let i = 0; i < TOTAL_TILES; i++) {
+        fullTileGrid.setTerritory(i, (i % 16) + 1);
+      }
+
+      const fullNutrientField = new NutrientField(fullTileGrid);
+      const fullFarmlands = new FarmlandSystem();
+      const casteSys = new SocialCasteSystem(ecs);
+      const geneticsSys = new MendelianGeneticsSystem(ecs);
+      const skillSys = new RaceSkillSystem(ecs);
+      const flowFieldSys = new VectorFlowFieldSystem(fullTileGrid);
+      flowFieldSys.generateField(100, 100);
+
+      const totemSys = new TotemDefenseSystem(ecs);
+      const moraleSys = new MoraleSystem(ecs, null, totemSys);
+
+      // 分配 100 个具备 M1+M2+M3 全部复合状态的测试实体
+      for (let i = 0; i < 100; i++) {
+        const id = ecs.allocateEntity();
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_X] = 50 + (i % 20) * 30;
+        ecs.transforms[id * TRANSFORM_STRIDE + TF_OFFSET_Y] = 50 + ((i / 20) | 0) * 40;
+        ecs.identities[id * IDENTITY_STRIDE + ID_OFFSET_FACTION] = (i % 16) + 1;
+        ecs.statusFlags[id] = IS_ALIVE |
+          (i % 10 === 0 ? IS_LEADER : 0) |
+          (i % 4 === 0 ? IS_CASTING : 0) |
+          (i % 5 === 0 ? IS_LAST_STAND : 0) |
+          (i % 6 === 0 ? IS_PANICKED : 0) |
+          (i % 7 === 0 ? IS_SACRED_BODY : 0);
+
+        casteSys.castes[id * CASTE_STRIDE + CASTE_OFFSET_TYPE] = i % 4;
+        geneticsSys.genetics[id * GENETICS_STRIDE + GEN_OFFSET_PHENOTYPE] = (1 << (i % 9));
+      }
+
+      // 添加初始冲击波
+      renderer.addShockwave(500, 400);
+
+      // 开启所有图层与流场调试开关
+      renderer.showTerritories = true;
+      renderer.showFlowField = true;
+      renderer.showMorale = true;
+      renderer.showTotemShield = true;
+      renderer.showNutrients = true;
+      renderer.showFarmlands = true;
+      renderer.showCastes = true;
+      renderer.showMutations = true;
+      renderer.showSkills = true;
+
+      const savesBefore = mock.contextCalls.save;
+      const restoresBefore = mock.contextCalls.restore;
+
+      for (let f = 0; f < 100; f++) {
+        renderer.render(
+          fullTileGrid,
+          ecs,
+          fullFarmlands,
+          fullNutrientField,
+          casteSys,
+          geneticsSys,
+          skillSys,
+          flowFieldSys,
+          moraleSys,
+          totemSys
+        );
+      }
+
+      // 核心守门铁律验证: 0 save, 0 restore, 0 逃逸
+      expect(mock.contextCalls.save).toBe(savesBefore);
+      expect(mock.contextCalls.restore).toBe(restoresBefore);
+      expect(mock.ctx.save).not.toHaveBeenCalled();
+      expect(mock.ctx.restore).not.toHaveBeenCalled();
+    });
+  });
 });
+
 

@@ -489,6 +489,112 @@
       min-height: 90px;
     }
 
+    /* M3 战争与政治看板样式 */
+    .faction-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .faction-row {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .faction-row.at-war {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .faction-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.74rem;
+    }
+
+    .faction-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+    }
+
+    .faction-color-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+    }
+
+    .war-status-tag {
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .tag-peace {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .tag-friction {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .tag-skirmish {
+      background: rgba(249, 115, 22, 0.15);
+      color: #f97316;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .tag-war {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      animation: pulse-war 1.5s infinite;
+    }
+
+    @keyframes pulse-war {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.5); }
+      50% { border-color: rgba(239, 68, 68, 1.0); }
+    }
+
+    .tension-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+
+    .tension-bar {
+      flex: 1;
+      height: 5px;
+      background: #0f172a;
+      border-radius: 2px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    .tension-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #f59e0b, #ef4444);
+      transition: width 0.2s ease;
+    }
+
     @media (max-width: 1400px) {
       main {
         flex-direction: column;
@@ -507,7 +613,7 @@
   <header>
     <div class="brand-group">
       <div class="game-title">《神之蛐蛐缸：万族争霸》</div>
-      <div class="badge-milestone">Milestone 2 领域全真视窗</div>
+      <div class="badge-milestone">Milestone 3 宏观战争与政治领域全真视窗</div>
     </div>
 
     <!-- 遥测快报 -->
@@ -548,6 +654,18 @@
 
       <!-- 视窗底快捷图层切换 -->
       <div class="viewport-toolbar">
+        <div class="toggle-chip active" id="toggleTerritories">
+          <span>🏰 领地国界光晕</span>
+        </div>
+        <div class="toggle-chip" id="toggleFlowField">
+          <span>🌊 战线向量流场 [F]</span>
+        </div>
+        <div class="toggle-chip active" id="toggleMorale">
+          <span>😤 士气微表情/死战</span>
+        </div>
+        <div class="toggle-chip active" id="toggleTotemShield">
+          <span>🛡️ 图腾金身圣盾</span>
+        </div>
         <div class="toggle-chip active" id="toggleNutrients">
           <span>🌿 地脉养分扩散场</span>
         </div>
@@ -577,6 +695,25 @@
 
     <!-- 侧边遥测与交互调试面板 -->
     <div class="sidebar">
+      
+      <!-- 0. 【M3 核心】十六政权地缘与政治张力看板 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🏰 十六政权地缘格局与战争看门狗</span>
+          <span id="activeFactionsBadge" style="color: #38bdf8;">12 活跃政权</span>
+        </div>
+        <!-- 战争冲突动态横幅 -->
+        <div id="warStalemateBanner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; font-size: 0.72rem; color: #fca5a5;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
+            <span id="warAlertText">⚔️ 战争进行中</span>
+            <span id="warWatchdogTimer" style="font-family: monospace; color: #ffd700;">看门狗: 300.0s</span>
+          </div>
+        </div>
+        <!-- 阵营列表 -->
+        <div class="faction-list" id="factionList">
+          <!-- 动态渲染各政权领地面积、张力进度条与外交状态 -->
+        </div>
+      </div>
       
       <!-- 1. 生态小人生理状态监控 -->
       <div class="card">
@@ -667,6 +804,33 @@
         </div>
       </div>
 
+      <!-- 3.5 【M3 核心】地缘政治与战争专属实验箱 -->
+      <div class="card">
+        <div class="card-title">
+          <span>⚔️ M3 地缘政治与战争专属实验箱</span>
+        </div>
+        <div class="action-btn-group">
+          <button class="btn btn-amber" id="btnBorderFriction">
+            ⚔️ 一键边境偷粮摩擦 (+10)
+          </button>
+          <button class="btn btn-danger" id="btnSchism">
+            💥 一键引爆图腾大裂变 (Voronoi)
+          </button>
+          <button class="btn btn-purple" id="btnDynastySuccession">
+            👑 一键世袭驾崩大转盘 (五大继承)
+          </button>
+          <button class="btn btn-special" id="btnTotemAegis">
+            🛡️ 一键图腾 25% 圣盾波 (震退敌军)
+          </button>
+          <button class="btn btn-danger" id="btnTriggerWar">
+            🚩 阵营决裂宣战 (启动看门狗)
+          </button>
+          <button class="btn" id="btnToggleFlow">
+            🌊 切换大军团流场可视化 [F]
+          </button>
+        </div>
+      </div>
+
       <!-- 4. M2 端到端交互操作箱 -->
       <div class="card">
         <div class="card-title">
@@ -738,7 +902,7 @@
   <!-- 引入原生 ESM 主调度脚本 -->
   <script type="module">
     // ==========================================
-    // 原生导入 M1/M2 真实构件与基础设施 (LL-003 严防两张皮)
+    // 原生导入 M1/M2/M3 真实构件与基础设施 (LL-003 严防两张皮)
     // ==========================================
     import {
       MiniRenderer,
@@ -754,7 +918,16 @@
       COLOR_CASTE_CIVILIAN,
       COLOR_CASTE_ARTISAN,
       COLOR_CASTE_SOLDIER,
-      COLOR_CASTE_LEADER
+      COLOR_CASTE_LEADER,
+      FACTION_TERRITORY_COLORS,
+      FACTION_BORDER_COLORS,
+      COLOR_FLOW_VECTOR,
+      COLOR_FLOW_TARGET,
+      COLOR_MORALE_SWEAT,
+      COLOR_MORALE_PANIC,
+      COLOR_LAST_STAND_AURA,
+      COLOR_TOTEM_SHIELD,
+      COLOR_TOTEM_SHOCKWAVE
     } from './src/rendering/MiniRenderer.js';
 
     import { TileGrid } from './src/world/TileGrid.js';
@@ -803,6 +976,10 @@
       IS_DISARMED,
       IS_SKILL_ACTIVE,
       IS_IMMOBILIZED,
+      IS_LAST_STAND,
+      IS_PANICKED,
+      IS_SACRED_BODY,
+      IS_STATIC_ANCHOR,
       hasStatus,
       setStatus,
       clearStatus
@@ -870,8 +1047,75 @@
       EntityPhysicalAggregator
     } from './src/systems/EntityPhysicalAggregator.js';
 
+    // M3 宏观战争、大军团寻路与政治演化真实领域系统构件 (LL-003)
+    import {
+      BorderFrictionSystem,
+      FrictionStage,
+      FRICTION_STOLEN_FOOD,
+      FRICTION_BRAWL_INJURY,
+      FRICTION_VIP_KILLED
+    } from './src/warfare/BorderFrictionSystem.js';
+
+    import {
+      TotemDefenseSystem,
+      TOTEM_AEGIS_DURATION,
+      TOTEM_AEGIS_HP_THRESHOLD
+    } from './src/warfare/TotemDefenseSystem.js';
+
+    import {
+      MoraleSystem,
+      MoraleState
+    } from './src/warfare/MoraleSystem.js';
+
+    import {
+      DamageCalculator
+    } from './src/warfare/DamageCalculator.js';
+
+    import {
+      WarWatchdogSystem,
+      WAR_MAX_DURATION,
+      WAR_STALEMATE_TIMEOUT
+    } from './src/warfare/WarWatchdogSystem.js';
+
+    import {
+      VectorFlowFieldSystem
+    } from './src/pathfinding/VectorFlowFieldSystem.js';
+
+    import {
+      ClanCensusSystem
+    } from './src/politics/ClanCensusSystem.js';
+
+    import {
+      SchismSystem
+    } from './src/politics/SchismSystem.js';
+
+    import {
+      DynastySuccessionSystem,
+      SuccessionRouletteType
+    } from './src/politics/DynastySuccessionSystem.js';
+
+    import {
+      RebelWrathSystem
+    } from './src/politics/RebelWrathSystem.js';
+
+    import {
+      PostWarTreatySystem
+    } from './src/politics/PostWarTreatySystem.js';
+
+    import {
+      MAX_FACTIONS,
+      FACTION_STRIDE,
+      FAC_OFFSET_TOTEM_ID,
+      FAC_OFFSET_CIVIC_ID,
+      FAC_OFFSET_TENSION,
+      FAC_OFFSET_POP_COUNT,
+      FAC_OFFSET_FLAGS,
+      FactionFlags,
+      InitialFactions
+    } from './src/data/FactionData.js';
+
     // ==========================================
-    // 实例化核心系统 (真实 M1/M2 架构)
+    // 实例化核心系统 (真实 M1/M2/M3 架构)
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const renderer = new MiniRenderer(canvas);
@@ -901,6 +1145,19 @@
     const casteSys = new SocialCasteSystem(ecs, eventBus);
     const geneticsSys = new MendelianGeneticsSystem(ecs, eventBus, prng);
     const raceSkillSys = new RaceSkillSystem(ecs, eventBus, { tileGrid, nutrientField });
+
+    // 7. M3 宏观战争、地缘政治与反向流场系统原生实例化 (LL-003)
+    const factionBuffer = new Int32Array(MAX_FACTIONS * FACTION_STRIDE);
+    const totemDefenseSys = new TotemDefenseSystem(ecs, eventBus);
+    const moraleSys = new MoraleSystem(ecs, eventBus, totemDefenseSys);
+    const borderFrictionSys = new BorderFrictionSystem(eventBus);
+    const warWatchdogSys = new WarWatchdogSystem(ecs, eventBus, borderFrictionSys, moraleSys);
+    const flowFieldSys = new VectorFlowFieldSystem(tileGrid);
+    const rebelWrathSys = new RebelWrathSystem(ecs, eventBus);
+    const schismSys = new SchismSystem(ecs, tileGrid, factionBuffer, eventBus, null, rebelWrathSys);
+    const clanCensusSys = new ClanCensusSystem(ecs, factionBuffer, eventBus, schismSys);
+    const dynastySys = new DynastySuccessionSystem(ecs, factionBuffer, eventBus, prng, geneticsSys.genetics);
+    const postWarSys = new PostWarTreatySystem(ecs, tileGrid, factionBuffer, eventBus);
 
     // 运行状态与时间倍速
     let timeScale = 1;
@@ -964,39 +1221,84 @@
     });
 
     // 订阅 M1 领域事件
-    eventBus.subscribe(DomainEvents.EVT_DEATH_STARVATION, (evt) => {
-      addLog(`💀 [饥饿衰竭] 实体 #${evt.srcId} 饥荒耗竭，骨肥归流地脉！`, 'danger');
+    eventBus.subscribe(DomainEvents.EVT_DEATH_STARVATION, (type, srcId) => {
+      addLog(`💀 [饥饿衰竭] 实体 #${srcId} 饥荒耗竭，骨肥归流地脉！`, 'danger');
     });
 
-    eventBus.subscribe(DomainEvents.EVT_BRAWL_RATION, (evt) => {
-      addLog(`⚔️ [口粮互殴] 掠夺实体 #${evt.srcId} 抢夺同伴口粮饱腹！`, 'warn');
-      if (evt.targetId > 0 && ecs.isAlive(evt.targetId)) {
-        casteSys.recordCombat(evt.targetId, 15.0, false);
+    eventBus.subscribe(DomainEvents.EVT_BRAWL_RATION, (type, srcId, dstId) => {
+      addLog(`⚔️ [口粮互殴] 掠夺实体 #${srcId} 抢夺同伴口粮饱腹！`, 'warn');
+      if (dstId > 0 && ecs.isAlive(dstId)) {
+        casteSys.recordCombat(dstId, 15.0, false);
       }
     });
 
     // 订阅 M2 阶级晋升与新王即位事件
-    eventBus.subscribe(DomainEvents.EVT_CASTE_PROMOTED, (evt) => {
+    eventBus.subscribe(DomainEvents.EVT_CASTE_PROMOTED, (type, srcId, dstId, p1, p2) => {
       const casteNames = ['平民', '工匠', '士兵', '领袖'];
-      const cName = casteNames[evt.param2] || '未知';
-      addLog(`🎖️ [社会阶级跃迁] 实体 #${evt.srcId} 晋升为【${cName}】！`, 'green');
+      const cName = casteNames[p2] || '未知';
+      addLog(`🎖️ [社会阶级跃迁] 实体 #${srcId} 晋升为【${cName}】！`, 'green');
     });
 
-    eventBus.subscribe(DomainEvents.EVT_HEIR_CROWNED, (evt) => {
-      addLog(`👑 [王朝加冕] 阵营 #${evt.param1} 新王加冕！新领袖为实体 #${evt.srcId}！`, 'green');
+    eventBus.subscribe(DomainEvents.EVT_HEIR_CROWNED, (type, srcId, dstId, p1) => {
+      addLog(`👑 [王朝加冕] 阵营 #${p1} 新王加冕！新领袖为实体 #${srcId}！`, 'green');
     });
 
     // 订阅 M2 技能触发与缴械事件
-    eventBus.subscribe(DomainEvents.EVT_RACE_SKILL_TRIGGERED, (evt) => {
-      addLog(`⚡ [特技激活] 实体 #${evt.srcId} 激发特技 (ID: ${evt.param1})！`, 'purple');
+    eventBus.subscribe(DomainEvents.EVT_RACE_SKILL_TRIGGERED, (type, srcId, dstId, p1) => {
+      addLog(`⚡ [特技激活] 实体 #${srcId} 激发特技 (ID: ${p1})！`, 'purple');
     });
 
-    eventBus.subscribe(DomainEvents.EVT_WEAPON_DISARMED, (evt) => {
-      addLog(`🗡️ [兵刃打落] 实体 #${evt.srcId} 兵器被打落，进入 6s 缴械状态！`, 'warn');
+    eventBus.subscribe(DomainEvents.EVT_WEAPON_DISARMED, (type, srcId) => {
+      addLog(`🗡️ [兵刃打落] 实体 #${srcId} 兵器被打落，进入 6s 缴械状态！`, 'warn');
     });
 
-    eventBus.subscribe(DomainEvents.EVT_ACTION_MUTEX_BLOCKED, (evt) => {
-      addLog(`🛑 [通道仲裁阻断] 实体 #${evt.srcId} 动作轨道冲突被阻断打断！`, 'info');
+    eventBus.subscribe(DomainEvents.EVT_ACTION_MUTEX_BLOCKED, (type, srcId) => {
+      addLog(`🛑 [通道仲裁阻断] 实体 #${srcId} 动作轨道冲突被阻断打断！`, 'info');
+    });
+
+    // ==========================================
+    // 订阅 M3 宏观战争、地缘与政治事件 (LL-003)
+    // ==========================================
+    eventBus.subscribe(DomainEvents.EVT_TOTEM_AEGIS_TRIGGERED, (evt, facId, totemId) => {
+      if (totemId > 0 && ecs.isAlive(totemId)) {
+        const tx = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X];
+        const ty = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_Y];
+        renderer.addShockwave(tx, ty, 144.0, 220.0);
+      }
+      const facConf = InitialFactions[facId - 1];
+      const facName = facConf ? facConf.name : `阵营 #${facId}`;
+      addLog(`🛡️ 【${facName}】图腾生命跌破 25%，触发圣火涅槃冲击波！震退敌军并开启 12s 金身圣盾！`, 'green');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_WAR_DECLARED, (evt, srcFac, dstFac) => {
+      const srcConf = InitialFactions[srcFac - 1];
+      const dstConf = InitialFactions[dstFac - 1];
+      const srcName = srcConf ? srcConf.name : `阵营 #${srcFac}`;
+      const dstName = dstConf ? dstConf.name : `阵营 #${dstFac}`;
+      addLog(`⚔️ 战争爆发！【${srcName}】与【${dstName}】爆发全面战争！300s 战争看门狗已启动！`, 'danger');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_PAX_DIVINA_FORCED, (evt, srcFac, dstFac) => {
+      const srcConf = InitialFactions[srcFac - 1];
+      const dstConf = InitialFactions[dstFac - 1];
+      const srcName = srcConf ? srcConf.name : `阵营 #${srcFac}`;
+      const dstName = dstConf ? dstConf.name : `阵营 #${dstFac}`;
+      addLog(`🕊️ 神圣休战！【${srcName}】与【${dstName}】交火达 300s，看门狗强制休战并退回离心边界！`, 'purple');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_LAST_STAND_ACTIVATED, (evt, facId, eid) => {
+      addLog(`🔥 【阵营 #${facId}】退守母国图腾 5 格内，破釜沉舟死战光环唤醒！士气锁死 1 点！`, 'amber');
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_SCHISM_TRIGGERED, (evt, motherFac, rebelFac) => {
+      addLog(`💥 领地大分裂！母国 #${motherFac} 政治张力爆表，裂变生成新叛乱军政权 #${rebelFac}！`, 'danger');
+      renderer.invalidateTerrain();
+    });
+
+    eventBus.subscribe(DomainEvents.EVT_SUCCESSION_ROULETTE, (evt, facId, rType, newLeaderId) => {
+      const rNames = ['正常顺位', '离奇横死', '幼主摄政', '兄弟掷骰', '私生子夺嫡'];
+      const rName = rNames[rType] || '大转盘继承';
+      addLog(`👑 【阵营 #${facId}】驾崩大转盘结算：【${rName}】，新主 #${newLeaderId} 继承加冕原子锁 3.0s！`, 'purple');
     });
 
     // ==========================================
@@ -1092,11 +1394,12 @@
       raceSkillSys.setEntityRace(eid, race.id);
       casteSys.setEntityRace(eid, race.id);
 
-      // 7. M2: 阶级系统初始化 (若为领袖则设为 LEADER，否则为 CIVILIAN)
+      // 7. M2/M3: 阶级系统与世袭王位绑定
       const initialCaste = isLeader ? CasteType.LEADER : CasteType.CIVILIAN;
       initSocialCaste(casteSys.castes, eid, initialCaste);
       if (isLeader) {
         casteSys.registerLeader(eid, factionId);
+        dynastySys.setLeader(factionId, eid);
       }
 
       // 8. M2: 遗传基因初始化 (始祖带部分突变器官，严格受 TabooFilter 禁忌拦截)
@@ -1159,6 +1462,72 @@
     }
 
     // ==========================================
+    // M3 初始化 12 大文明阵营的中心图腾与地缘领地
+    // ==========================================
+    function initFactionsAndTerritories() {
+      const cols = 4;
+      const rows = 3;
+      const cellW = (GRID_WIDTH / cols) | 0; // 14
+      const cellH = (GRID_HEIGHT / rows) | 0; // 12
+
+      for (let f = 1; f <= 12; f++) {
+        const idx = f - 1;
+        const col = idx % cols;
+        const row = (idx / cols) | 0;
+
+        const centerX = col * cellW + ((cellW * 0.5) | 0);
+        const centerY = row * cellH + ((cellH * 0.5) | 0);
+        const worldX = centerX * TILE_SIZE + 12;
+        const worldY = centerY * TILE_SIZE + 12;
+
+        // 生成不可摧毁的静态图腾实体
+        const totemId = ecs.allocateEntity();
+        ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X] = worldX;
+        ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_Y] = worldY;
+        ecs.identities[totemId * IDENTITY_STRIDE + ID_OFFSET_FACTION] = f;
+        ecs.health[totemId * HEALTH_STRIDE + HP_OFFSET_CURRENT] = 600.0;
+        ecs.health[totemId * HEALTH_STRIDE + HP_OFFSET_MAX] = 600.0;
+        ecs.statusFlags[totemId] = IS_ALIVE | IS_STATIC_ANCHOR;
+
+        // 注册到图腾防御机制与战争看门狗
+        totemDefenseSys.registerTotem(f, totemId);
+        warWatchdogSys.registerTotem(f, totemId);
+
+        // 写入政权运行时缓冲区
+        const facOffset = (f - 1) * FACTION_STRIDE;
+        factionBuffer[facOffset + FAC_OFFSET_TOTEM_ID] = totemId;
+        factionBuffer[facOffset + FAC_OFFSET_FLAGS] = FactionFlags.ACTIVE;
+        factionBuffer[facOffset + FAC_OFFSET_TENSION] = 10 + prng.nextInt(0, 10);
+
+        // 为该阵营划定以图腾为中心的地缘领地 (半径 4 瓦片圆形)
+        const rad = 4;
+        for (let dy = -rad; dy <= rad; dy++) {
+          const ty = centerY + dy;
+          if (ty < 0 || ty >= GRID_HEIGHT) continue;
+          for (let dx = -rad; dx <= rad; dx++) {
+            const tx = centerX + dx;
+            if (tx < 0 || tx >= GRID_WIDTH) continue;
+            if (dx * dx + dy * dy <= rad * rad) {
+              tileGrid.setTerritoryByCoord(tx, ty, f);
+            }
+          }
+        }
+      }
+
+      // 默认反向 BFS 寻路向量流场以阵营 2 (森灵) 图腾为集结靶心
+      const t2Id = totemDefenseSys.totemEntityIds[2];
+      if (t2Id > 0) {
+        flowFieldSys.generateField(
+          ecs.transforms[t2Id * TRANSFORM_STRIDE + TF_OFFSET_X],
+          ecs.transforms[t2Id * TRANSFORM_STRIDE + TF_OFFSET_Y]
+        );
+      }
+    }
+
+    // 零 GC 复用流场采样对象
+    const _flowSample = { x: 0, y: 0, distance: 0, tileX: 0, tileY: 0 };
+
+    // ==========================================
     // 真实系统驱动单步更新 (Update Tick)
     // ==========================================
     function updateSimulation(dt) {
@@ -1171,7 +1540,7 @@
       // 2. 真实 2x2 农田四阶演替迭代
       farmlandSys.update(dt, nutrientField);
 
-      // 3. 实体平滑漫游与地形碰撞阻尼
+      // 3. 实体平滑漫游、远征疲劳阻尼与流场微观牵引
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
       const flags = ecs.statusFlags;
@@ -1181,6 +1550,14 @@
       for (let i = 0; i < activeCount; i++) {
         const eid = dense[i];
         if ((flags[eid] & IS_ALIVE) === 0) continue;
+
+        // 图腾静态锚点绝对锁死
+        if (hasStatus(flags, eid, IS_STATIC_ANCHOR)) {
+          const phyOff = eid * PHYSICS_STRIDE;
+          phy[phyOff + PHY_OFFSET_VX] = 0.0;
+          phy[phyOff + PHY_OFFSET_VY] = 0.0;
+          continue;
+        }
 
         const phyOff = eid * PHYSICS_STRIDE;
         const tfOff = eid * TRANSFORM_STRIDE;
@@ -1207,7 +1584,16 @@
           phy[phyOff + PHY_OFFSET_VY] *= 0.96;
         }
 
-        // 随机巡航漫游
+        // 大军团反向 BFS 向量流场微观引导
+        if (flowFieldSys.targetTileX >= 0) {
+          flowFieldSys.sampleField(curX, curY, _flowSample);
+          if (_flowSample.distance !== 65535 && (_flowSample.x !== 0 || _flowSample.y !== 0)) {
+            phy[phyOff + PHY_OFFSET_VX] += _flowSample.x * 12.0 * dt;
+            phy[phyOff + PHY_OFFSET_VY] += _flowSample.y * 12.0 * dt;
+          }
+        }
+
+        // 随机漫游巡航
         if (prng.nextFloat(0, 1) < 0.025) {
           const angle = prng.nextFloat(0, Math.PI * 2);
           const speed = 25.0 + prng.nextFloat(0, 20.0);
@@ -1234,7 +1620,34 @@
       // 9. M2 实体物理属性动态聚合管线推进 (质量、护甲、移速即时同步)
       EntityPhysicalAggregator.aggregateAll(ecs, geneticsSys.genetics);
 
-      // 10. 领域事件总线 Flush 分发
+      // 10. M3 边境摩擦系统推进
+      borderFrictionSys.update(dt);
+
+      // 11. M3 部族微观普查与政治张力推进 (60-Tick 周期普查)
+      clanCensusSys.update(dt);
+
+      // 12. M3 政治大分裂系统推进
+      schismSys.update(dt);
+
+      // 13. M3 王朝世袭与继承推进
+      dynastySys.update(dt);
+
+      // 14. M3 叛乱军自由之怒时钟推进
+      rebelWrathSys.update(dt);
+
+      // 15. M3 四级士气动态状态机推进
+      moraleSys.update(dt);
+
+      // 16. M3 图腾防卫机制推进 (圣盾与生命监测)
+      totemDefenseSys.update(dt);
+
+      // 17. M3 战争超时双门限防伪看门狗推进 (TC-EDGE-04)
+      warWatchdogSys.update(dt);
+
+      // 18. M3 战后条约与荒原释放推进
+      postWarSys.update(dt);
+
+      // 19. 领域事件总线 Flush 分发
       eventBus.flush();
     }
 
@@ -1352,6 +1765,96 @@
         }
       });
 
+      // 更新十六政权地缘格局与战争看门狗看板
+      let activeFactionCount = 0;
+      let factionListHtml = '';
+      let activeWarFound = null;
+
+      const territoryCounts = new Uint16Array(MAX_FACTIONS + 1);
+      const tFac = tileGrid.territoryFaction;
+      for (let i = 0; i < TOTAL_TILES; i++) {
+        const f = tFac[i];
+        if (f > 0 && f <= MAX_FACTIONS) {
+          territoryCounts[f]++;
+        }
+      }
+
+      for (let f = 1; f <= MAX_FACTIONS; f++) {
+        const baseOff = (f - 1) * FACTION_STRIDE;
+        const flags = factionBuffer[baseOff + FAC_OFFSET_FLAGS];
+        const isActive = (flags & FactionFlags.ACTIVE) !== 0 && (flags & FactionFlags.DESTROYED) === 0;
+        if (!isActive && f > 12) continue;
+
+        activeFactionCount++;
+        const terrCount = territoryCounts[f];
+        const tension = clanCensusSys.getTension(f);
+        const borderCol = FACTION_BORDER_COLORS[f] || '#ffffff';
+        const rConf = InitialFactions[f - 1] || { name: `叛乱政权 #${f}`, color: borderCol };
+
+        let isWar = false;
+        let warEnemy = 0;
+        for (let other = 1; other <= MAX_FACTIONS; other++) {
+          if (other === f) continue;
+          if (borderFrictionSys.isAtWar(f, other) || warWatchdogSys.isWarActive(f, other)) {
+            isWar = true;
+            warEnemy = other;
+            if (!activeWarFound) {
+              activeWarFound = {
+                facA: Math.min(f, other),
+                facB: Math.max(f, other),
+                duration: warWatchdogSys.getWarDuration(f, other)
+              };
+            }
+            break;
+          }
+        }
+
+        const statusBadge = isWar 
+          ? `<span class="tag-war">⚔️ 战火 (vs #${warEnemy})</span>` 
+          : `<span class="tag-peace">🕊️ 和平</span>`;
+
+        factionListHtml += `
+          <div class="faction-row">
+            <div class="faction-header">
+              <div class="faction-title">
+                <span class="faction-color-dot" style="background: ${borderCol};"></span>
+                <span class="faction-name">#${f} ${rConf.name}</span>
+              </div>
+              ${statusBadge}
+            </div>
+            <div style="font-size: 0.65rem; color: #94a3b8; display: flex; justify-content: space-between; margin-top: 2px;">
+              <span>领地: ${terrCount} 瓦片</span>
+              <span>政治张力: ${tension|0}%</span>
+            </div>
+            <div class="tension-bar-container">
+              <div class="tension-bar-fill" style="width: ${Math.min(100, Math.max(0, tension))}%;"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      const facListElem = document.getElementById('factionList');
+      if (facListElem) facListElem.innerHTML = factionListHtml;
+      const actFacElem = document.getElementById('activeFactionsBadge');
+      if (actFacElem) actFacElem.textContent = `${activeFactionCount} 活跃政权`;
+
+      const warBanner = document.getElementById('warStalemateBanner');
+      if (warBanner) {
+        if (activeWarFound) {
+          warBanner.style.display = 'block';
+          const dur = activeWarFound.duration;
+          const rem = Math.max(0, 300.0 - dur).toFixed(1);
+          const facAName = InitialFactions[activeWarFound.facA - 1]?.name || `#${activeWarFound.facA}`;
+          const facBName = InitialFactions[activeWarFound.facB - 1]?.name || `#${activeWarFound.facB}`;
+          const alertElem = document.getElementById('warAlertText');
+          const timerElem = document.getElementById('warWatchdogTimer');
+          if (alertElem) alertElem.textContent = `⚔️ ${facAName} vs ${facBName} 决战交火中`;
+          if (timerElem) timerElem.textContent = `300s 看门狗: ${rem}s`;
+        } else {
+          warBanner.style.display = 'none';
+        }
+      }
+
       // 更新实体全息检视器
       if (selectedEntityId > 0 && ecs.isAlive(selectedEntityId)) {
         const eid = selectedEntityId;
@@ -1376,6 +1879,14 @@
         const isCasting = hasStatus(flags, eid, IS_CASTING);
         const isDisarmed = hasStatus(flags, eid, IS_DISARMED);
 
+        // M3 士气与远征后勤疲劳
+        const mState = moraleSys.getMoraleState(eid);
+        const mVal = ecs.morale[eid * MORALE_STRIDE + MORALE_OFFSET_VAL].toFixed(1);
+        const mStateNames = ['稳固 (SOLID)', '动摇 (WAVERING)', '惊恐后撤 (DISORGANIZED)', '溃不成军 (ROUTED)'];
+        const mStateColors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
+        const isLastStand = hasStatus(flags, eid, IS_LAST_STAND);
+        const fatigue = totemDefenseSys.getExpeditionFatigue(eid);
+
         // 遗传
         const mat = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_MATERNAL];
         const pat = genetics[eid * GENETICS_STRIDE + GEN_OFFSET_PATERNAL];
@@ -1392,8 +1903,9 @@
         inspectorBox.innerHTML = `
           <strong>[实体 #${eid}]</strong> ${isL ? '👑 ' : ''}${race.name} (阵营 #${facId})<br>
           <div style="margin-top: 4px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
-            <strong>阶级身份:</strong> <span style="color: #ffd700;">${casteNames[cType]}</span> | 劳作: ${expL} | 战功: ${expC} | 防抖锁: ${cCd}s<br>
+            <strong>社会阶级:</strong> <span style="color: #ffd700;">${casteNames[cType]}</span> | 劳作: ${expL} | 战功: ${expC} | 防抖锁: ${cCd}s<br>
             <strong>种族特技:</strong> 【${skConfig ? skConfig.active.displayName : '无'}】 | ICD: ${skCd}s | 持续: ${skDur}s ${isCasting ? '⏳施法中' : ''} ${isDisarmed ? '🗡️缴械中' : ''}<br>
+            <strong>心智士气:</strong> <span style="color: ${mStateColors[mState] || '#fff'}; font-weight: bold;">${mStateNames[mState] || '稳固'}</span> (${mVal}/100) ${isLastStand ? '🔥破釜沉舟死战' : ''} | 远征疲劳: ${fatigue.layers} 层 (移速 ${(fatigue.speedMod * 100).toFixed(0)}%, 伤害 ${(fatigue.damageMod * 100).toFixed(0)}%)<br>
             <strong>孟德尔基因 (F${gen}):</strong> 母系[${matNames}] / 父系[${patNames}]<br>
             <strong>表达表型:</strong> <span style="color: #38bdf8;">${phenoNames}</span><br>
             <strong>聚合物理:</strong> 质量: ${mass}kg | 护甲: ${armor} | 生命: ${curHp}/${maxHp} | 饥饿: ${hg}/100
@@ -1403,14 +1915,110 @@
     }
 
     // ==========================================
-    // 交互操作逻辑 (直接驱动真实 M2 系统)
+    // 交互操作逻辑 (直接驱动真实 M2/M3 系统，LL-003)
     // ==========================================
-    // 1. 生成 100 只小人
+    // M3 专属: 1. 一键边境偷粮摩擦 (+10)
+    const btnBorderFriction = document.getElementById('btnBorderFriction');
+    if (btnBorderFriction) {
+      btnBorderFriction.addEventListener('click', () => {
+        borderFrictionSys.recordFriction(1, 2, 10.0);
+        const f = borderFrictionSys.getFriction(1, 2);
+        const stage = borderFrictionSys.getStage(1, 2);
+        const stageNames = ['中立相安', '私怨打砸', '边境械斗', '全面战争'];
+        addLog(`⚔️ 边境突发越界偷粮摩擦！阵营 #1 与 阵营 #2 摩擦张力增至 ${f.toFixed(1)}/100 (阶段: ${stageNames[stage]})`, 'amber');
+      });
+    }
+
+    // M3 专属: 2. 一键引爆图腾大裂变 (Voronoi)
+    const btnSchism = document.getElementById('btnSchism');
+    if (btnSchism) {
+      btnSchism.addEventListener('click', () => {
+        let bestFac = 1;
+        let maxTerr = 0;
+        for (let i = 1; i <= 12; i++) {
+          const cnt = schismSys.countTerritory(i);
+          if (cnt > maxTerr) {
+            maxTerr = cnt;
+            bestFac = i;
+          }
+        }
+        clanCensusSys.setTension(bestFac, 100.0);
+        const success = schismSys.attemptSchism(bestFac);
+        if (success) {
+          renderer.invalidateTerrain();
+          addLog(`💥 【图腾大裂变】母国 #${bestFac} 内部政治张力爆表！Voronoi 双核切分成功并消除孤岛飞地！`, 'danger');
+        } else {
+          addLog(`⚠️ 母国 #${bestFac} 裂变未触发（可能已达 16 国上限或触发防碎片守门拦截）`, 'warn');
+        }
+      });
+    }
+
+    // M3 专属: 3. 一键世袭驾崩大转盘 (五大继承)
+    const btnDynastySuccession = document.getElementById('btnDynastySuccession');
+    if (btnDynastySuccession) {
+      btnDynastySuccession.addEventListener('click', () => {
+        const facId = 1;
+        const currentRuler = dynastySys.getLeader(facId);
+        const deadKing = currentRuler > 0 ? currentRuler : NULL_ENTITY;
+        const newKing = dynastySys.triggerSuccession(facId, deadKing, 0);
+        addLog(`👑 阵营 #${facId} 旧王驾崩！世袭五大驾崩大转盘启动，新王加冕为实体 #${newKing}！`, 'purple');
+      });
+    }
+
+    // M3 专属: 4. 一键图腾 25% 圣盾波 (震退敌军)
+    const btnTotemAegis = document.getElementById('btnTotemAegis');
+    if (btnTotemAegis) {
+      btnTotemAegis.addEventListener('click', () => {
+        const facId = 1;
+        totemDefenseSys.resetTotemTrigger(facId);
+        totemDefenseSys.triggerTotemAegis(facId);
+        const totemId = totemDefenseSys.totemEntityIds[facId];
+        if (totemId > 0 && ecs.isAlive(totemId)) {
+          const tx = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_X];
+          const ty = ecs.transforms[totemId * TRANSFORM_STRIDE + TF_OFFSET_Y];
+          renderer.addShockwave(tx, ty, 144.0, 220.0);
+        }
+        addLog(`🛡️ 阵营 #${facId} 图腾圣火涅槃冲击波激活！震退 6 瓦片敌军，施加 2.5s 眩晕并赋予 12s 金身圣盾！`, 'green');
+      });
+    }
+
+    // M3 专属: 5. 阵营决裂宣战 (启动看门狗)
+    const btnTriggerWar = document.getElementById('btnTriggerWar');
+    if (btnTriggerWar) {
+      btnTriggerWar.addEventListener('click', () => {
+        borderFrictionSys.declareWar(1, 2);
+        warWatchdogSys.startWar(1, 2);
+        addLog(`🚩 阵营 #1 对 阵营 #2 正式宣战！300s 战争交火防伪看门狗启动！`, 'danger');
+      });
+    }
+
+    // M3 专属: 6. 切换大军团流场可视化 [F]
+    const btnToggleFlow = document.getElementById('btnToggleFlow');
+    if (btnToggleFlow) {
+      btnToggleFlow.addEventListener('click', () => {
+        renderer.showFlowField = !renderer.showFlowField;
+        const chip = document.getElementById('toggleFlowField');
+        if (chip) chip.classList.toggle('active', renderer.showFlowField);
+        addLog(`🌊 大军团反向 BFS 流场向量网格可视化: ${renderer.showFlowField ? '开启' : '关闭'}`, 'info');
+      });
+    }
+
+    // 快捷键 [F] 监听
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'f' || e.key === 'F') {
+        renderer.showFlowField = !renderer.showFlowField;
+        const chip = document.getElementById('toggleFlowField');
+        if (chip) chip.classList.toggle('active', renderer.showFlowField);
+        addLog(`🌊 [快捷键 F] 大军团流场可视化: ${renderer.showFlowField ? '开启' : '关闭'}`, 'info');
+      }
+    });
+
+    // M2: 7. 生成 100 只小人
     document.getElementById('btnSpawn100').addEventListener('click', () => {
       spawnBatch(100);
     });
 
-    // 2. 全员释放种族特技
+    // M2: 8. 全员释放种族特技
     document.getElementById('btnCastAllSkills').addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
@@ -1420,7 +2028,6 @@
         const eid = dense[i];
         if (!ecs.isAlive(eid)) continue;
         const raceKey = raceSkillSys.getEntityRaceKey(eid);
-        // 尝试释放技能
         if (raceSkillSys.triggerSkill(eid, raceKey)) {
           triggered++;
         }
@@ -1428,7 +2035,7 @@
       addLog(`⚡ 全军号令激活！共激发 ${triggered} 名战士的种族特技！`, 'purple');
     });
 
-    // 3. 诱发环境辐射突变 (通过 TabooFilter 禁忌过滤与重映射)
+    // M2: 9. 诱发环境辐射突变 (通过 TabooFilter 禁忌过滤与重映射)
     document.getElementById('btnRadiateMutation').addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
@@ -1441,7 +2048,6 @@
           const raceKey = raceSkillSys.getEntityRaceKey(eid);
           const rawMask = (1 << prng.nextInt(0, 8));
           const filtered = filterAndRemapOrgans(raceKey, rawMask);
-          // 注入母系或父系
           const genOff = eid * GENETICS_STRIDE;
           geneticsSys.genetics[genOff + GEN_OFFSET_MATERNAL] |= filtered.remappedMask;
           updatePhenotype(geneticsSys.genetics, eid);
@@ -1452,7 +2058,7 @@
       addLog(`🧬 沃土神辐射洗礼！共促发 ${mutated} 名单位产生合法表型突变！`, 'green');
     });
 
-    // 4. 战备动员与劳作晋升 (向平民注入劳作经验/战备经验)
+    // M2: 10. 战备动员与劳作晋升 (向平民注入劳作经验/战备经验)
     document.getElementById('btnPromoteCastes').addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
@@ -1464,9 +2070,9 @@
         const cType = casteSys.getCaste(eid);
         if (cType === CasteType.CIVILIAN) {
           if (prng.nextFloat(0, 1) < 0.5) {
-            casteSys.recordLabor(eid, 6.0); // 达到工匠门槛
+            casteSys.recordLabor(eid, 6.0);
           } else {
-            casteSys.recordCombat(eid, 60.0, true); // 达到士兵门槛
+            casteSys.recordCombat(eid, 60.0, true);
           }
           expInjected++;
         }
@@ -1474,7 +2080,7 @@
       addLog(`🎖️ 战备号召与工匠大竞赛！注入履历促进 ${expInjected} 名平民跃迁！`, 'amber');
     });
 
-    // 5. 斩首领袖仲裁继承
+    // M2: 11. 斩首领袖仲裁继承
     document.getElementById('btnRegicide').addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
@@ -1484,7 +2090,6 @@
         const eid = dense[i];
         if (ecs.isAlive(eid) && hasStatus(ecs.statusFlags, eid, IS_LEADER)) {
           casteSys.onLeaderDied(eid);
-          // 处死实体
           ecs.destroyEntity(eid);
           killed++;
         }
@@ -1496,7 +2101,7 @@
       }
     });
 
-    // 6. 一键引发饥荒
+    // M2: 12. 一键引发饥荒
     document.getElementById('btnTriggerFamine').addEventListener('click', () => {
       const activeCount = ecs.getActiveCount();
       const dense = ecs.getActiveEntities();
@@ -1517,12 +2122,12 @@
       addLog(`🚨 全图神罚大饥荒爆发！饥饿升至 95，农田全毁，触发 10s 互斥锁！`, 'danger');
     });
 
-    // 7. 种植 8 片农田
+    // M2: 13. 种植 8 片农田
     document.getElementById('btnSpawnFarms').addEventListener('click', () => {
       initStarterFarms();
     });
 
-    // 8. 重置生态
+    // 14. 彻底重置生态与地缘格局
     document.getElementById('btnResetAll').addEventListener('click', () => {
       ecs.reset();
       nutrientField.reset(20.0);
@@ -1532,20 +2137,42 @@
       casteSys.castes.fill(0);
       geneticsSys.genetics.fill(0);
       raceSkillSys.skills.fill(0);
+
+      // 重置 M3 状态
+      tileGrid.territoryFaction.fill(0);
+      moraleSys.moraleStates.fill(0);
+      borderFrictionSys.frictionMatrix.fill(0);
+      borderFrictionSys.warStates.fill(0);
+      borderFrictionSys.peaceLocks.fill(0);
+      totemDefenseSys.totemTriggeredFlags.fill(0);
+      totemDefenseSys.aegisDuration.fill(0);
+      warWatchdogSys.warActive.fill(0);
+      warWatchdogSys.warDuration.fill(0);
+      warWatchdogSys.stalemateTimer.fill(0);
+      factionBuffer.fill(0);
+      dynastySys.successionTimers.fill(0);
+      dynastySys.factionLeaderIds.fill(0);
+
+      initFactionsAndTerritories();
       initStarterFarms();
       spawnBatch(120);
       renderer.invalidateTerrain();
-      addLog(`生态系统彻底重置，重新孕育 120 只始祖部族！`, 'info');
+      addLog(`生态与地缘政治系统彻底重置，重新划分 12 始祖领地并孕育 120 只小人！`, 'info');
     });
 
-    // 9. 图层快捷切换
+    // 15. 图层快捷切换
     const bindToggle = (id, prop) => {
       const btn = document.getElementById(id);
+      if (!btn) return;
       btn.addEventListener('click', () => {
         renderer[prop] = !renderer[prop];
         btn.classList.toggle('active', renderer[prop]);
       });
     };
+    bindToggle('toggleTerritories', 'showTerritories');
+    bindToggle('toggleFlowField', 'showFlowField');
+    bindToggle('toggleMorale', 'showMorale');
+    bindToggle('toggleTotemShield', 'showTotemShield');
     bindToggle('toggleNutrients', 'showNutrients');
     bindToggle('toggleFarmlands', 'showFarmlands');
     bindToggle('toggleHealthBars', 'showHealthBars');
@@ -1555,7 +2182,7 @@
     bindToggle('toggleSkills', 'showSkills');
     bindToggle('toggleGrid', 'showGrid');
 
-    // 10. 倍速切换
+    // 16. 倍速切换
     const speedBtns = [
       { id: 'btnPause', val: 0 },
       { id: 'btn1x', val: 1 },
@@ -1565,15 +2192,19 @@
 
     speedBtns.forEach(item => {
       const btn = document.getElementById(item.id);
+      if (!btn) return;
       btn.addEventListener('click', () => {
         timeScale = item.val;
-        speedBtns.forEach(b => document.getElementById(b.id).classList.remove('active'));
+        speedBtns.forEach(b => {
+          const el = document.getElementById(b.id);
+          if (el) el.classList.remove('active');
+        });
         btn.classList.add('active');
         addLog(`时间流速调谐至: ${timeScale === 0 ? '暂停 ⏸' : timeScale + 'x'}`, 'info');
       });
     });
 
-    // 11. 画布点击选定实体全息检视
+    // 17. 画布点击选定实体全息检视
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -1611,8 +2242,9 @@
     });
 
     // ==========================================
-    // 启动 60 FPS 定步长 GameLoop
+    // 启动 60 FPS 定步长 GameLoop (原生驱动 M1+M2+M3)
     // ==========================================
+    initFactionsAndTerritories();
     initStarterFarms();
     spawnBatch(120);
 
@@ -1626,8 +2258,19 @@
       },
       (interpolation) => {
         const t0 = performance.now();
-        // 传入真实 M2 领域系统: tileGrid, ecs, farmlandSys, nutrientField, casteSys, geneticsSys, raceSkillSys
-        renderer.render(tileGrid, ecs, farmlandSys, nutrientField, casteSys, geneticsSys, raceSkillSys);
+        // 传入真实 M1/M2/M3 领域系统驱动原生渲染
+        renderer.render(
+          tileGrid,
+          ecs,
+          farmlandSys,
+          nutrientField,
+          casteSys,
+          geneticsSys,
+          raceSkillSys,
+          flowFieldSys,
+          moraleSys,
+          totemDefenseSys
+        );
         lastFrameDurationMs = performance.now() - t0;
 
         frameCount++;
@@ -1644,7 +2287,7 @@
     );
 
     gameLoop.start();
-    addLog(`60 FPS M2 端到端领域视窗已就绪，全量构件原生运转中！`, 'green');
+    addLog(`60 FPS M3 宏观战争与地缘政治端到端领域视窗已就绪，全量构件原生运转中！`, 'green');
   </script>
 </body>
 </html>
